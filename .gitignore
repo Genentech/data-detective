@@ -1,0 +1,17 @@
+.DS_Store
+*.npz
+*.json
+*.csv
+*.zip
+
+.idea/
+.ipynb_checkpoints/
+__pycache__/
+conf/
+data/
+kbutil/
+pyrankagg/
+
+main.py
+requirements_old.txt
+
