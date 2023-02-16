@@ -8,6 +8,7 @@ import torch.utils.data
 from torch.utils.data import DataLoader, Dataset
 
 from src.datasets.column_filtered_dataset import ColumnFilteredDataset
+from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
@@ -78,6 +79,7 @@ def validate_from_schema(config_dict: Dict, data_object: Dict) -> Dict:
         for key, dataset in data_object.items():
             #TODO: implement filtering correctly on the torch datasets.
             filtered_data_object[key] = filter_dataset(dataset, include_lst)
+            filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
 
         if 'transforms' in config_dict.keys():
             transforms_dict = config_dict['transforms']
@@ -88,8 +90,8 @@ def validate_from_schema(config_dict: Dict, data_object: Dict) -> Dict:
             filtered_transformed_data_object = filtered_data_object
 
         ## delete, for debugging
-        train = filtered_transformed_data_object['training_set']
-        x = train[:3]
+        # train = filtered_transformed_data_object['training_set']
+        # x = train[:3]
         ## delete, for debugging
 
 

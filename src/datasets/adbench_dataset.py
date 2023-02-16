@@ -36,5 +36,3 @@ class ADBenchDataset(Dataset):
             self.input_data_name: self.input_data_type,
             "label": self.output_data_type,
         }
-
-

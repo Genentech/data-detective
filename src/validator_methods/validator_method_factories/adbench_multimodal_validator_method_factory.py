@@ -6,10 +6,12 @@ from pyod.models.base import BaseDetector
 from pytypes import override
 from torch.utils.data import Dataset
 
+
+from constants import FloatTensor
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
 
-class ADBenchValidatorMethodFactory:
+class ADBenchMultimodalValidatorMethodFactory:
     models = {
         "cblof": cblof.CBLOF,
         "cof": cof.COF,
@@ -27,11 +29,11 @@ class ADBenchValidatorMethodFactory:
 
     @staticmethod
     def get_all_validator_methods():
-        return [ADBenchValidatorMethodFactory.get_validator_method(model_name) for model_name in ADBenchValidatorMethodFactory.models.keys()]
+        return [ADBenchMultimodalValidatorMethodFactory.get_validator_method(model_name) for model_name in ADBenchMultimodalValidatorMethodFactory.models.keys()]
 
     @staticmethod
     def get_validator_method(model_name: str):
-        model = ADBenchValidatorMethodFactory.models[model_name]
+        model = ADBenchMultimodalValidatorMethodFactory.models[model_name]
         class ADBenchAnomalyValidatorMethod(DataValidatorMethod):
             """
             A method for determining multidimensional anomalies. Operates on continuous datasets.
@@ -47,7 +49,7 @@ class ADBenchValidatorMethodFactory:
                 Returns the datatype the validators method operates on
                 @return: the datatype the validators method operates on
                 """
-                return {DataType.MULTIDIMENSIONAL}
+                return {DataType.MULTIDIMENSIONAL, DataType.CONTINUOUS, DataType.CATEGORICAL}
 
             @staticmethod
             def param_keys() -> Set[ValidatorMethodParameter]:
@@ -68,22 +70,20 @@ class ADBenchValidatorMethodFactory:
                 """
                 entire_dataset: Dataset = data_object["entire_set"]
 
-                matrix_dict = {
-                    column: [] for column in entire_dataset.datatypes().keys()
-                }
+                matrix = []
 
                 for idx in range(entire_dataset.__len__()):
                     sample = entire_dataset[idx]
-                    for column, column_data in sample.items():
-                        matrix_dict[column].append(column_data)
+                    matrix.append(
+                        np.concatenate([k.flatten() for k in sample.values()])
+                    )
 
-                for column in entire_dataset.datatypes().keys():
-                    matrix_dict[column] = np.vstack(matrix_dict[column])
+                matrix = np.array(matrix)
 
                 kwargs_dict = {
-                    f"{column}_results": {
-                        "data_matrix": column_data,
-                    } for column, column_data in matrix_dict.items()
+                    f"results": {
+                        "data_matrix": matrix,
+                    }
                 }
 
                 return kwargs_dict
