@@ -37,7 +37,7 @@ class FCITValidatorMethod(DataValidatorMethod):
         Gets the arguments for each run of the validator_method, and what to store the results under. given data_object
         with include_filtering and the validator kwargs, as given precisely in the schema.
 
-        @param data_object: the data object after `include` filtering
+        @param data_object: the datasets object after `include` filtering
         @param validator_kwargs:
         @return:
         """

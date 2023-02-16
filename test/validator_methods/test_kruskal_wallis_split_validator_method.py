@@ -5,7 +5,7 @@ import torch
 
 import src.utils
 
-from src.data.synthetic_data_generators import SyntheticNormalDataset
+from src.datasets.synthetic_data_generators import SyntheticNormalDataset
 
 
 class TestKruskalWallisSplitValidatorMethod:

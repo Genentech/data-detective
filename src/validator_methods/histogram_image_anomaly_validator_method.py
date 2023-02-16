@@ -63,7 +63,7 @@ class HistogramImageAnomalyValidatorMethod(DataValidatorMethod):
         """
         Gets the arguments for each run of the validator_method, and what to store the results under.
 
-        @param data_object: the data object containing the datasets (train, test, entire, etc.)
+        @param data_object: the datasets object containing the datasets (train, test, entire, etc.)
         @param validator_kwargs: the kwargs from the validation schema.
         @return: a dict mapping from the key the result from calling .validate() on the kwargs values.
         """
@@ -202,7 +202,7 @@ class HistogramImageAnomalyValidatorMethod(DataValidatorMethod):
 #         generator = torch.Generator(device=DEVICE)
 #         generator.manual_seed(SEED)
 #
-#         train_loader_1 = iter(DataLoader(train, batch_size=1, shuffle=False, num_workers=0, worker_init_fn=seed_worker, sampler=torch.utils.data.RandomSampler(train,generator=generator)))
+#         train_loader_1 = iter(DataLoader(train, batch_size=1, shuffle=False, num_workers=0, worker_init_fn=seed_worker, sampler=torch.utils.datasets.RandomSampler(train,generator=generator)))
 #
 #         random.seed(SEED)
 #         np.random.seed(SEED)
@@ -214,7 +214,7 @@ class HistogramImageAnomalyValidatorMethod(DataValidatorMethod):
 #         generator = torch.Generator(device=DEVICE)
 #         generator.manual_seed(SEED)
 #
-#         train_loader_2 = iter(DataLoader(train, batch_size=1, shuffle=False, num_workers=0, worker_init_fn=seed_worker, sampler=torch.utils.data.RandomSampler(train,generator=generator)))
+#         train_loader_2 = iter(DataLoader(train, batch_size=1, shuffle=False, num_workers=0, worker_init_fn=seed_worker, sampler=torch.utils.datasets.RandomSampler(train,generator=generator)))
 #     """
 #
 #     weights = np.array([sampling_factor[class_number] for class_number in sorted(list(class_counts.keys()))])

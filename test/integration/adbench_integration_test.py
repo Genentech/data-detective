@@ -7,8 +7,8 @@ import sklearn.metrics
 import torch
 from torchvision.transforms import transforms
 
-import src.data.synthetic_data_generators
-from src.data.adbench_dataset import ADBenchDataset
+import src.datasets.synthetic_data_generators
+from src.datasets.adbench_dataset import ADBenchDataset
 from src.enums.enums import DataType
 from src.utils import validate_from_schema
 
@@ -40,7 +40,7 @@ class TestADBenchIntegration:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper data augmentation strategy
+            # TODO: add proper datasets augmentation strategy
             adbench_dataset: ADBenchDataset = ADBenchDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
@@ -121,7 +121,7 @@ class TestADBenchIntegration:
                 print(validator_method, roc_auc_score)
 
                 results_for_table.append({
-                    "validator": "unsupervised anomaly data validator",
+                    "validator": "unsupervised anomaly datasets validator",
                     "validator_method": validator_method,
                     "dataset": npz_filename.split(".")[0].split("_")[1],
                     "metric_value": roc_auc_score,
@@ -153,7 +153,7 @@ class TestADBenchIntegration:
                 print(validator_method, roc_auc_score)
 
                 results_for_table.append({
-                    "validator": "ood inference data validator",
+                    "validator": "ood inference datasets validator",
                     "validator_method": validator_method,
                     "dataset": npz_filename.split(".")[0].split("_")[1],
                     "metric_value": roc_auc_score,
@@ -185,7 +185,7 @@ class TestADBenchIntegration:
                     has_significant_result = has_significant_result or has_significant_result_dict['has_significant_result']
 
                 results_for_table.append({
-                    "validator": "split distribution shift data validator",
+                    "validator": "split distribution shift datasets validator",
                     "validator_method": validator_method,
                     "dataset": npz_filename.split(".")[0].split("_")[1],
                     "metric_value": min_pvalue,
@@ -193,7 +193,7 @@ class TestADBenchIntegration:
                 })
 
                 results_for_table.append({
-                    "validator": "split distribution shift data validator",
+                    "validator": "split distribution shift datasets validator",
                     "validator_method": validator_method,
                     "dataset": npz_filename.split(".")[0].split("_")[1],
                     "metric_value": has_significant_result,

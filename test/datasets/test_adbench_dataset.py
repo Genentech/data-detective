@@ -1,6 +1,6 @@
 import pytest
 
-import src.data.synthetic_data_generators as synthetic_data_generators
+import src.datasets.synthetic_data_generators as synthetic_data_generators
 
 import torchvision.transforms as transforms
 
@@ -11,7 +11,7 @@ from src.enums.enums import DataType
 def adbench_speech():
     ADBenchDataset = synthetic_data_generators.ADBenchDataset
 
-    # TODO: add proper data augmentation strategy
+    # TODO: add proper datasets augmentation strategy
     adbench_speech: ADBenchDataset = ADBenchDataset(
         npz_filename="36_speech.npz",
         input_data_type=DataType.TIME_SERIES,

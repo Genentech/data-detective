@@ -5,7 +5,7 @@ import torch
 
 import src.utils
 
-from src.data.synthetic_data_generators import SyntheticNormalDataset
+from src.datasets.synthetic_data_generators import SyntheticNormalDataset
 
 
 class TestChiSquareSplitValidatorMethod:
@@ -27,10 +27,10 @@ class TestChiSquareSplitValidatorMethod:
         # train_size: int = int(0.6 * len(normal_dataset))
         # val_size: int = int(0.2 * len(normal_dataset))
         # test_size: int = len(normal_dataset) - train_size - val_size
-        # train_dataset, val_dataset, test_dataset=torch.utils.data.random_split( normal_dataset, [train_size, val_size, test_size])
+        # train_dataset, val_dataset, test_dataset=torch.utils.datasets.random_split( normal_dataset, [train_size, val_size, test_size])
         #
         # #TODO: lists for validation sets and test sets.
-        # data_object: Dict[str, torch.utils.data.Dataset] = {
+        # data_object: Dict[str, torch.utils.datasets.Dataset] = {
         #     "training_set": train_dataset,
         #     "validation_set": val_dataset,
         #     "test_set": test_dataset,
@@ -66,7 +66,7 @@ class TestChiSquareSplitValidatorMethod:
         # test_dataset: SyntheticNormalDataset = SyntheticNormalDataset(num_cols=1, dataset_size=10000, loc=1)
         #
         # #TODO: lists for validation sets and test sets.
-        # data_object: Dict[str, torch.utils.data.Dataset] = {
+        # data_object: Dict[str, torch.utils.datasets.Dataset] = {
         #     "training_set": train_dataset,
         #     "validation_set": val_dataset,
         #     "test_set": test_dataset,

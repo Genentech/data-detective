@@ -6,18 +6,18 @@ import torch
 from torchvision.transforms import transforms
 
 from constants import SEED
-from src.data import synthetic_data_generators
+from src.datasets import synthetic_data_generators
 from src.utils import validate_from_schema
-from src.data.synthetic_data_generators import SyntheticNormalDataset, MyFashionMNIST, SyntheticAnomalousDataset
+from src.datasets.synthetic_data_generators import SyntheticNormalDataset, MyFashionMNIST, SyntheticAnomalousDataset
 from src.validator_methods.hbos_validator_method import load_dataset_as_anomaly
 
 @pytest.fixture()
 def fashion_mnist():
     MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
 
-    # TODO: add proper data augmentation strategy
+    # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
-        root='./data/FashionMNIST',
+        root='./datasets/FashionMNIST',
         train=True,
         download=True,
         transform=transforms.Compose([
@@ -29,9 +29,9 @@ def fashion_mnist():
 def cifar_10():
     MyCIFAR10 = synthetic_data_generators.MyCIFAR10
 
-    # TODO: add proper data augmentation strategy
+    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
-        root='./data/CIFAR10',
+        root='./datasets/CIFAR10',
         train=True,
         download=True,
         transform=transforms.Compose([
@@ -45,9 +45,9 @@ def cifar_10():
 def synthetic_anomalous_dataset():
     MyCIFAR10 = synthetic_data_generators.MyCIFAR10
 
-    # TODO: add proper data augmentation strategy
+    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
-        root='./data/CIFAR10',
+        root='./datasets/CIFAR10',
         train=True,
         download=True,
         transform=transforms.Compose([

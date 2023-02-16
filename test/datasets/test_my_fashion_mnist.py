@@ -1,4 +1,4 @@
-import src.data.synthetic_data_generators as synthetic_data_generators
+import src.datasets.synthetic_data_generators as synthetic_data_generators
 
 import torchvision.transforms as transforms
 
@@ -10,9 +10,9 @@ class TestMyFashionMNIST:
     def test_error_free_construction(self):
         MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
 
-        #TODO: add proper data augmentation strategy
+        #TODO: add proper datasets augmentation strategy
         fashion_mnist: MyFashionMNIST = MyFashionMNIST(
-            root='./data/FashionMNIST',
+            root='./datasets/FashionMNIST',
             train=True,
             download=True,
             transform=transforms.Compose([
@@ -22,9 +22,9 @@ class TestMyFashionMNIST:
 
     def test_length(self):
         MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
-        # TODO: add proper data augmentation strategy
+        # TODO: add proper datasets augmentation strategy
         fashion_mnist: MyFashionMNIST = MyFashionMNIST(
-            root='./data/FashionMNIST',
+            root='./datasets/FashionMNIST',
             train=True,
             download=True,
             transform=transforms.Compose([
@@ -35,9 +35,9 @@ class TestMyFashionMNIST:
 
     def test_getitem(self):
         MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
-        # TODO: add proper data augmentation strategy
+        # TODO: add proper datasets augmentation strategy
         fashion_mnist: MyFashionMNIST = MyFashionMNIST(
-            root='./data/FashionMNIST',
+            root='./datasets/FashionMNIST',
             train=True,
             download=True,
             transform=transforms.Compose([
@@ -51,9 +51,9 @@ class TestMyFashionMNIST:
 
     def test_datatypes(self):
         MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
-        # TODO: add proper data augmentation strategy
+        # TODO: add proper datasets augmentation strategy
         fashion_mnist: MyFashionMNIST = MyFashionMNIST(
-            root='./data/FashionMNIST',
+            root='./datasets/FashionMNIST',
             train=True,
             download=True,
             transform=transforms.Compose([

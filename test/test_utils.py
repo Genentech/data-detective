@@ -4,9 +4,9 @@ import torch
 from torchvision.transforms import transforms
 
 from constants import SEED
-from src.data import synthetic_data_generators
+from src.datasets import synthetic_data_generators
 from src.utils import validate_from_schema
-from src.data.synthetic_data_generators import SyntheticNormalDataset
+from src.datasets.synthetic_data_generators import SyntheticNormalDataset
 
 
 class TestUtils:
@@ -46,7 +46,7 @@ class TestUtils:
     # def test_anomaly_loader_reproducibility(self):
     #     MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
     #     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
-    #         root='./data/FashionMNIST',
+    #         root='./datasets/FashionMNIST',
     #         train=True,
     #         download=True,
     #         transform=transforms.Compose([

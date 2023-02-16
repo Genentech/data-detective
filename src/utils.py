@@ -7,7 +7,7 @@ import torch
 import torch.utils.data
 from torch.utils.data import DataLoader, Dataset
 
-from src.data.column_filtered_dataset import ColumnFilteredDataset
+from src.datasets.column_filtered_dataset import ColumnFilteredDataset
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
@@ -33,7 +33,7 @@ def validate_from_schema(config_dict: Dict, data_object: Dict) -> Dict:
     Ok, here's a better example. imagine that you are trying to write a method that handles spurious correlations
     across features. Then it is more of a multi-feature input... 
 
-    Let's formalize this. You have an n x d data matrix of continuous data, where k < d features are needed to be looked 
+    Let's formalize this. You have an n x d datasets matrix of continuous datasets, where k < d features are needed to be looked 
     at, all at once, to find out whether some bias exists by looking at all k columns at once.
 
     An example of this could be CI testing, where we have X ⫫ Y | A, B, C; this requires us to be able to look at the 
@@ -42,13 +42,13 @@ def validate_from_schema(config_dict: Dict, data_object: Dict) -> Dict:
     A n x 2 example of this is spurious correlations with an extra attribute. How do you specify this in a
     generalizable, abstract way?
 
-    Let's start by looking at the data that we need to do something like CI testing:
-        - the data object
+    Let's start by looking at the datasets that we need to do something like CI testing:
+        - the datasets object
         - the two variable feature names that are CI 
         - the conditional feature names 
 
     Let's think about the spurious correlation case for variable redundancy, where there might be more generic-ness.
-        - the data object 
+        - the datasets object 
         - a SET of features that you might need to compare against
         - in this case, it's really not all that obvious that you need a different approach!
 
@@ -292,7 +292,7 @@ def parse_transforms(transform_dict: Dict[str, Any], data_object):
 
     for data_type, transform_specification_list in transform_dict.items():
          if data_type not in DataType._value2member_map_:
-             raise Exception(f"data type {data_type} from transform dict does not exist in DataType enumeration.")
+             raise Exception(f"datasets type {data_type} from transform dict does not exist in DataType enumeration.")
 
          relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value]
 

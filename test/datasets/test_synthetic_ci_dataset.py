@@ -1,5 +1,5 @@
-from src.data import synthetic_data_generators
-from src.data.synthetic_data_generators import SyntheticCIDataset
+from src.datasets import synthetic_data_generators
+from src.datasets.synthetic_data_generators import SyntheticCIDataset
 
 
 class TestSyntheticCIDataset:

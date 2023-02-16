@@ -1,6 +1,6 @@
 import pytest
 
-import src.data.synthetic_data_generators as synthetic_data_generators
+import src.datasets.synthetic_data_generators as synthetic_data_generators
 
 import torchvision.transforms as transforms
 
@@ -11,9 +11,9 @@ from src.enums.enums import DataType
 def cifar_10():
     MyCIFAR10 = synthetic_data_generators.MyCIFAR10
 
-    # TODO: add proper data augmentation strategy
+    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
-        root='./data/CIFAR10',
+        root='./datasets/CIFAR10',
         train=True,
         download=True,
         transform=transforms.Compose([

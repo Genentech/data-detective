@@ -78,7 +78,7 @@ class KolmogorovSmirnovMultidimensionalSplitValidatorMethod(DataValidatorMethod)
             columns_0 = sorted(list(dataset_0.datatypes().keys()))
             columns_1 = sorted(list(dataset_1.datatypes().keys()))
             if columns_0 != columns_1:
-                raise Exception("Columns in data splits are not the same")
+                raise Exception("Columns in datasets splits are not the same")
             else:
                 columns = columns_0
 

@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from src.aggregation.rankings import RankingAggregator, RankingAggregationMethod
-from src.data.adbench_dataset import ADBenchDataset
+from src.datasets.adbench_dataset import ADBenchDataset
 from src.enums.enums import DataType
 from src.utils import validate_from_schema
 
@@ -36,7 +36,7 @@ class TestADBenchIntegration:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper data augmentation strategy
+            # TODO: add proper datasets augmentation strategy
             adbench_dataset: ADBenchDataset = ADBenchDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,

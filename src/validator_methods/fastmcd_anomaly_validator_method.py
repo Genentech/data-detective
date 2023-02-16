@@ -23,7 +23,7 @@ to turn it back into a method for tabular outlier detection.
 
 class FastMCDAnomalyValidatorMethod(DataValidatorMethod):
     """
-    A method for determining multidimensional anomalies. Operates on continuous data.
+    A method for determining multidimensional anomalies. Operates on continuous datasets.
     Explained further (and implementation inspired from) https://towardsdatascience.com/anomaly-detection-in-python-part-2-multivariate-unsupervised-methods-and-code-b311a63f298b
 
 
@@ -53,7 +53,7 @@ class FastMCDAnomalyValidatorMethod(DataValidatorMethod):
         """
         Gets the arguments for each run of the validator_method, and what to store the results under.
 
-        @param data_object: the data object containing the datasets (train, test, entire, etc.)
+        @param data_object: the datasets object containing the datasets (train, test, entire, etc.)
         @param validator_kwargs: the kwargs from the validation schema.
         @return: a dict mapping from the key the result from calling .validate() on the kwargs values.
         """

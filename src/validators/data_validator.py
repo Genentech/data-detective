@@ -4,8 +4,8 @@ from typing import Type, Dict, Set
 from torch.utils.data import Dataset
 
 import src.validator_methods.data_validator_method as data_validator_method
-import src.data.synthetic_data_generators as synthetic_data_generators
-from src.data.column_filtered_dataset import ColumnFilteredDataset
+import src.datasets.synthetic_data_generators as synthetic_data_generators
+from src.datasets.column_filtered_dataset import ColumnFilteredDataset
 from src.enums.enums import DataType
 
 
@@ -14,7 +14,7 @@ class DataValidator:
     A dataset has many features/columns, and each column has many ValidatorMethods that apply to it, depending on the
     datatype. A validators's job includes:
         - running validators methods on the correct datatypes in a dataset (for example, running an outlier detector
-        on both categorical and continuous data)
+        on both categorical and continuous datasets)
         - setting up the parameters correctly for each validator_method
         - applying the validator_methods individually on all of the specified columns.
 
@@ -39,7 +39,7 @@ class DataValidator:
     def _method_applies(data_object, validator_method):
         """
         Returns True iff there is some overlap between the validator method's datatypes
-        and the data object's datatypes.
+        and the datasets object's datatypes.
 
         @param method_specific_data_object:
         @return:
@@ -68,7 +68,7 @@ class DataValidator:
         """
         Ok, so what can we expect out of default behavior?
             - the method operates on a single column/feature at a time. 
-            - the method operates on just the data objects specified
+            - the method operates on just the datasets objects specified
         If this is no longer true, then we just have to subclass this and reapply some of the logic.
         """
         results = {}
@@ -82,9 +82,9 @@ class DataValidator:
             # look at the datatypes on the validators method, and apply
             method_results = {}
 
-            # for every data object:
+            # for every datasets object:
                 # add an .item from data_object key to filtered dataset (by datatype matching method/dataset)
-                # if the data object is included in the method's param_keys
+                # if the datasets object is included in the method's param_keys
             method_specific_data_object = {
                 key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
                     for key, dataset in data_object.items()

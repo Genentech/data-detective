@@ -5,7 +5,7 @@ import torch
 from torchvision.transforms import transforms
 
 from src.utils import validate_from_schema
-from src.data.synthetic_data_generators import SyntheticNormalDataset, MyFashionMNIST
+from src.datasets.synthetic_data_generators import SyntheticNormalDataset, MyFashionMNIST
 
 
 class TestIsolationForestAnomalyValidatorMethod:

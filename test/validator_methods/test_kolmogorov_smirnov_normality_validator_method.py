@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from src.utils import validate_from_schema
-from src.data.synthetic_data_generators import SyntheticNormalDataset
+from src.datasets.synthetic_data_generators import SyntheticNormalDataset
 
 
 class TestKolmogorovSmirnovNormalityValidatorMethod:

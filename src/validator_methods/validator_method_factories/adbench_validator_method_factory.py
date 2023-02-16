@@ -34,7 +34,7 @@ class ADBenchValidatorMethodFactory:
         model = ADBenchValidatorMethodFactory.models[model_name]
         class ADBenchAnomalyValidatorMethod(DataValidatorMethod):
             """
-            A method for determining multidimensional anomalies. Operates on continuous data.
+            A method for determining multidimensional anomalies. Operates on continuous datasets.
             """
             @override
             def name(self) -> str:
@@ -52,7 +52,7 @@ class ADBenchValidatorMethodFactory:
             @staticmethod
             def param_keys() -> Set[ValidatorMethodParameter]:
                 """
-                Useful for documentation purposes. Lists the parameters in the data object that the validators operates on.
+                Useful for documentation purposes. Lists the parameters in the datasets object that the validators operates on.
                 @return: a list of parameters for the .validate() method.
                 """
                 return {ValidatorMethodParameter.ENTIRE_SET}
@@ -62,7 +62,7 @@ class ADBenchValidatorMethodFactory:
                 """
                 Gets the arguments for each run of the validator_method, and what to store the results under.
 
-                @param data_object: the data object containing the datasets (train, test, entire, etc.)
+                @param data_object: the datasets object containing the datasets (train, test, entire, etc.)
                 @param validator_kwargs: the kwargs from the validation schema.
                 @return: a dict mapping from the key the result from calling .validate() on the kwargs values.
                 """
@@ -95,7 +95,7 @@ class ADBenchValidatorMethodFactory:
                 """
                 Runs anomaly detection.
 
-                @param data_matrix: an n x d matrix with the data needed for the model.
+                @param data_matrix: an n x d matrix with the datasets needed for the model.
                 @return:
                 """
                 model_instance = model()
