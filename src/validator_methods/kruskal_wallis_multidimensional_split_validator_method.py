@@ -83,8 +83,20 @@ class KruskalWallisMultidimensionalSplitValidatorMethod(DataValidatorMethod):
                 columns = columns_0
 
             for column_name in columns:
-                matrix_0 = dataset_0[:][column_name]
-                matrix_1 = dataset_1[:][column_name]
+                def get_matrix(column_key, dataset):
+                    matrix_lst = []
+
+                    for idx in range(dataset.__len__()):
+                        sample = dataset[idx]
+                        column_data = sample[column_key]
+                        matrix_lst.append(column_data)
+
+                    matrix_lst = np.vstack(matrix_lst)
+
+                    return matrix_lst
+
+                matrix_0 = get_matrix(column_name, dataset_0)
+                matrix_1 = get_matrix(column_name, dataset_1)
 
                 kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
                     "matrix_0" : matrix_0,

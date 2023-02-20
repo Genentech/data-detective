@@ -55,6 +55,7 @@ class CBLOFOODInferenceValidatorMethod(DataValidatorMethod):
         """
         return { ValidatorMethodParameter.EVERYTHING_BUT_INFERENCE_SET, ValidatorMethodParameter.INFERENCE_SET }
 
+
     @staticmethod
     def get_method_kwargs(data_object: typing.Dict[str, Dataset], validator_kwargs: Dict = None) -> Dict:
         """
@@ -69,8 +70,20 @@ class CBLOFOODInferenceValidatorMethod(DataValidatorMethod):
 
         # todo: figure out matrix representation for both datasets formats.
         # matrix_representation = np.array([list(d.values()) for d in entire_dataset[:].values()]).T,
-        matrix_representation = list(everything_but_inference_dataset[:].values())[0]
-        matrix_representation_inference = list(inference_dataset[:].values())[0]
+
+        def get_matrix_rep(dataset):
+            matrix = []
+
+            for idx in range(dataset.__len__()):
+                sample = dataset[idx]
+                matrix.append(
+                    np.concatenate([k.flatten() for k in sample.values()])
+                )
+
+            return np.array(matrix)
+
+        matrix_representation = get_matrix_rep(everything_but_inference_dataset)
+        matrix_representation_inference = get_matrix_rep(inference_dataset)
 
         kwargs_dict = {
             "results": {

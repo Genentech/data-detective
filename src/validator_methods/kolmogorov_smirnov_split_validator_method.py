@@ -63,11 +63,24 @@ class KolmogorovSmirnovSplitValidatorMethod(DataValidatorMethod):
 
         # columns = list(test_dataset.datatypes().keys())
 
+        def get_series(column_key, dataset):
+            matrix_dict = {
+                column: [] for column in dataset.datatypes().keys()
+            }
+
+            for idx in range(dataset.__len__()):
+                sample = dataset[idx]
+                for column, column_data in sample.items():
+                    matrix_dict[column].append(column_data)
+
+            for column in dataset.datatypes().keys():
+                matrix_dict[column] = np.vstack(matrix_dict[column])
+
+            return matrix_dict[column_key].flatten()
+
         for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
             dataset_0 = data_object[dataset_0_key]
             dataset_1 = data_object[dataset_1_key]
-
-            dataset_combination_str = f"{dataset_0_key}/{dataset_1_key}"
 
             columns_0 = sorted(list(dataset_0.datatypes().keys()))
             columns_1 = sorted(list(dataset_1.datatypes().keys()))
@@ -77,9 +90,11 @@ class KolmogorovSmirnovSplitValidatorMethod(DataValidatorMethod):
                 columns = columns_0
 
             for column_name in columns:
-                series_0 = np.array(list(dataset_0[:][column_name].values()))
-                series_1 = np.array(list(dataset_1[:][column_name].values()))
+                series_0 = get_series(column_name, dataset_0)
+                series_1 = get_series(column_name, dataset_1)
 
+                # series_0 = np.array(list(dataset_0[:][column_name].values()))
+                # series_1 = np.array(list(dataset_1[:][column_name].values()))
                 kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
                     "series_0" : series_0,
                     "series_1" : series_1,
