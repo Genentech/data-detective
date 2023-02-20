@@ -64,8 +64,6 @@ class PCAAnomalyValidatorMethod(DataValidatorMethod):
         """
         entire_dataset: Dataset = data_object["entire_set"]
 
-        # todo: figure out matrix representation for both datasets formats.
-        # matrix_representation = np.array([list(d.values()) for d in entire_dataset[:].values()]).T,
         matrix_dict = {
             column: [] for column in entire_dataset.datatypes().keys()
         }
@@ -91,21 +89,8 @@ class PCAAnomalyValidatorMethod(DataValidatorMethod):
         data_matrix: Type[np.array] = None, # n x d
     ) -> object:
         """
-        Runs an isolation forest to try and perform anomaly detection.
+        Runs anomaly detection.
 
-        Input dict:
-        {
-            "featr": {
-                0: 1.1412321,
-                ...
-                9999: -0.4123643
-            }
-        }
-
-        @param n_estimators:
-        @param max_samples:
-        @param contamination:
-        @param max_features:
         @return:
         """
         model = pyod.models.pca.PCA()

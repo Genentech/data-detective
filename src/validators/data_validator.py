@@ -28,8 +28,8 @@ class DataValidator:
     @staticmethod
     @abstractmethod
     def is_default() -> bool:
-        pass
         # raise NotImplementedError()
+        pass
 
     @classmethod
     def supported_datatypes(cls) -> Set[DataType]:
@@ -90,12 +90,6 @@ class DataValidator:
                     for key, dataset in data_object.items()
                     if key in {e.value for e in validator_method.param_keys()}
             }
-
-            ## delete, for debugging
-            # entire_set = method_specific_data_object['entire_set']
-            # x = entire_set[0]
-            # y = entire_set[:2]
-            ## delete, for debugging
 
             for result_key, method_kwargs in validator_method.get_method_kwargs(data_object = method_specific_data_object, validator_kwargs=validator_kwargs).items():
                 method_results[result_key] = validator_method.validate(**method_kwargs)

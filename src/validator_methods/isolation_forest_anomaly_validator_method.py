@@ -119,22 +119,9 @@ class IsolationForestAnomalyValidatorMethod(DataValidatorMethod):
         @param max_features:
         @return:
         """
-        # model: IsolationForest = ensemble.IsolationForest(n_estimators=n_estimators, max_samples=max_samples, contamination=contamination, max_features=max_features,
-        #                                  bootstrap=False, n_jobs=1, random_state=1, verbose=0, warm_start=False)
-        # model.fit(data_matrix)
-        #
-        # anomaly_score = model.decision_function(data_matrix)
-        # predictions = model.predict(data_matrix)
-        #
-        # return anomaly_score, predictions
-
-
-        # ^this is the old isolation forest code
-        # v this is the pyod code, we are just using it temporoarily for reproducibiliyt
         model = IForest()
         model.fit(data_matrix)
 
         anomaly_scores = model.decision_function(data_matrix)
-        # predictions = model.predict(data_matrix)
 
         return anomaly_scores

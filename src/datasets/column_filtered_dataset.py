@@ -18,13 +18,6 @@ class ColumnFilteredDataset(Dataset):
         self.matching_regexes = matching_regexes if matching_regexes else ['.*']
         self.matching_datatypes = matching_datatypes if matching_datatypes else [ e.value for e in DataType ]
 
-        # existing_matching_datatypes = self.unfiltered_dataset.matching_datatypes
-        # matching_datatypes = list(set(existing_matching_datatypes) & set(matching_datatypes))
-        #
-        # existing_matching_regexp = self.unfiltered_dataset.matching_regexes
-        # matching_datatypes = list(set(existing_matching_datatypes) & set(matching_datatypes))
-
-
     def __getitem__(self, index: int):
         return {
             column_name: entry
@@ -43,9 +36,6 @@ class ColumnFilteredDataset(Dataset):
             ptr = ptr.dataset
         return ptr.datatypes()
         # fixes a bug where sometimes the self.unfiltered dataset is a subset
-        # return self.unfiltered_dataset.datatypes() \
-        #                     if not isinstance(self.unfiltered_dataset, torch.utils.datasets.Subset) \
-        #                     else self.unfiltered_dataset.dataset.datatypes()
 
     def include_column(self, column_name):
         has_matching_datatype = self.unfiltered_datatypes[column_name].value in self.matching_datatypes

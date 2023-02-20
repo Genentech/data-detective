@@ -3,7 +3,6 @@ from sklearn.preprocessing import OneHotEncoder
 
 import torch
 
-from constants import FloatTensor
 from src.enums.enums import DataType
 
 

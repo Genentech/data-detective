@@ -15,7 +15,6 @@ class SyntheticNormalDataset(Dataset):
         self.columns = [f"feature_{j}" for j in range(num_cols)]
         self.outlier_index_set: Set[int] = set()
 
-        #  dataframe = pd.DataFrame({ f"feature_{i}": np.random.normal(0, 1, size=10000) for i in range(10) }, columns=[f"feature_{j}" for j in range(10)])
         dataframe: DataFrame = pd.DataFrame({
             f"feature_{i}": np.random.normal(loc, 1, size=dataset_size)
             for i in range(self.num_columns)

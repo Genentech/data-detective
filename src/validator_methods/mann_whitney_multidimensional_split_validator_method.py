@@ -65,15 +65,11 @@ class MannWhitneyMultidimensionalSplitValidatorMethod(DataValidatorMethod):
         dataset_keys[0], dataset_keys[1] = dataset_keys[1], dataset_keys[0]
         alpha = validator_kwargs.get("alpha", MannWhitneyMultidimensionalSplitValidatorMethod.DEFAULT_ALPHA)
 
-        # columns = list(test_dataset.datatypes().keys())
-
         # the number of combinations over the splits (used for bonferroni correction)
         num_combinations = len(list(itertools.combinations(dataset_keys, 2)))
         for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
             dataset_0 = data_object[dataset_0_key]
             dataset_1 = data_object[dataset_1_key]
-
-            dataset_combination_str = f"{dataset_0_key}/{dataset_1_key}"
 
             columns_0 = sorted(list(dataset_0.datatypes().keys()))
             columns_1 = sorted(list(dataset_1.datatypes().keys()))

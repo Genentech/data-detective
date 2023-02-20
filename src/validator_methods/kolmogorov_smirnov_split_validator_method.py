@@ -54,14 +54,9 @@ class KolmogorovSmirnovSplitValidatorMethod(DataValidatorMethod):
         """
         kwargs_dict: dict[str, dict[str, Union[ndarray, Any]]] = {}
 
-        # test_dataset = data_object["test_set"]
-        # training_dataset = data_object["training_set"]
-        # validation_dataset = data_object["validation_set"]
         dataset_keys = sorted([param_key.value for param_key in KolmogorovSmirnovSplitValidatorMethod.param_keys()])
         # train, val, test order
         dataset_keys[0], dataset_keys[1] = dataset_keys[1], dataset_keys[0]
-
-        # columns = list(test_dataset.datatypes().keys())
 
         def get_series(column_key, dataset):
             matrix_dict = {
@@ -93,8 +88,6 @@ class KolmogorovSmirnovSplitValidatorMethod(DataValidatorMethod):
                 series_0 = get_series(column_name, dataset_0)
                 series_1 = get_series(column_name, dataset_1)
 
-                # series_0 = np.array(list(dataset_0[:][column_name].values()))
-                # series_1 = np.array(list(dataset_1[:][column_name].values()))
                 kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
                     "series_0" : series_0,
                     "series_1" : series_1,
@@ -106,14 +99,6 @@ class KolmogorovSmirnovSplitValidatorMethod(DataValidatorMethod):
     def validate(series_0: Type[np.array], series_1: Type[np.array]) -> object:
         """
         Runs a kolmogorov-smirnov test against N(0, 1)
-        Input dict:
-        {
-            "": {
-                0: 1.1412321,
-                ...
-                9999: -0.4123643
-            }
-        }
 
         @return: the stats object that it needs when it gets back.
         """

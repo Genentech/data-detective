@@ -11,8 +11,6 @@ def get_resnet50(**kwargs):
     modules = list(resnet.children())[:-1]
     backbone = torch.nn.Sequential(torch.nn.Upsample((224, 224)), *modules)
     def full_impl(x):
-        # import pdb; pdb.set_trace()
-
         if len(x.shape) == 3:
             # need a 4th dimension
             x = torch.unsqueeze(x, 0)
@@ -39,9 +37,4 @@ TRANSFORM_LIBRARY = {
         new_column_name_fn=lambda name: f"resnet50_backbone_{name}",
         new_column_datatype=DataType.MULTIDIMENSIONAL
     ),
-    "resnet18": Transform(
-        transform_class=get_resnet50,
-        new_column_name_fn=lambda name: f"resnet18_backbone_{name}",
-        new_column_datatype=DataType.MULTIDIMENSIONAL
-    )
 }

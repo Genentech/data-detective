@@ -38,9 +38,6 @@ class SyntheticCIDataset(Dataset):
     def __len__(self) -> int:
         return self.dataset_size
 
-    def __repr__(self):
-        return self[:]
-
     @property
     def num_columns(self):
         return 3

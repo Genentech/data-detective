@@ -129,6 +129,5 @@ class IsolationForestOODInferenceValidatorMethod(DataValidatorMethod):
         model.fit(data_matrix)
 
         anomaly_scores = model.decision_function(inference_data_matrix)
-        # predictions = model.predict(data_matrix)
 
         return anomaly_scores

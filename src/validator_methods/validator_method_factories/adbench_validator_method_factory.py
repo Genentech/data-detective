@@ -1,13 +1,13 @@
+from typing import Set, Dict, Type
+
 import numpy as np
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
-from typing import List, Optional, Set, Dict, Type
-
-from pyod.models.base import BaseDetector
 from pytypes import override
 from torch.utils.data import Dataset
 
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
+
 
 class ADBenchValidatorMethodFactory:
     models = {
@@ -101,7 +101,6 @@ class ADBenchValidatorMethodFactory:
                 model_instance = model()
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
-                # predictions = model.predict(data_matrix)
 
                 return anomaly_scores
 

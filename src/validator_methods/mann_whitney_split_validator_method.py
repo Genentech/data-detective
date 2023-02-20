@@ -63,8 +63,6 @@ class MannWhitneySplitValidatorMethod(DataValidatorMethod):
         # train, val, test order
         dataset_keys[0], dataset_keys[1] = dataset_keys[1], dataset_keys[0]
 
-        # columns = list(test_dataset.datatypes().keys())
-
         def get_series(column_key, dataset):
             matrix_dict = {
                 column: [] for column in dataset.datatypes().keys()
@@ -108,15 +106,7 @@ class MannWhitneySplitValidatorMethod(DataValidatorMethod):
     @staticmethod
     def validate(series_0: Type[np.array], series_1: Type[np.array]) -> object:
         """
-        Runs a kolmogorov-smirnov test against N(0, 1)
-        Input dict:
-        {
-            "": {
-                0: 1.1412321,
-                ...
-                9999: -0.4123643
-            }
-        }
+        Runs a mann whitney u test.
 
         @return: the stats object that it needs when it gets back.
         """

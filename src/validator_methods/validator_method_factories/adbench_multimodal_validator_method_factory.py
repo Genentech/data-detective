@@ -1,15 +1,13 @@
+from typing import Set, Dict, Type
+
 import numpy as np
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
-from typing import List, Optional, Set, Dict, Type
-
-from pyod.models.base import BaseDetector
 from pytypes import override
 from torch.utils.data import Dataset
 
-
-from constants import FloatTensor
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
+
 
 class ADBenchMultimodalValidatorMethodFactory:
     models = {

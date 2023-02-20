@@ -57,14 +57,6 @@ class KolmogorovSmirnovNormalityValidatorMethod(DataValidatorMethod):
     def validate(series: Type[np.array]) -> object:
         """
         Runs a kolmogorov-smirnov test against N(0, 1)
-        Input dict:
-        {
-            "feature_name": {
-                0: 1.1412321,
-                ...
-                9999: -0.4123643
-            }
-        }
 
         @return: the stats object that it needs when it gets back.
         """

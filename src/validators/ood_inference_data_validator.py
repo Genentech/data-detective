@@ -21,7 +21,7 @@ class OodInferenceDataValidator(DataValidator):
     def validator_methods() -> Set[Type[DataValidatorMethod]]:
         return {
             # HistogramImageAnomalyValidatorMethod,
-            # CBLOFOODInferenceValidatorMethod,
+            CBLOFOODInferenceValidatorMethod,
             IsolationForestOODInferenceValidatorMethod,
-            # PCAOODInferenceValidatorMethod,
+            PCAOODInferenceValidatorMethod,
         }

@@ -63,9 +63,6 @@ class FastMCDAnomalyValidatorMethod(DataValidatorMethod):
             "results": {
                 "contamination": validator_kwargs.get("contamination", FastMCDAnomalyValidatorMethod.DEFAULT_CONTAMINATION),
                 "data_matrix": np.array([list(d.values()) for d in entire_dataset[:].values()]).T,
-                # "max_features": validator_kwargs.get("max_features", IsolationForestAnomalyValidatorMethod.DEFAULT_MAX_FEATURES),
-                # "max_samples": validator_kwargs.get("max_samples", IsolationForestAnomalyValidatorMethod.DEFAULT_MAX_SAMPLES),
-                # "n_estimators": validator_kwargs.get("n_estimators", IsolationForestAnomalyValidatorMethod.DEFAULT_N_ESTIMATORS),
             }
         }
 

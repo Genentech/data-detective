@@ -89,20 +89,13 @@ def validate_from_schema(config_dict: Dict, data_object: Dict) -> Dict:
         else:
             filtered_transformed_data_object = filtered_data_object
 
-        ## delete, for debugging
-        # train = filtered_transformed_data_object['training_set']
-        # x = train[:3]
-        ## delete, for debugging
-
-
         print(f"running {validator_class_name}...")
         result_dict[validator_class_name] = validator_class_object.validate(data_object=filtered_transformed_data_object,
                                                                             validator_kwargs=validator_kwargs)
-        c=4
 
     if default_inclusion:
         #TODO: need results from the rest of validators that are listed.
-        #do this later
+        #TODO: do this later
         pass
 
     return result_dict
@@ -311,10 +304,3 @@ def parse_transforms(transform_dict: Dict[str, Any], data_object):
                  output_dict[column_name].append(transform)
 
     return dict(output_dict)
-
-class FixShape(torch.nn.Module):
-    def forward(self, x):
-        if len(x.shape == 3):
-            return torch.unsqueeze(x, 0)
-        else:
-            return x

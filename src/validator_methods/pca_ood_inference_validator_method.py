@@ -67,9 +67,6 @@ class PCAOODInferenceValidatorMethod(DataValidatorMethod):
         everything_but_inference_dataset: Dataset = data_object["everything_but_inference_set"]
         inference_dataset: Dataset = data_object["inference_set"]
 
-        # todo: figure out matrix representation for both datasets formats.
-        # matrix_representation = np.array([list(d.values()) for d in entire_dataset[:].values()]).T,
-
         def get_matrix_rep(dataset):
             matrix = []
 
@@ -97,36 +94,16 @@ class PCAOODInferenceValidatorMethod(DataValidatorMethod):
 
     @staticmethod
     def validate(
-        # contamination: Union[float, Literal['auto']] = DEFAULT_CONTAMINATION,
         data_matrix: Type[np.array] = None, # n x d
         inference_data_matrix:  Type[np.array] = None,
-
-        # max_features: Union[int, float] = DEFAULT_MAX_FEATURES,
-        # max_samples: Union[float, int, Literal['auto']] = DEFAULT_MAX_SAMPLES,
-        # n_estimators: int = DEFAULT_N_ESTIMATORS,
     ) -> object:
         """
-        Runs an isolation forest to try and perform anomaly detection.
-
-        Input dict:
-        {
-            "featr": {
-                0: 1.1412321,
-                ...
-                9999: -0.4123643
-            }
-        }
-
-        @param n_estimators:
-        @param max_samples:
-        @param contamination:
-        @param max_features:
+        Runs anomaly detection.
         @return:
         """
         model = pyod.models.pca.PCA()
         model.fit(data_matrix)
 
         anomaly_scores = model.decision_function(inference_data_matrix)
-        # predictions = model.predict(data_matrix)
 
         return anomaly_scores
