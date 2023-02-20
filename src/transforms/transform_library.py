@@ -1,12 +1,11 @@
 import torch
-import torchvision.transforms
 
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import Transform
-import torchvision.models
 
 
 def get_resnet50(**kwargs):
+    import torchvision.models
     resnet = torchvision.models.resnet50(weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2, **kwargs)
     modules = list(resnet.children())[:-1]
     backbone = torch.nn.Sequential(torch.nn.Upsample((224, 224)), *modules)
@@ -31,10 +30,50 @@ def get_resnet50(**kwargs):
 
     return full_impl
 
+def get_vit(**kwargs):
+    from transformers import AutoImageProcessor, ViTModel
+
+    image_processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
+    model = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k")
+
+    def full_impl(x):
+        inputs = image_processor(x, return_tensors="pt")
+        outputs = model(**inputs)
+        return outputs.last_hidden_state
+    
+    return full_impl
+
+
+def get_bert(**kwargs):
+    from transformers import AutoTokenizer, BertModel
+
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    model = BertModel.from_pretrained("bert-base-uncased")
+
+    def full_impl(x):
+        inputs = tokenizer(x, return_tensors="pt")
+        outputs = model(**inputs)
+        return outputs.last_hidden_state
+    
+    return full_impl
+
+
+
 TRANSFORM_LIBRARY = {
     "resnet50": Transform(
         transform_class=get_resnet50,
         new_column_name_fn=lambda name: f"resnet50_backbone_{name}",
+        new_column_datatype=DataType.MULTIDIMENSIONAL
+    ),
+
+    "ViT": Transform(
+        transform_class=get_vit,
+        new_column_name_fn=lambda name: f"vit_backbone_{name}",
+        new_column_datatype=DataType.MULTIDIMENSIONAL
+    ),
+    "BERT": Transform(
+        transform_class=get_bert,
+        new_column_name_fn=lambda name: f"bert_backbone_{name}",
         new_column_datatype=DataType.MULTIDIMENSIONAL
     ),
 }

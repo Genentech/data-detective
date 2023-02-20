@@ -33,3 +33,11 @@ git clone https://github.com/thelahunginjeet/kbutil
 pip install -r requirements.txt
 ```
 
+If you are planning to make use of the pretrained transform library for high dimensional inputs, follow the additional install steps outlined below.
+
+```bash
+# for huggingface hosted models
+pip install transformers
+
+```
+
