@@ -18,7 +18,6 @@ them, returning the results back to the user. For a more detailed usage overview
 - Are there any serious outliers present in the dataset?
 - Are the conditional independences we expect in the data obeyed?
 - Are the datapoints at inference in the same distribution as what we have used to train/test the model?
-- Are there any high level "lint-style" issues?
 
 ## Installation Steps
 After cloning the repository and `cd`'ing into the directory, run the following commands.
