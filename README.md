@@ -1,3 +1,5 @@
+![Data Detective logo](DD_im.png)
+
 # Data Detective
 
 Data Detective is an open-source, modular, extensible validation framework for identifying potential issues with heterogeneous, multimodal data.
@@ -20,10 +22,22 @@ them, returning the results back to the user. For a more detailed usage overview
 - Are the datapoints at inference in the same distribution as what we have used to train/test the model?
 
 ## Installation Steps
-After cloning the repository and `cd`'ing into the directory, run the following commands.
+After cloning the repository and `cd`'ing into the directory, run the following commands. 
 
-```
+```bash
+# install packages supporting rank aggregation
 git clone https://github.com/thelahunginjeet/pyrankagg
 git clone https://github.com/thelahunginjeet/kbutil
+
+# install all other packages
 pip install -r requirements.txt
 ```
+
+If you are planning to make use of the pretrained transform library for high dimensional inputs, follow the additional install steps outlined below.
+
+```bash
+# for huggingface hosted models
+pip install transformers
+
+```
+
