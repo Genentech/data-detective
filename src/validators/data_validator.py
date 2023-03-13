@@ -19,6 +19,9 @@ class DataValidator:
         - applying the validator_methods individually on all of the specified columns.
 
     """
+    def name(self) -> str:
+        return self.__module__.split(".")[-1]
+
     @staticmethod
     @abstractmethod
     def validator_methods() -> Set[Type[data_validator_method.DataValidatorMethod]]:
@@ -44,7 +47,6 @@ class DataValidator:
         @param method_specific_data_object:
         @return:
         """
-
         for key, filtered_dataset in data_object.items():
             filtered_dataset_datatype_set = set(filtered_dataset.datatypes().values())
             validator_method_datatype_set = validator_method.datatype()

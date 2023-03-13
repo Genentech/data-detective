@@ -36,7 +36,7 @@ class OneHotEncodedDataset:
 
         for column, list_of_vars in categorical_variables.items():
             # src: https://www.geeksforgeeks.org/how-to-check-if-an-object-is-iterable-in-python/
-            column_dim = list_of_vars[0].__len__() if hasattr(list_of_vars[0], '__iter__') else 1
+            column_dim = list_of_vars[0].__len__() if hasattr(list_of_vars[0], '__iter__') and not isinstance(list_of_vars[0], str) else 1
             X = np.array(list_of_vars)
             X = X.reshape((-1, column_dim))
             if not OneHotEncodedDataset.is_one_hot_encoded(X):
