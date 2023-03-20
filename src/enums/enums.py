@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class DataType(Enum):
+    # a list of supporteed data types throughout Data Detective
     CONTINUOUS = "continuous"
     CATEGORICAL = "categorical"
     MULTIDIMENSIONAL = "multidimensional"

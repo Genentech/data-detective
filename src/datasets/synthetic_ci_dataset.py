@@ -8,20 +8,18 @@ from src.enums.enums import DataType
 
 
 class SyntheticCIDataset(Dataset):
-    """
-    Generates a dataset with three variables: X, Y, and Z, all continuous
-    @param dataset_type: the type of dataset ('CI', 'I', or 'NI')
-    """
     def __init__(self, dataset_type: str, dataset_size: int = 10000) -> None:
+        """
+        Initializes the dataset and generaates the data.
+        Generates a dataset with three variables: X, Y, and Z, all continuous
+
+        @param dataset_type: the type of dataset ('CI', 'I', or 'NI')
+        @param dataset_size: the size of the dataset to generate
+        """
         self.dataset_size = dataset_size
         self.dataset_type = dataset_type
         self.columns = ['x', 'y', 'z']
 
-        # more flexibility as needed.
-        # self.x, self.y, self.z = src.utils.generate_samples_random(
-        #     size=dataset_size,
-        #     sType=dataset_type
-        # )
 
         if self.dataset_type == "CI":
             self.x, self.y, self.z = src.utils.generate_ci_samples(dataset_size)
@@ -29,6 +27,11 @@ class SyntheticCIDataset(Dataset):
             self.x, self.y, self.z = src.utils.generate_ni_samples(dataset_size)
 
     def __getitem__(self, index: int) -> Dict:
+        """
+        Returns a sample from the dataset.
+        @param idx: the dataset index. Only accepts integer indices.
+        @return: A dictionary consisting of the data and the label.
+        """
         return {
             'x': self.x[index],
             'y': self.y[index],
@@ -36,17 +39,26 @@ class SyntheticCIDataset(Dataset):
         }
 
     def __len__(self) -> int:
+        """
+        Returns the length of the dataset.
+        @return: the length of the dataset
+        """
         return self.dataset_size
 
     @property
-    def num_columns(self):
+    def num_columns(self) -> int:
+        """
+        The number of columns in the dataset.
+        @return: the number of columns in the dataset.
+        """
         return 3
 
     def datatypes(self) -> typing.Dict[str, DataType]:
+        """
+        Gives the datatypes of a the dataset sample.
+        @return: the datatypes of a the dataset sample.
+        """
         return {
             column_name: DataType.MULTIDIMENSIONAL
             for column_name in self.columns
         }
-
-    def id(self):
-        return id(self)

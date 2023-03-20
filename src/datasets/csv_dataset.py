@@ -1,3 +1,4 @@
+import typing
 from typing import Dict
 
 import pandas as pd
@@ -12,11 +13,24 @@ class CSVDataset:
         self.df = self.df[list(datatype_dict.keys())]
         self.df = self.df.dropna()
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the length of the dataset.
+        @return: the length of the dataset
+        """
         return self.df.__len__()
 
-    def __getitem__(self, item: int):
+    def __getitem__(self, item) -> typing.Dict:
+        """
+        Returns an item from the dataset.
+        @param idx: the dataset index. Only accepts integer indices.
+        @return: A dictionary consisting of the data and the label.
+        """
         return self.df.iloc[item]
 
     def datatypes(self) -> Dict[str, DataType]:
+        """
+        Gives the datatypes of a the dataset sample.
+        @return: the datatypes of a the dataset sample.
+        """
         return self.datatypes_dict

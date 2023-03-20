@@ -14,17 +14,30 @@ class OneHotEncodedDataset:
         self.prepare_one_hot_encodings()
 
     def datatypes(self):
+        """
+        Gives the datatypes of a dataset sample.
+        @return: the datatypes of a dataset sample.
+        """
         return self.dataset.datatypes()
 
     @staticmethod
-    def is_one_hot_encoded(X):
+    def is_one_hot_encoded(X: np.array) -> bool:
+        """
+        Determines if the data matrix (X) is already one hot encoded.
+
+        @param X: the data matrix to check.
+        @return: a bool detailing if the data matrix is one hot encoded.
+        """
         # src: https://stackoverflow.com/questions/66670839/how-to-check-if-my-data-is-one-hot-encoded
         try:
             return (X.sum(axis=1)-torch.ones(X.shape[0])).sum()==0
         except Exception:
             return False
 
-    def prepare_one_hot_encodings(self):
+    def prepare_one_hot_encodings(self) -> None:
+        """
+        Prepares the one hot encoding transforms by fitting them to the categorical variables in the dataset.
+        """
         categorical_variables = {column: [] for column, datatype in self.dataset.datatypes().items() if datatype == DataType.CATEGORICAL}
 
         self.one_hot_encoded_catvars = {}
@@ -43,6 +56,11 @@ class OneHotEncodedDataset:
                 self.one_hot_encoded_catvars[column] = np.array(OneHotEncoder().fit_transform(X).todense())
 
     def __getitem__(self, idx: int):
+        """
+        Returns an item from the dataset, applying one hot categorical transforms as well.
+        @param idx: the dataset index. Only accepts integer indices.
+        @return: A dictionary consisting of the data.
+        """
         sample = self.dataset[idx]
         for column_name in sample.keys():
             if column_name in self.one_hot_encoded_catvars.keys():

@@ -30,13 +30,14 @@ class SyntheticAnomalousDataset(Dataset):
         self.class_indices = self._get_class_indices(original_dataset)
         self.added_normal_elements = self.compute_added_normal_elements(include_all, desired_normal_class_proportion)
 
-    def compute_added_normal_elements(self, include_all, desired_normal_class_proportion):
+    def compute_added_normal_elements(self, include_all: bool, desired_normal_class_proportion: float):
         """
         Computes how many added normal elements we need to get to our desired normal class proporotion.
 
-        @param include_all:
-        @return:
+        @param include_all: whether to include all of the existing elements as well
+        @return: a number of normal elements that need to be added in order
         """
+        # haven't supported partial inclusion yet
         assert include_all
         class_counts = self._get_class_counts(self.original_dataset)
 
@@ -74,7 +75,7 @@ class SyntheticAnomalousDataset(Dataset):
         Gets the class counts for the anomalous dataset.
 
         @param original_dataset: the original dataset that is getting oversampled
-        @return: the a dictioonar
+        @return: the a dictionary mapping from each class to a list of the indices in that class
         """
         class_indices: defaultdict[int, List[int]] = defaultdict(lambda: [])
         dataset_length: int = original_dataset.__len__()

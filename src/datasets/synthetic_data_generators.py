@@ -19,14 +19,7 @@ from src.enums.enums import DataType
 #         pass
 #
 #     @abstractmethod
-#     def transforms(self) -> Dict[str, List[torch.nn.Module]]:
-#         return {}
-#
-#     @abstractmethod
 #     def __len__(self) -> int:
-#         pass
-#
-#     def getitem(self, index: int) -> Dict[str, Any]:
 #         pass
 #
 #     def __getitem__(self, index: int) -> Dict[str, Any]:

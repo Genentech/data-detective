@@ -5,7 +5,6 @@ import pandas as pd
 from pandas import DataFrame
 from torch.utils.data import Dataset
 
-from src.datasets.synthetic_data_generators import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
@@ -62,10 +61,3 @@ class SyntheticNormalDataset(Dataset):
             column_name: DataType.CONTINUOUS
             for column_name in self.columns
         }
-
-    def to_matrix(self):
-        return np.array([list(d.values()) for d in self[:].values()]).T,
-
-    def id(self):
-        return id(self)
-

@@ -18,7 +18,12 @@ class ColumnFilteredDataset(Dataset):
         self.matching_regexes = matching_regexes if matching_regexes else ['.*']
         self.matching_datatypes = matching_datatypes if matching_datatypes else [ e.value for e in DataType ]
 
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> typing.Dict:
+        """
+        Returns an item from the dataset.
+        @param idx: the dataset index. Only accepts integer indices.
+        @return: A dictionary consisting of the data and the label.
+        """
         return {
             column_name: entry
             for column_name, entry in self.unfiltered_dataset.__getitem__(index).items()
@@ -26,10 +31,18 @@ class ColumnFilteredDataset(Dataset):
         }
 
     def __len__(self) -> int:
+        """
+        Returns the length of the dataset.
+        @return: the length of the dataset
+        """
         return self.unfiltered_dataset.__len__()
 
     @property
     def unfiltered_datatypes(self) -> typing.Dict[str, DataType]:
+        """
+        Gets the datatypes of the unfiltered dataset
+        @return: datatypes of the unfiltered dataset
+        """
         # fixes a bug where there are multiple dataset splits
         ptr = self.unfiltered_dataset
         while isinstance(ptr, torch.utils.data.Subset):
@@ -37,13 +50,23 @@ class ColumnFilteredDataset(Dataset):
         return ptr.datatypes()
         # fixes a bug where sometimes the self.unfiltered dataset is a subset
 
-    def include_column(self, column_name):
+    def include_column(self, column_name: str) -> bool:
+        """
+        Returns whether or not the column should be included in the filtered dataset.
+
+        @param column_name: the name of the column to check
+        @return: a boolean indicating whether or not the column should be included.
+        """
         has_matching_datatype = self.unfiltered_datatypes[column_name].value in self.matching_datatypes
         has_matching_name = any([re.compile(reg_exp).match(column_name) for reg_exp in self.matching_regexes])
 
         return has_matching_name and has_matching_datatype
 
     def datatypes(self) -> typing.Dict[str, DataType]:
+        """
+        Gives the datatypes of a dataset sample for the column filtered dataset.
+        @return: the datatypes of a dataset sample.
+        """
         datatypes = {
             column_name: datatype
             for column_name, datatype in self.unfiltered_datatypes.items()
@@ -51,14 +74,3 @@ class ColumnFilteredDataset(Dataset):
         }
 
         return datatypes
-
-    def to_matrix(self):
-        return self.unfiltered_dataset.to_matrix()
-
-    def id(self):
-        original_dataset = self.unfiltered_dataset
-
-        while isinstance(original_dataset, ColumnFilteredDataset):
-            original_dataset = src.utils.unfilter_dataset(original_dataset)
-
-        return id(original_dataset)
