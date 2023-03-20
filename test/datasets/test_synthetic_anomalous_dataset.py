@@ -4,13 +4,12 @@ import torchvision.transforms as transforms
 from tqdm import tqdm
 
 from src.datasets import synthetic_data_generators
-from src.datasets.synthetic_data_generators import SyntheticAnomalousDataset
+from src.datasets.my_fashion_mnist import MyFashionMNIST
+from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 
 
 @pytest.fixture()
 def synthetic_anomalous_dataset():
-    MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
-
     # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
         root='./datasets/FashionMNIST',

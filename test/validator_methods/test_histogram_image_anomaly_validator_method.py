@@ -7,14 +7,13 @@ from torchvision.transforms import transforms
 
 from constants import SEED
 from src.datasets import synthetic_data_generators
+from src.datasets.my_cifar_10 import MyCIFAR10
+from src.datasets.my_fashion_mnist import MyFashionMNIST
+from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 from src.utils import validate_from_schema
-from src.datasets.synthetic_data_generators import SyntheticNormalDataset, MyFashionMNIST, SyntheticAnomalousDataset
-from src.validator_methods.hbos_validator_method import load_dataset_as_anomaly
 
 @pytest.fixture()
 def fashion_mnist():
-    MyFashionMNIST = synthetic_data_generators.MyFashionMNIST
-
     # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
         root='./datasets/FashionMNIST',
@@ -27,8 +26,6 @@ def fashion_mnist():
 
 @pytest.fixture
 def cifar_10():
-    MyCIFAR10 = synthetic_data_generators.MyCIFAR10
-
     # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
@@ -43,8 +40,6 @@ def cifar_10():
 
 @pytest.fixture()
 def synthetic_anomalous_dataset():
-    MyCIFAR10 = synthetic_data_generators.MyCIFAR10
-
     # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
@@ -97,9 +92,9 @@ class TestHistogramImageAnomalyValidatorMethod:
             "rename: splits": {
                 "entire_set": synthetic_anomalous_dataset
             },
-            "transforms": {
-                "column": [transform1, transform2]
-            }
+            # "transforms": {
+            #     "column": [transform1, transform2]
+            # }
         }
 
 

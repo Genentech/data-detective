@@ -1,10 +1,8 @@
 from typing import Set, Type
 
-from src.validator_methods.cblof_ood_inference_validator_method import CBLOFOODInferenceValidatorMethod
 from src.validator_methods.data_validator_method import DataValidatorMethod
-from src.validator_methods.isolation_forest_ood_inference_validator_method import \
-    IsolationForestOODInferenceValidatorMethod
-from src.validator_methods.pca_ood_inference_validator_method import PCAOODInferenceValidatorMethod
+from src.validator_methods.validator_method_factories.adbench_ood_inference_validator_method_factory import \
+    ADBenchOODInferenceValidatorMethodFactory
 from src.validators.data_validator import DataValidator
 
 
@@ -21,7 +19,7 @@ class OodInferenceDataValidator(DataValidator):
     def validator_methods() -> Set[Type[DataValidatorMethod]]:
         return {
             # HistogramImageAnomalyValidatorMethod,
-            CBLOFOODInferenceValidatorMethod,
-            IsolationForestOODInferenceValidatorMethod,
-            PCAOODInferenceValidatorMethod,
+            ADBenchOODInferenceValidatorMethodFactory.get_validator_method("cblof"),
+            ADBenchOODInferenceValidatorMethodFactory.get_validator_method("pca"),
+            ADBenchOODInferenceValidatorMethodFactory.get_validator_method("iforest"),
         }

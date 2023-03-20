@@ -1,12 +1,6 @@
 from typing import Set, Type
 
-from src.validator_methods.cblof_anomaly_validator_method import CBLOFAnomalyValidatorMethod
 from src.validator_methods.data_validator_method import DataValidatorMethod
-# from src.validator_methods.fcit_validator_method import FCITValidatorMethod
-# from src.validator_methods.hbos_validator_method import HBOSValidatorMethod
-from src.validator_methods.histogram_image_anomaly_validator_method import HistogramImageAnomalyValidatorMethod
-from src.validator_methods.isolation_forest_anomaly_validator_method import IsolationForestAnomalyValidatorMethod
-from src.validator_methods.pca_anomaly_validator_method import PCAAnomalyValidatorMethod
 from src.validator_methods.validator_method_factories.adbench_validator_method_factory import \
     ADBenchValidatorMethodFactory
 

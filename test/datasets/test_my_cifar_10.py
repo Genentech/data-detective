@@ -5,12 +5,11 @@ import src.datasets.synthetic_data_generators as synthetic_data_generators
 import torchvision.transforms as transforms
 
 from constants import FloatTensor
+from src.datasets.my_cifar_10 import MyCIFAR10
 from src.enums.enums import DataType
 
 @pytest.fixture
 def cifar_10():
-    MyCIFAR10 = synthetic_data_generators.MyCIFAR10
-
     # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',

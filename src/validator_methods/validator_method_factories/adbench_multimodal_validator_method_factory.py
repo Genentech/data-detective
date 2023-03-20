@@ -27,11 +27,13 @@ class ADBenchMultimodalValidatorMethodFactory:
 
     @staticmethod
     def get_all_validator_methods():
-        return [ADBenchMultimodalValidatorMethodFactory.get_validator_method(model_name) for model_name in ADBenchMultimodalValidatorMethodFactory.models.keys()]
+        return [ADBenchMultimodalValidatorMethodFactory.get_validator_method(model_name)
+                for model_name in ADBenchMultimodalValidatorMethodFactory.models.keys()]
 
     @staticmethod
     def get_validator_method(model_name: str):
         model = ADBenchMultimodalValidatorMethodFactory.models[model_name]
+
         class ADBenchAnomalyValidatorMethod(DataValidatorMethod):
             """
             A method for determining multidimensional anomalies. Operates on continuous datasets.
@@ -52,7 +54,8 @@ class ADBenchMultimodalValidatorMethodFactory:
             @staticmethod
             def param_keys() -> Set[ValidatorMethodParameter]:
                 """
-                Useful for documentation purposes. Lists the parameters in the datasets object that the validators operates on.
+                Useful for documentation purposes. Lists the parameters in the datasets object that the validators
+                operates on.
                 @return: a list of parameters for the .validate() method.
                 """
                 return {ValidatorMethodParameter.ENTIRE_SET}
@@ -94,15 +97,12 @@ class ADBenchMultimodalValidatorMethodFactory:
                 Runs anomaly detection.
 
                 @param data_matrix: an n x d matrix with the datasets needed for the model.
-                @return:
+                @return: a list of anomaly scores
                 """
                 model_instance = model()
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
-                # predictions = model.predict(data_matrix)
 
                 return anomaly_scores
 
         return ADBenchAnomalyValidatorMethod
-
-

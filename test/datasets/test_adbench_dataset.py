@@ -1,16 +1,13 @@
 import pytest
 
-import src.datasets.synthetic_data_generators as synthetic_data_generators
-
 import torchvision.transforms as transforms
 
 from constants import FloatTensor
+from src.datasets.adbench_dataset import ADBenchDataset
 from src.enums.enums import DataType
 
 @pytest.fixture
 def adbench_speech():
-    ADBenchDataset = synthetic_data_generators.ADBenchDataset
-
     # TODO: add proper datasets augmentation strategy
     adbench_speech: ADBenchDataset = ADBenchDataset(
         npz_filename="36_speech.npz",

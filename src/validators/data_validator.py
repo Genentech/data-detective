@@ -4,7 +4,6 @@ from typing import Type, Dict, Set
 from torch.utils.data import Dataset
 
 import src.validator_methods.data_validator_method as data_validator_method
-import src.datasets.synthetic_data_generators as synthetic_data_generators
 from src.datasets.column_filtered_dataset import ColumnFilteredDataset
 from src.enums.enums import DataType
 
@@ -44,7 +43,9 @@ class DataValidator:
         Returns True iff there is some overlap between the validator method's datatypes
         and the datasets object's datatypes.
 
-        @param method_specific_data_object:
+        @param data_object: the data object to use to determine overlap with the validator method.
+        @param validator_method: the method to use to determinne overlap with the data object
+
         @return:
         """
         for key, filtered_dataset in data_object.items():

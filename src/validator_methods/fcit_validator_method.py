@@ -38,25 +38,26 @@ class FCITValidatorMethod(DataValidatorMethod):
         with include_filtering and the validator kwargs, as given precisely in the schema.
 
         @param data_object: the datasets object after `include` filtering
-        @param validator_kwargs:
+        @param validator_kwargs: the kwargs storing the ci relations to verify.
         @return:
         """
         kwargs_dict = {}
 
+        """
+        Example validator_kwargs:
+            "validator_kwargs": {
+                "ci_relations" : [{
+                    "independent" : "True",
+                    "x": "x",
+                    "y": "y",
+                    "given": [
+                        "z"
+                    ]
+                }]
+            }
+        """
         entire_dataset = data_object["entire_set"]
         ci_relations = validator_kwargs["ci_relations"]
-        """
-                            "validator_kwargs": {
-                        "ci_relations" : [{
-                            "independent" : "True",
-                            "x": "x",
-                            "y": "y",
-                            "given": [
-                                "z"
-                            ]
-                        }]
-                    }
-        """
 
 
         for index, ci_relation in enumerate(ci_relations):
