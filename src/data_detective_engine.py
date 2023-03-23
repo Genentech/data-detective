@@ -1,13 +1,17 @@
+import os
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Any
 
 import torch
+from joblib import delayed, Parallel
 
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
+from src.transforms.transform_library import Transform, get_resnet50, get_vit, get_bert
 from src.utils import snake_to_camel, filter_dataset
 from src.validators.data_validator import DataValidator
 
@@ -21,6 +25,7 @@ class DataDetectiveEngine:
             - transforms
             - (aggregators ?)
         """
+        #todo: copy this
         self.transform_dict = deepcopy(TRANSFORM_LIBRARY)
         self.validator_dict = {}
 
@@ -29,6 +34,42 @@ class DataDetectiveEngine:
 
     def register_transform(self, transform, transform_name):
         self.transform_dict[transform_name] = transform
+
+    def get_results(self, validator_class_name, validator_params, config_dict, data_object):
+        def thread_print(s):
+            print(f"thread {os.getpid()}: {s}")
+        print(f"thread {os.getpid()} entered to handle validator class {validator_class_name}")
+
+        validator_class_object: DataValidator = self.validator_name_to_object(validator_class_name)
+        include_lst: List[str] = validator_params.get("include", ['.*'])
+        validator_kwargs: Dict = validator_params.get("validator_kwargs", {})
+
+        # filter the datasets by the inclusion criteria.
+        filtered_data_object = {}
+
+        for key, dataset in data_object.items():
+            # TODO: implement filtering correctly on the torch datasets.
+            filtered_data_object[key] = filter_dataset(dataset, include_lst)
+            filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
+
+        if 'transforms' in config_dict.keys():
+            transforms_dict = config_dict['transforms']
+            transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
+            filtered_transformed_data_object = {
+                data_object_name: TransformedDataset(data_object_part, transforms_dict) for
+                data_object_name, data_object_part in filtered_data_object.items()}
+        else:
+            filtered_transformed_data_object = filtered_data_object
+
+        thread_print(f"running {validator_class_name}...")
+
+        rv = (validator_class_name,
+                validator_class_object.validate(
+                    data_object=filtered_transformed_data_object,
+                    validator_kwargs=validator_kwargs)
+                )
+        print(f"{os.getpid()} finished")
+        return rv
 
     def validate_from_schema(self, config_dict: Dict, data_object: Dict) -> Dict:
         """
@@ -78,39 +119,16 @@ class DataDetectiveEngine:
         do the validation. 
         """
         # this specifies whether to use the default validators or not.
-        result_dict = {}
-
         default_inclusion = config_dict.get("default_inclusion", True)
         validators = config_dict["validators"]
 
-        # get all (validator_class, data_object, feature_lst) entries
-        for validator_class_name, validator_params in validators.items():
-            validator_class_object: DataValidator = self.validator_name_to_object(validator_class_name)
-            include_lst: List[str] = validator_params.get("include", ['.*'])
-            validator_kwargs: Dict = validator_params.get("validator_kwargs", {})
+        print("running parallel section")
+        print(validators.items())
 
-            # filter the datasets by the inclusion criteria.
-            filtered_data_object = {}
+        result_items = Parallel(n_jobs=-1, backend="multiprocessing")(delayed(self.get_results)(validator_class_name, validator_params, config_dict, data_object)
+                        for validator_class_name, validator_params in validators.items())
 
-            for key, dataset in data_object.items():
-                # TODO: implement filtering correctly on the torch datasets.
-                filtered_data_object[key] = filter_dataset(dataset, include_lst)
-                filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
-
-            if 'transforms' in config_dict.keys():
-                transforms_dict = config_dict['transforms']
-                transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
-                filtered_transformed_data_object = {
-                    data_object_name: TransformedDataset(data_object_part, transforms_dict) for
-                    data_object_name, data_object_part in filtered_data_object.items()}
-            else:
-                filtered_transformed_data_object = filtered_data_object
-
-            print(f"running {validator_class_name}...")
-            result_dict[validator_class_name] = validator_class_object.validate(
-                data_object=filtered_transformed_data_object,
-                validator_kwargs=validator_kwargs)
-
+        result_dict = {k: v for k, v in result_items}
         if default_inclusion:
             # TODO: need results from the rest of validators that are listed.
             # TODO: do this later

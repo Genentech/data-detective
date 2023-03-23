@@ -30,6 +30,10 @@ def get_resnet50(**kwargs):
 
     return full_impl
 
+# you have to do these by hand now because of the multiprocessing.
+def resnet50_backbone_name(original_name):
+    return f"resnet50_backbone_{original_name}"
+
 def get_vit(**kwargs):
     from transformers import AutoImageProcessor, ViTModel
 
@@ -43,6 +47,8 @@ def get_vit(**kwargs):
     
     return full_impl
 
+def vit_backbone_name(original_name):
+    return f"vit_backbone_{original_name}"
 
 def get_bert(**kwargs):
     from transformers import AutoTokenizer, BertModel
@@ -57,23 +63,24 @@ def get_bert(**kwargs):
     
     return full_impl
 
-
+def bert_backbone_name(original_name):
+    return f"bert_backbone_{original_name}"
 
 TRANSFORM_LIBRARY = {
     "resnet50": Transform(
         transform_class=get_resnet50,
-        new_column_name_fn=lambda name: f"resnet50_backbone_{name}",
+        new_column_name_fn=resnet50_backbone_name,
         new_column_datatype=DataType.MULTIDIMENSIONAL
     ),
 
     "ViT": Transform(
         transform_class=get_vit,
-        new_column_name_fn=lambda name: f"vit_backbone_{name}",
+        new_column_name_fn=vit_backbone_name,
         new_column_datatype=DataType.MULTIDIMENSIONAL
     ),
     "BERT": Transform(
         transform_class=get_bert,
-        new_column_name_fn=lambda name: f"bert_backbone_{name}",
+        new_column_name_fn=bert_backbone_name,
         new_column_datatype=DataType.MULTIDIMENSIONAL
     ),
 }

@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
 import torch
+from torch.utils.data import DataLoader
 
 from src.enums.enums import DataType
 
@@ -42,8 +43,7 @@ class OneHotEncodedDataset:
 
         self.one_hot_encoded_catvars = {}
 
-        for idx in range(self.dataset.__len__()):
-            sample = self.dataset[idx]
+        for sample in iter(DataLoader(self.dataset)):
             for column in categorical_variables.keys():
                 categorical_variables[column].append(sample[column])
 

@@ -19,10 +19,6 @@ class UnsupervisedAnomalyDataValidator(DataValidator):
     @staticmethod
     def validator_methods() -> Set[Type[DataValidatorMethod]]:
         return {
-            # HistogramImageAnomalyValidatorMethod,
-            # CBLOFAnomalyValidatorMethod,
-            # IsolationForestAnomalyValidatorMethod,
-            # PCAAnomalyValidatorMethod,
             ADBenchValidatorMethodFactory.get_validator_method("cblof"),
             ADBenchValidatorMethodFactory.get_validator_method("pca"),
             ADBenchValidatorMethodFactory.get_validator_method("iforest"),

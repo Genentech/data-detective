@@ -1,6 +1,8 @@
+import os
 from abc import abstractmethod
 from typing import Type, Dict, Set
 
+from joblib import Parallel, delayed
 from torch.utils.data import Dataset
 
 import src.validator_methods.data_validator_method as data_validator_method
@@ -56,6 +58,36 @@ class DataValidator:
 
         return True
 
+    @classmethod
+    def get_results(cls, data_object, validator_method, validator_kwargs):
+        def thread_print(s):
+            print(f"thread {os.getpid()}: {s}")
+
+        print(f"thread {os.getpid()} entered to handle validator method {validator_method().name()}")
+        thread_print(f"   running {validator_method().name()}...")
+        # this filters out methods that don't accept the datatypes needed.
+        if not DataValidator._method_applies(data_object, validator_method):
+            return
+
+        # look at the datatypes on the validators method, and apply
+        method_results = {}
+
+        # for every datasets object:
+        # add an .item from data_object key to filtered dataset (by datatype matching method/dataset)
+        # if the datasets object is included in the method's param_keys
+        method_specific_data_object = {
+            key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
+            for key, dataset in data_object.items()
+            if key in {e.value for e in validator_method.param_keys()}
+        }
+
+        for result_key, method_kwargs in validator_method.get_method_kwargs(data_object=method_specific_data_object,
+                                                                            validator_kwargs=validator_kwargs).items():
+            method_results[result_key] = validator_method.validate(**method_kwargs)
+
+
+        print(f"{os.getpid()} finished")
+        return (validator_method().name(), method_results)
 
     @classmethod
     def validate(cls, data_object: Dict[str, Dataset], validator_kwargs: Dict) -> Dict:
@@ -74,29 +106,33 @@ class DataValidator:
             - the method operates on just the datasets objects specified
         If this is no longer true, then we just have to subclass this and reapply some of the logic.
         """
-        results = {}
+        # results = {}
 
-        for validator_method in cls.validator_methods():
-            print(f"   running {validator_method}...")
-            # this filters out methods that don't accept the datatypes needed.
-            if not DataValidator._method_applies(data_object, validator_method):
-                continue
+        # for validator_method in cls.validator_methods():
+        #     print(f"   running {validator_method().name()}...")
+        #     # this filters out methods that don't accept the datatypes needed.
+        #     if not DataValidator._method_applies(data_object, validator_method):
+        #         continue
+        #
+        #     # look at the datatypes on the validators method, and apply
+        #     method_results = {}
+        #
+        #     # for every datasets object:
+        #         # add an .item from data_object key to filtered dataset (by datatype matching method/dataset)
+        #         # if the datasets object is included in the method's param_keys
+        #     method_specific_data_object = {
+        #         key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
+        #             for key, dataset in data_object.items()
+        #             if key in {e.value for e in validator_method.param_keys()}
+        #     }
+        #
+        #     for result_key, method_kwargs in validator_method.get_method_kwargs(data_object = method_specific_data_object, validator_kwargs=validator_kwargs).items():
+        #         method_results[result_key] = validator_method.validate(**method_kwargs)
+        #
+        #     results[validator_method().name()] = method_results
+        result_items = Parallel(n_jobs=-1, backend="multiprocessing")(delayed(cls.get_results)(data_object, validator_method, validator_kwargs)
+                        for validator_method in cls.validator_methods())
 
-            # look at the datatypes on the validators method, and apply
-            method_results = {}
-
-            # for every datasets object:
-                # add an .item from data_object key to filtered dataset (by datatype matching method/dataset)
-                # if the datasets object is included in the method's param_keys
-            method_specific_data_object = {
-                key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
-                    for key, dataset in data_object.items()
-                    if key in {e.value for e in validator_method.param_keys()}
-            }
-
-            for result_key, method_kwargs in validator_method.get_method_kwargs(data_object = method_specific_data_object, validator_kwargs=validator_kwargs).items():
-                method_results[result_key] = validator_method.validate(**method_kwargs)
-
-            results[validator_method().name()] = method_results
+        results = {k: v for k, v in [x for x in result_items if x is not None]}
 
         return results
