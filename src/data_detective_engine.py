@@ -1,8 +1,13 @@
+import multiprocessing.pool
 import os
+import queue
 import sys
+import threading
+import time
+
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 
 import torch
 from joblib import delayed, Parallel
@@ -15,6 +20,7 @@ from src.transforms.transform_library import Transform, get_resnet50, get_vit, g
 from src.utils import snake_to_camel, filter_dataset
 from src.validators.data_validator import DataValidator
 
+task_queue = queue.Queue()
 
 class DataDetectiveEngine:
     def __init__(self):
@@ -25,7 +31,6 @@ class DataDetectiveEngine:
             - transforms
             - (aggregators ?)
         """
-        #todo: copy this
         self.transform_dict = deepcopy(TRANSFORM_LIBRARY)
         self.validator_dict = {}
 
@@ -35,10 +40,17 @@ class DataDetectiveEngine:
     def register_transform(self, transform, transform_name):
         self.transform_dict[transform_name] = transform
 
-    def get_results(self, validator_class_name, validator_params, config_dict, data_object):
-        def thread_print(s):
-            print(f"thread {os.getpid()}: {s}")
-        print(f"thread {os.getpid()} entered to handle validator class {validator_class_name}")
+    def get_task_list(self, validator_class_name, validator_params, config_dict, data_object) -> List[Tuple]:
+        """
+        Gets a list of the tasks (one task per method call) and the args for the tasks
+
+        @param validator_class_name: the name of the validator class
+        @param validator_params: the params for the validator
+        @param config_dict: the configuration dictionary for the validator.
+        @param data_object: the data object for the validator class
+        @return: a list of tuples, each tuple contains the task class and the args to call it with.
+        """
+        print(f"running validator class {validator_class_name}...")
 
         validator_class_object: DataValidator = self.validator_name_to_object(validator_class_name)
         include_lst: List[str] = validator_params.get("include", ['.*'])
@@ -61,20 +73,15 @@ class DataDetectiveEngine:
         else:
             filtered_transformed_data_object = filtered_data_object
 
-        thread_print(f"running {validator_class_name}...")
-
-        rv = (validator_class_name,
-                validator_class_object.validate(
-                    data_object=filtered_transformed_data_object,
-                    validator_kwargs=validator_kwargs)
-                )
-        print(f"{os.getpid()} finished")
-        return rv
+        return validator_class_object.get_task_list(
+            data_object=filtered_transformed_data_object,
+            validator_kwargs=validator_kwargs
+        )
 
     def validate_from_schema(self, config_dict: Dict, data_object: Dict) -> Dict:
         """
         Validates a particular parameter object (dict of things like train_dataset and test_dataset) against
-        all validators specified in the config file.
+        all validators specified in the config file. Leverages a thread pool to run all validator methods in parallel.
 
         @param config_dict: the config dict to get what validators to use. if default-inclusion is set to on, then
         it should also include all default validators and apply them everywhere that is relevant.
@@ -122,13 +129,32 @@ class DataDetectiveEngine:
         default_inclusion = config_dict.get("default_inclusion", True)
         validators = config_dict["validators"]
 
-        print("running parallel section")
-        print(validators.items())
+        for validator_class_name, validator_params in validators.items():
+            for task in self.get_task_list(validator_class_name, validator_params, config_dict, data_object):
+                task_queue.put(task)
 
-        result_items = Parallel(n_jobs=-1, backend="multiprocessing")(delayed(self.get_results)(validator_class_name, validator_params, config_dict, data_object)
-                        for validator_class_name, validator_params in validators.items())
+        result_items = []
 
-        result_dict = {k: v for k, v in result_items}
+        with multiprocessing.pool.ThreadPool(100) as pool:
+            while task_queue.qsize() > 0:
+                task, args = task_queue.get()
+                res = pool.apply_async(task, args)
+                result_items.append(res)
+
+            pool.close()
+            pool.join()
+
+        # uncomment for synchronous behavior
+        # results = [task(*args) for task, args in total_task_list]
+
+        result_dict = {}
+        result_items = [result_item.get() for result_item in result_items]
+        for validator, validator_method, results in result_items:
+            if validator not in result_dict.keys():
+                result_dict[validator] = {}
+
+            result_dict[validator][validator_method] = results
+
         if default_inclusion:
             # TODO: need results from the rest of validators that are listed.
             # TODO: do this later

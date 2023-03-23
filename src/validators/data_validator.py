@@ -1,6 +1,10 @@
+import multiprocessing.pool
+import queue
 import os
+import time
+import threading
 from abc import abstractmethod
-from typing import Type, Dict, Set
+from typing import Type, Dict, Set, List, Tuple, Optional
 
 from joblib import Parallel, delayed
 from torch.utils.data import Dataset
@@ -18,10 +22,10 @@ class DataValidator:
         on both categorical and continuous datasets)
         - setting up the parameters correctly for each validator_method
         - applying the validator_methods individually on all of the specified columns.
-
     """
-    def name(self) -> str:
-        return self.__module__.split(".")[-1]
+    @classmethod
+    def name(cls) -> str:
+        return cls.__module__.split(".")[-1]
 
     @staticmethod
     @abstractmethod
@@ -37,6 +41,10 @@ class DataValidator:
 
     @classmethod
     def supported_datatypes(cls) -> Set[DataType]:
+        """
+        A list of supported datatypes by the validator.
+        @return: a set of supported datatypes by the validator.
+        """
         return {method.datatype for method in cls.validator_methods()}
 
     @staticmethod
@@ -59,11 +67,21 @@ class DataValidator:
         return True
 
     @classmethod
-    def get_results(cls, data_object, validator_method, validator_kwargs):
-        def thread_print(s):
-            print(f"thread {os.getpid()}: {s}")
+    def validate(cls, data_object, validator_method, validator_kwargs) -> Optional[Tuple]:
+        """
+        Runs a single validator method against the data object.
 
-        print(f"thread {os.getpid()} entered to handle validator method {validator_method().name()}")
+        @param data_object: the data object for the validator_method
+        @param validator_method: the validator methood to run the data object against
+        @param validator_kwargs: any other kwargs needed for the validator method
+
+        @return a tuple consisting of the validator class, the validator method name, and the results from the validator
+        method.
+        """
+        def thread_print(s):
+            print(f"thread {threading.get_ident()}: {s}")
+
+        print(f"thread {threading.get_ident()} entered to handle validator method {validator_method().name()}")
         thread_print(f"   running {validator_method().name()}...")
         # this filters out methods that don't accept the datatypes needed.
         if not DataValidator._method_applies(data_object, validator_method):
@@ -85,54 +103,21 @@ class DataValidator:
                                                                             validator_kwargs=validator_kwargs).items():
             method_results[result_key] = validator_method.validate(**method_kwargs)
 
-
-        print(f"{os.getpid()} finished")
-        return (validator_method().name(), method_results)
+        thread_print(f"finished")
+        return (cls.name(), validator_method().name(), method_results)
 
     @classmethod
-    def validate(cls, data_object: Dict[str, Dataset], validator_kwargs: Dict) -> Dict:
+    def get_task_list(cls, data_object: Dict[str, Dataset], validator_kwargs: Dict) -> List[Tuple]:
         """
-        Run all of the validators methods on the dataset. What are the things we might need in a .validate method?
-            - training dataset
-            - validation dataset
-            - test dataset
-            - entire dataset (in cases of cross-validation)
-            - point(s) of interest for test-time OOD
+        Gets a list of the task class and task arguments as a list of tuples.
+
+        @param data_object: the data object for the validator_method
+        @param validator_kwargs: any other kwargs needed for the validator method
+        @return: a list of task descriptors (method / arg tuples)
         """
-
-        """
-        Ok, so what can we expect out of default behavior?
-            - the method operates on a single column/feature at a time. 
-            - the method operates on just the datasets objects specified
-        If this is no longer true, then we just have to subclass this and reapply some of the logic.
-        """
-        # results = {}
-
-        # for validator_method in cls.validator_methods():
-        #     print(f"   running {validator_method().name()}...")
-        #     # this filters out methods that don't accept the datatypes needed.
-        #     if not DataValidator._method_applies(data_object, validator_method):
-        #         continue
-        #
-        #     # look at the datatypes on the validators method, and apply
-        #     method_results = {}
-        #
-        #     # for every datasets object:
-        #         # add an .item from data_object key to filtered dataset (by datatype matching method/dataset)
-        #         # if the datasets object is included in the method's param_keys
-        #     method_specific_data_object = {
-        #         key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
-        #             for key, dataset in data_object.items()
-        #             if key in {e.value for e in validator_method.param_keys()}
-        #     }
-        #
-        #     for result_key, method_kwargs in validator_method.get_method_kwargs(data_object = method_specific_data_object, validator_kwargs=validator_kwargs).items():
-        #         method_results[result_key] = validator_method.validate(**method_kwargs)
-        #
-        #     results[validator_method().name()] = method_results
-        result_items = Parallel(n_jobs=-1, backend="multiprocessing")(delayed(cls.get_results)(data_object, validator_method, validator_kwargs)
-                        for validator_method in cls.validator_methods())
-
-        results = {k: v for k, v in [x for x in result_items if x is not None]}
-
-        return results
+        return [
+            (
+                cls.validate,
+                (data_object, validator_method, validator_kwargs)
+            ) for validator_method in cls.validator_methods()
+        ]
