@@ -43,9 +43,9 @@ pip install transformers
 
 # Contributing
 
-To contriubte to Data Detective, please first complete the `ExtendingDD` jupyter notebook to learn more about 
+To contribute to Data Detective, please first complete the `ExtendingDD` jupyter notebook to learn more about 
 how to extend Data Detective to add new validator methods, validators, and validator methods to the Data Detective 
-ecosystem. To submit a contributionn, issue a pull request containing the contribution as well as any relevant
+ecosystem. To submit a contribution, issue a pull request containing the contribution as well as any relevant
 tests guaranteeing functionality of the implementation. All pull requests must be approved by at least one Data Detective 
 administrator before being merged into the master branch. 
 
