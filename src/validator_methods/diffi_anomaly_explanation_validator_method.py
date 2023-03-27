@@ -66,24 +66,15 @@ class DiffiAnomalyExplanationValidatorMethod(DataValidatorMethod):
             data_schema: Dict[str, int] = None,
     ) -> object:
         """
-        Returns the diffiley values for the
+        Returns the diffi values for the
 
         @param data_matrix: an n x d matrix with the datasets needed for the model.
         @param data_schema: a schema mapping from each data column key to its size. needed for aggregation of
-        diffiley values
-        @return: a list of anomaly diffiley values.
+        diffi values
+        @return: a list of anomaly diffi values.
         """
         iforest = IsolationForest(max_samples=64)
         iforest.fit(data_matrix)
         diffi_values, ord_idx_diffi_te, _ = local_diffi_batch(iforest, data_matrix)
 
-        # aggregate diffi values by data type
-        # cumulative_indices = np.cumsum(list(data_schema.values()))
-        # column_diffi_value_dict = {}
-        # for index, data_key in enumerate(list(data_schema.keys())):
-        #     start_index = 0 if index == 0 else cumulative_indices[index - 1]
-        #     end_index = cumulative_indices[index]
-        #     data_column_diffi_values = diffi_values[:,start_index:end_index].mean(axis=1)
-        #     column_diffi_value_dict[data_key] = data_column_diffi_values
-        #
         return diffi_values
