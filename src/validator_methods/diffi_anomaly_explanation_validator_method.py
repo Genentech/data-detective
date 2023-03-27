@@ -11,7 +11,7 @@ from src.validator_methods.data_validator_method import DataValidatorMethod
 
 class DiffiAnomalyExplanationValidatorMethod(DataValidatorMethod):
     """
-    A validator method for explainable anomaly detection using Shapley values.
+    A validator method for explainable anomaly detection using the DIFFI feature importance method.
     @src: https://diffi-lrjball.readthedocs.io/en/latest/generated/diffi.TreeExplainer.html
     """
     @staticmethod
