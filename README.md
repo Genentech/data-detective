@@ -26,8 +26,11 @@ After cloning the repository and `cd`'ing into the directory, run the following 
 
 ```bash
 # install packages supporting rank aggregation
-git clone https://github.com/thelahunginjeet/pyrankagg
-git clone https://github.com/thelahunginjeet/kbutil
+git clone https://github.com/thelahunginjeet/pyrankagg.git
+git clone https://github.com/thelahunginjeet/kbutil.git
+
+# only if you want DIFFI validator method support 
+git clone https://github.com/mattiacarletti/DIFFI.git
 
 # install all other packages
 pip install -r requirements.txt

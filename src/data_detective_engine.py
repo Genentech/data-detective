@@ -145,7 +145,7 @@ class DataDetectiveEngine:
             pool.join()
 
         # uncomment for synchronous behavior
-        # results = [task(*args) for task, args in total_task_list]
+        # results = [task(*args) for task, args in task_queue]
 
         result_dict = {}
         result_items = [result_item.get() for result_item in result_items]
