@@ -66,7 +66,7 @@ class ShapTreeValidatorMethod(DataValidatorMethod):
             data_schema: Dict[str, int] = None,
     ) -> object:
         """
-        Returns the shapley values for the
+        Returns the shapley values for the isolation forest that is trained.
 
         @param data_matrix: an n x d matrix with the datasets needed for the model.
         @param data_schema: a schema mapping from each data column key to its size. needed for aggregation of
