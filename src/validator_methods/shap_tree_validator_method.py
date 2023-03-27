@@ -78,7 +78,7 @@ class ShapTreeValidatorMethod(DataValidatorMethod):
         explainer = shap.TreeExplainer(iforest, feature_perturbation='tree_path_dependent')
         shap_values = explainer.shap_values(data_matrix)
 
-        # aggregate shap values by data type
+        # aggregate shap values within each data modality (column)
         cumulative_indices = np.cumsum(list(data_schema.values()))
         column_shap_value_dict = {}
         for index, data_key in enumerate(list(data_schema.keys())):
