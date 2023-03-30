@@ -10,8 +10,9 @@ pyyaml
 regex
 scikit-learn==0.24.2
 scipy==1.7.1
+seaborn
 shap==0.41.0
 statsmodels==0.11.1
 tensorflow
-torch
-torchvision
+torch==1.13.1
+torchvision==0.14.1
