@@ -46,29 +46,3 @@ class CSVDataset:
         @return: the datatypes of a the dataset sample.
         """
         return self.datatypes_dict
-
-
-"""
-What are the run persistent caching options available?
-
-First, let's examine our requirements: 
-    - once a single datapoint is cached in a dataset, it should never have to be transformed again. 
-    - this is basically mapping (dataset, index, transforms) to (output)
-        - it seems that the crux of the issue is doing hashing/versioning/identification on teh dataset
-        - problems to address:
-            - how do we identify the specific instance of the dataset and load it next time? (we need to find the params that 
-                - maybe we need (dataset => dataset version / hash => index => transforms)
-                - but this doesn't quite make the mark, because a true data cache would only need the data about the datapoint
-                and the transforms... 
-                - so maybe the answer isn't even a dataset level cache but a data level cache! 
-                - OMG this is going to be so much cleaner... now we just hash(sample || alphabetized_transform_list) and we are good to go!
-                
-            - how do we accommodate the situation where the dataset has changed slightly? (need to support dataset hashing)
-        - i think we need to write some tests that are emblematic of 
-        
-        
-    - we cannot assume that there is only one dataset of each chass type (there are splits)
-    - ...so we need a form of identifier that basically maps to each version of a dataset...
-        - maybe we could use wandb artifacts?
-        - we absolutely need to be hashing the whole dataset... or do we?
-"""
