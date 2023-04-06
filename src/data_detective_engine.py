@@ -1,22 +1,16 @@
 import multiprocessing.pool
-import os
 import queue
-import sys
-import threading
-import time
+import torch
 
 from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Any, Tuple
 
-import torch
-from joblib import delayed, Parallel
 
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
-from src.transforms.transform_library import Transform, get_resnet50, get_vit, get_bert
 from src.utils import snake_to_camel, filter_dataset
 from src.validators.data_validator import DataValidator
 
@@ -73,7 +67,7 @@ class DataDetectiveEngine:
         else:
             filtered_transformed_data_object = filtered_data_object
 
-        return validator_class_object.get_task_list(
+        return filtered_transformed_data_object, validator_class_object.get_task_list(
             data_object=filtered_transformed_data_object,
             validator_kwargs=validator_kwargs
         )
@@ -129,11 +123,16 @@ class DataDetectiveEngine:
         default_inclusion = config_dict.get("default_inclusion", True)
         validators = config_dict["validators"]
 
+        data_objects = []
+
         for validator_class_name, validator_params in validators.items():
-            for task in self.get_task_list(validator_class_name, validator_params, config_dict, data_object):
+            data_object, tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
+            data_objects.append(data_object)
+            for task in tasks:
                 task_queue.put(task)
 
         result_items = []
+        result_dict = {}
 
         with multiprocessing.pool.ThreadPool(100) as pool:
             while task_queue.qsize() > 0:
@@ -144,11 +143,17 @@ class DataDetectiveEngine:
             pool.close()
             pool.join()
 
-        # uncomment for synchronous behavior
-        # results = [task(*args) for task, args in task_queue]
-
-        result_dict = {}
         result_items = [result_item.get() for result_item in result_items]
+
+        # uncomment for synchronous behavior
+
+        # while task_queue.qsize() > 0:
+        #     task, args = task_queue.get()
+        #     result_items.append(task(*args))
+
+        # uncomment for synchronous behavior
+
+        # ipdb> p [[dataset.cache_statistics_dict for dataset in data_object.values()] for data_object in data_objects]
         for validator, validator_method, results in result_items:
             if validator not in result_dict.keys():
                 result_dict[validator] = {}

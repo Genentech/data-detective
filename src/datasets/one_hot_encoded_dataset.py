@@ -43,7 +43,9 @@ class OneHotEncodedDataset:
 
         self.one_hot_encoded_catvars = {}
 
-        for sample in iter(DataLoader(self.dataset)):
+        # do not switch this to a dataloader! it compromises determinism and breaks caching.
+        for idx in range(self.dataset.__len__()):
+            sample = self.dataset[idx]
             for column in categorical_variables.keys():
                 categorical_variables[column].append(sample[column])
 
@@ -67,12 +69,6 @@ class OneHotEncodedDataset:
                 sample[column_name] = self.one_hot_encoded_catvars[column_name][idx]
 
         return sample
-
-    def __getattr__(self, item):
-        if hasattr(self, item):
-            return getattr(self, item)
-
-        return getattr(self.dataset, item)
 
     def __len__(self):
         return self.dataset.__len__()

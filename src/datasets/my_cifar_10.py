@@ -1,7 +1,5 @@
 from typing import Dict, Union
 
-import pandas as pd
-import torch
 from torchvision.datasets import CIFAR10
 
 from constants import FloatTensor

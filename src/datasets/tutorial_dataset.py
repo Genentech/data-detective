@@ -13,6 +13,7 @@ class TutorialDataset(MNIST):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         dataset_size = self.__len__()
+        np.random.seed(42)
         self.normal_column = np.random.normal(size=(dataset_size, 2))
         self.normal_column_2 = np.random.normal(size=dataset_size)
 

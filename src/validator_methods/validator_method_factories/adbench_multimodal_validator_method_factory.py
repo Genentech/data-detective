@@ -41,7 +41,7 @@ class ADBenchMultimodalValidatorMethodFactory:
             @override
             def name(self) -> str:
                 method_name = model.__module__.split(".")[-1]
-                return f"{method_name}_anomaly_validator_method"
+                return f"{method_name}_multimodal_anomaly_validator_method"
 
             @staticmethod
             def datatype() -> Set[DataType]:
