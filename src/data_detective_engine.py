@@ -72,7 +72,7 @@ class DataDetectiveEngine:
             validator_kwargs=validator_kwargs
         )
 
-    def validate_from_schema(self, config_dict: Dict, data_object: Dict) -> Dict:
+    def validate_from_schema(self, config_dict: Dict, data_object: Dict, run_concurrently: bool = True) -> Dict:
         """
         Validates a particular parameter object (dict of things like train_dataset and test_dataset) against
         all validators specified in the config file. Leverages a thread pool to run all validator methods in parallel.
@@ -134,24 +134,21 @@ class DataDetectiveEngine:
         result_items = []
         result_dict = {}
 
-        with multiprocessing.pool.ThreadPool(100) as pool:
+        if run_concurrently:
+            with multiprocessing.pool.ThreadPool(100) as pool:
+                while task_queue.qsize() > 0:
+                    task, args = task_queue.get()
+                    res = pool.apply_async(task, args)
+                    result_items.append(res)
+
+                pool.close()
+                pool.join()
+
+            result_items = [result_item.get() for result_item in result_items]
+        else:
             while task_queue.qsize() > 0:
                 task, args = task_queue.get()
-                res = pool.apply_async(task, args)
-                result_items.append(res)
-
-            pool.close()
-            pool.join()
-
-        result_items = [result_item.get() for result_item in result_items]
-
-        # uncomment for synchronous behavior
-
-        # while task_queue.qsize() > 0:
-        #     task, args = task_queue.get()
-        #     result_items.append(task(*args))
-
-        # uncomment for synchronous behavior
+                result_items.append(task(*args))
 
         # ipdb> p [[dataset.cache_statistics_dict for dataset in data_object.values()] for data_object in data_objects]
         for validator, validator_method, results in result_items:
