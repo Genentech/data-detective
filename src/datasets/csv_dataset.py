@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 import typing
@@ -5,16 +7,17 @@ import typing
 from PIL import Image
 from typing import Dict
 
+from constants import DD_PATH, FloatTensor
 from src.enums.enums import DataType
 
 
 class CSVDataset:
-    def __init__(self, filepath: str, datatype_dict: Dict[str, DataType], unwrap_paths: bool = True):
+    def __init__(self, filepath: str, datatype_dict: Dict[str, DataType]):
         self.datatypes_dict = datatype_dict
-        self.df = pd.read_csv(filepath)
+        pth = os.path.join(DD_PATH, "data", filepath)
+        self.df = pd.read_csv(pth)
         self.df = self.df[list(datatype_dict.keys())]
         self.df = self.df.dropna()
-        self.unwrap_paths = unwrap_paths
 
     def __len__(self) -> int:
         """
@@ -33,10 +36,12 @@ class CSVDataset:
 
         for column_name, datatype in self.datatypes_dict.items():
             # if we are working with an image that is being represented as a path
-            if datatype == DataType.IMAGE and isinstance(sample[column_name], str) and self.unwrap_paths:
-                img_path = f"data/{sample[column_name]}"
-                img = np.array(Image.open(img_path))
-                sample[column_name] = img
+            if datatype == DataType.IMAGE and isinstance(sample[column_name], str):
+                img_path = os.path.join(DD_PATH, "data", sample[column_name])
+                img = np.load(img_path)
+                img = img - img.min()
+                img = img / img.max()
+                sample[column_name] = FloatTensor(img)
 
         return sample
 

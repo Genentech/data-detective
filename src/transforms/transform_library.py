@@ -10,16 +10,15 @@ def get_resnet50(**kwargs):
     modules = list(resnet.children())[:-1]
     backbone = torch.nn.Sequential(torch.nn.Upsample((224, 224)), *modules)
     def full_impl(x):
+        if len(x.shape) == 2:
+            #add channel dimension
+            x = torch.unsqueeze(x, 0)
+        if x.shape[0] == 1:
+            # if 1ch need from 1ch to 3ch RGB
+            x = x.expand(3,*x.shape[1:])
         if len(x.shape) == 3:
             # need a 4th dimension
             x = torch.unsqueeze(x, 0)
-        if x.shape[-3] == 1:
-            # need to map to multiple channels
-            x2 = torch.zeros((x.shape[0], 3, x.shape[2], x.shape[3]))
-            x2[:, 0, :, :] = x[:, 0, :, :]
-            x2[:, 1, :, :] = x[:, 0, :, :]
-            x2[:, 2, :, :] = x[:, 0, :, :]
-            x = x2
 
         x = backbone(x)
         x = x.squeeze()

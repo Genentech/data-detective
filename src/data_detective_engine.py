@@ -151,6 +151,7 @@ class DataDetectiveEngine:
                 result_items.append(task(*args))
 
         # ipdb> p [[dataset.cache_statistics_dict for dataset in data_object.values()] for data_object in data_objects]
+        result_items = [result_item for result_item in result_items if result_item is not None]
         for validator, validator_method, results in result_items:
             if validator not in result_dict.keys():
                 result_dict[validator] = {}

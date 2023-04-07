@@ -77,6 +77,9 @@ class TransformedDataset:
                         new_value = pickle.load(f)
                         new_item[new_column_name] = new_value
                 else:
+                    if not os.path.isdir("data/tmp"):
+                        os.makedirs("data/tmp")
+
                     new_value = transform(new_item[col_name])
                     with open(filepath, "wb") as f:
                         self.cache_statistics_dict['cache_misses'] += 1
