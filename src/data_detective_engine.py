@@ -1,22 +1,16 @@
 import multiprocessing.pool
-import os
 import queue
-import sys
-import threading
-import time
+import torch
 
 from collections import defaultdict
 from copy import deepcopy
 from typing import Dict, List, Any, Tuple
 
-import torch
-from joblib import delayed, Parallel
 
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
-from src.transforms.transform_library import Transform, get_resnet50, get_vit, get_bert
 from src.utils import snake_to_camel, filter_dataset
 from src.validators.data_validator import DataValidator
 
@@ -73,12 +67,12 @@ class DataDetectiveEngine:
         else:
             filtered_transformed_data_object = filtered_data_object
 
-        return validator_class_object.get_task_list(
+        return filtered_transformed_data_object, validator_class_object.get_task_list(
             data_object=filtered_transformed_data_object,
             validator_kwargs=validator_kwargs
         )
 
-    def validate_from_schema(self, config_dict: Dict, data_object: Dict) -> Dict:
+    def validate_from_schema(self, config_dict: Dict, data_object: Dict, run_concurrently: bool = True) -> Dict:
         """
         Validates a particular parameter object (dict of things like train_dataset and test_dataset) against
         all validators specified in the config file. Leverages a thread pool to run all validator methods in parallel.
@@ -129,26 +123,35 @@ class DataDetectiveEngine:
         default_inclusion = config_dict.get("default_inclusion", True)
         validators = config_dict["validators"]
 
+        data_objects = []
+
         for validator_class_name, validator_params in validators.items():
-            for task in self.get_task_list(validator_class_name, validator_params, config_dict, data_object):
+            data_object, tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
+            data_objects.append(data_object)
+            for task in tasks:
                 task_queue.put(task)
 
         result_items = []
+        result_dict = {}
 
-        with multiprocessing.pool.ThreadPool(100) as pool:
+        if run_concurrently:
+            with multiprocessing.pool.ThreadPool(100) as pool:
+                while task_queue.qsize() > 0:
+                    task, args = task_queue.get()
+                    res = pool.apply_async(task, args)
+                    result_items.append(res)
+
+                pool.close()
+                pool.join()
+
+            result_items = [result_item.get() for result_item in result_items]
+        else:
             while task_queue.qsize() > 0:
                 task, args = task_queue.get()
-                res = pool.apply_async(task, args)
-                result_items.append(res)
+                result_items.append(task(*args))
 
-            pool.close()
-            pool.join()
-
-        # uncomment for synchronous behavior
-        # results = [task(*args) for task, args in task_queue]
-
-        result_dict = {}
-        result_items = [result_item.get() for result_item in result_items]
+        # ipdb> p [[dataset.cache_statistics_dict for dataset in data_object.values()] for data_object in data_objects]
+        result_items = [result_item for result_item in result_items if result_item is not None]
         for validator, validator_method, results in result_items:
             if validator not in result_dict.keys():
                 result_dict[validator] = {}
