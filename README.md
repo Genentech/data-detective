@@ -33,8 +33,13 @@ git clone https://github.com/thelahunginjeet/kbutil.git
 git clone https://github.com/mattiacarletti/DIFFI.git
 
 # install all other packages
-pip install -r requirements.txt
+virtualenv dd_env -p python3.9 
+source dd_env/bin/activate
+pip3 install -r requirements.txt
+dd_env/bin/python -m ipykernel install --name=dd_env 
 ```
+
+If you are planning on using Data Detective in a jupyter notebook, please ensure that the kernel is switched to the appropriate virtual environoment.
 
 If you are planning to make use of the pretrained transform library for high dimensional inputs, follow the additional install steps outlined below.
 
