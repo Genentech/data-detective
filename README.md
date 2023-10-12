@@ -35,6 +35,8 @@ git clone https://github.com/mattiacarletti/DIFFI.git
 # install all other packages
 virtualenv dd_env -p python3.9 
 source dd_env/bin/activate
+# READ: only do the following line if on Ubuntu.
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py | python3.9 - 
 pip3 install -r requirements.txt
 dd_env/bin/python -m ipykernel install --name=dd_env 
 ```
