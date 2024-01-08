@@ -32,7 +32,8 @@ def cifar_10():
 
 class TestEmbeddingTransformer:
     def test_embedding_transformer(self, cifar_10):
-        gaussian_blur = Transform(GaussianBlur(9), lambda name: f"blurred_{name}", DataType.IMAGE, in_place=False)
+        gaussian_blur = Transform(GaussianBlur, lambda name: f"blurred_{name}", DataType.IMAGE, in_place=False)
+        gaussian_blur.initialize_transform({"kernel_size": 9})
         resnet = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
         modules = list(resnet.children())[:-1]
         backbone = torch.nn.Sequential(*modules)
@@ -42,17 +43,17 @@ class TestEmbeddingTransformer:
         transformed_dataset = TransformedDataset(cifar_10, transform_dict)
         x = transformed_dataset[0]
 
-        assert("blurred_image" in x.keys())
-        assert("blurred_image" in transformed_dataset.datatypes())
-        assert("image" in x.keys())
-        assert("image" in transformed_dataset.datatypes())
+        assert("blurred_cifar_image" in x.keys())
+        assert("blurred_cifar_image" in transformed_dataset.datatypes())
+        assert("cifar_image" in x.keys())
+        assert("cifar_image" in transformed_dataset.datatypes())
 
 
     def test_embedding_transformer_integration(self, cifar_10):
         test_validation_schema : dict = {
             "default_inclusion": False,
             "transforms": {
-                "image": [{
+                "cifar_image": [{
                     "name": "resnet50",
                     "in_place": "False",
                     "options": {},

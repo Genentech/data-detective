@@ -5,7 +5,6 @@ from typing import List
 import torch
 from torch.utils.data import Dataset
 
-import src.utils
 from src.enums.enums import DataType
 
 

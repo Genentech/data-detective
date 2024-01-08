@@ -28,10 +28,10 @@ class TestMyCIFAR10:
 
     def test_getitem(self, cifar_10):
         sample = cifar_10[0]
-        assert(isinstance(sample['image'], FloatTensor))
+        assert(isinstance(sample['cifar_image'], FloatTensor))
         assert(isinstance(sample['label'], int))
 
     def test_datatypes(self, cifar_10):
         datatypes = cifar_10.datatypes()
-        assert(datatypes['image'] == DataType.IMAGE)
+        assert(datatypes['cifar_image'] == DataType.IMAGE)
         assert(datatypes['label'] == DataType.CATEGORICAL)

@@ -8,7 +8,7 @@ from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 from src.data_detective_engine import DataDetectiveEngine
 
 
-class TestUtils:
+class TestDataDetectiveEngine:
     def test_validate_from_schema(self):
         """
         Tests for functionality over validate_from_schema in the data detective engine.

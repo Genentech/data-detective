@@ -3,11 +3,10 @@ from typing import List, Set, Dict, Type
 import numpy as np
 import pandas as pd
 import torch
-from fcit import fcit
 from torch.utils.data import Dataset
 
 from src.enums.enums import DataType, ValidatorMethodParameter
-from src.utils import filter_dataset
+from src.utils import fcit_test, filter_dataset
 from src.validator_methods.data_validator_method import DataValidatorMethod
 
 
@@ -90,5 +89,5 @@ class FCITValidatorMethod(DataValidatorMethod):
 
         @return: the stats object that it needs when it gets back.
         """
-        result = fcit.test(x, y, z)
+        result = fcit_test(x, y, z)
         return result

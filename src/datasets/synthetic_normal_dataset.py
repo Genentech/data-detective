@@ -21,7 +21,7 @@ class SyntheticNormalDataset(Dataset):
 
         self.dataframe = dataframe
 
-    def getitem(self, index: int):
+    def __getitem__(self, index: int):
         return self.dataframe.iloc[index].to_dict()
 
     def __len__(self) -> int:

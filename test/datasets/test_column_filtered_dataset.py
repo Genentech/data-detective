@@ -22,7 +22,7 @@ class TestColumnFilteredDataset:
         normal_dataset: SyntheticNormalDataset = SyntheticNormalDataset(num_cols=100, dataset_size = 10000)
         filtered_dataset: ColumnFilteredDataset = ColumnFilteredDataset(normal_dataset, ["^feature_22$"])
 
-        assert(len(filtered_dataset[:].keys()) == 1)
+        assert(len(filtered_dataset[0].keys()) == 1)
 
     def test_datatypes_filter(self):
         normal_dataset: SyntheticNormalDataset = SyntheticNormalDataset(num_cols=100, dataset_size=10000)
