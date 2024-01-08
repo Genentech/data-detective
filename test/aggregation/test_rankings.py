@@ -109,7 +109,7 @@ class TestADBenchIntegration:
             aggregator = RankingAggregator(results)
             aggregated_results = aggregator.aggregate_rankings(
                 validator_name="unsupervised_anomaly_data_validator",
-                aggregation_method=RankingAggregationMethod.ROUND_ROBIN
+                aggregation_methods=[RankingAggregationMethod.ROUND_ROBIN]
             )
 
             x=3
