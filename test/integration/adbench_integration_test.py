@@ -6,11 +6,10 @@ import pandas as pd
 import sklearn.metrics
 import torch
 from torchvision.transforms import transforms
+from src.data_detective_engine import DataDetectiveEngine
 
-import src.datasets.synthetic_data_generators
 from src.datasets.adbench_dataset import ADBenchDataset
 from src.enums.enums import DataType
-from src.utils import validate_from_schema
 
 INFERENCE_SIZE = 20
 
@@ -105,7 +104,8 @@ class TestADBenchIntegration:
                 "inference_set": inference_dataset
             }
 
-            results = validate_from_schema(test_validation_schema, data_object)
+            
+            results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
             # print(results)
 
             auc_dict = {}

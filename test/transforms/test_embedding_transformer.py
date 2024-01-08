@@ -13,7 +13,7 @@ import torchvision.transforms as transforms
 from src.datasets.my_cifar_10 import MyCIFAR10
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import Transform, TransformedDataset
-from src.utils import validate_from_schema
+from src.data_detective_engine import DataDetectiveEngine
 
 
 @pytest.fixture
@@ -89,6 +89,6 @@ class TestEmbeddingTransformer:
             "entire_set": cifar_10,
         }
 
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         c=3
 

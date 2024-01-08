@@ -5,8 +5,8 @@ import torch
 
 from src.aggregation.rankings import RankingAggregator, RankingAggregationMethod
 from src.datasets.adbench_dataset import ADBenchDataset
+from src.data_detective_engine import DataDetectiveEngine
 from src.enums.enums import DataType
-from src.utils import validate_from_schema
 
 INFERENCE_SIZE = 20
 
@@ -103,7 +103,8 @@ class TestADBenchIntegration:
                 "inference_set": inference_dataset
             }
 
-            results = validate_from_schema(test_validation_schema, data_object)
+            
+            results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
 
             aggregator = RankingAggregator(results)
             aggregated_results = aggregator.aggregate_rankings(

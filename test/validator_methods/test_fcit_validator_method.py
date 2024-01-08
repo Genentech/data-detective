@@ -3,8 +3,8 @@ from typing import Dict
 import numpy as np
 import torch
 
-from src.utils import validate_from_schema
-from src.datasets.synthetic_data_generators import SyntheticCIDataset
+from src.data_detective_engine import DataDetectiveEngine
+from src.datasets.synthetic_ci_dataset import SyntheticCIDataset
 
 
 class TestFCITValidatorMethod:
@@ -50,7 +50,7 @@ class TestFCITValidatorMethod:
         }
 
         # results == {'conditional_independence_data_validator': {'fcit_validator_method': {'0': 0.5}}}
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         p_value = results['conditional_independence_data_validator']['fcit_validator_method']['0']
 
         assert(p_value > 0.05)
@@ -94,7 +94,7 @@ class TestFCITValidatorMethod:
         }
 
         # results == {'conditional_independence_data_validator': {'fcit_validator_method': {'0': 7.402629383549662e-06}}}
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         p_value = results['conditional_independence_data_validator']['fcit_validator_method']['0']
 
         assert(p_value < 0.05)

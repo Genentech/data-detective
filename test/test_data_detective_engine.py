@@ -4,13 +4,15 @@ import torch
 from torchvision.transforms import transforms
 
 from constants import SEED
-from src.datasets import synthetic_data_generators
-from src.utils import validate_from_schema
-from src.datasets.synthetic_data_generators import SyntheticNormalDataset
+from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
+from src.data_detective_engine import DataDetectiveEngine
 
 
 class TestUtils:
     def test_validate_from_schema(self):
+        """
+        Tests for functionality over validate_from_schema in the data detective engine.
+        """
         test_validation_schema: Dict = {
             "default_inclusion": False,
             "validators": {
@@ -36,8 +38,8 @@ class TestUtils:
             "entire_set": normal_dataset
         }
 
-        results = validate_from_schema(test_validation_schema, data_object)
-        c = 4
+        data_detective_engine = DataDetectiveEngine()
+        results = data_detective_engine.validate_from_schema(test_validation_schema, data_object)
 
     def test_split(self):
         pass

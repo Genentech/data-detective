@@ -3,9 +3,8 @@ from typing import Dict
 import numpy as np
 import torch
 
-import src.utils
-
-from src.datasets.synthetic_data_generators import SyntheticNormalDataset
+from src.data_detective_engine import DataDetectiveEngine
+from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 
 
 class TestMannWhitneySplitValidatorMethod:
@@ -38,7 +37,7 @@ class TestMannWhitneySplitValidatorMethod:
         }
 
         # results == {'split_covariate_data_validator': {'kolmogorov_smirnov_split_validator_method': {'training_set/test_set/feature_0': KstestResult(statistic=0.005366666666666672, pvalue=0.7785188817028788), 'training_set/validation_set/feature_0': KstestResult(statistic=0.006116666666666659, pvalue=0.6263395414856405), 'test_set/validation_set/feature_0': KstestResult(statistic=0.00660000000000005, pvalue=0.7737396658858053)}, 'kruskal_wallis_split_validator_method': {'training_set/test_set/feature_0': KruskalResult(statistic=0.06664652898325585, pvalue=0.7962835117722751), 'training_set/validation_set/feature_0': KruskalResult(statistic=0.5260585436481051, pvalue=0.4682686595849018), 'test_set/validation_set/feature_0': KruskalResult(statistic=0.14121920499019325, pvalue=0.707071953434097)}, 'mann_whitney_split_validator_method': {'training_set/test_set/feature_0': MannwhitneyuResult(statistic=600730191.0, pvalue=0.7962836482032007), 'training_set/validation_set/feature_0': MannwhitneyuResult(statistic=602051468.0, pvalue=0.4682687680109038), 'test_set/validation_set/feature_0': MannwhitneyuResult(statistic=200433932.0, pvalue=0.7070722753726866)}}}
-        results = src.utils.validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         method_results = results['split_covariate_data_validator']['mann_whitney_split_validator_method']
         p_value = method_results['training_set/validation_set/feature_0'].pvalue
         assert(p_value > 0.05)

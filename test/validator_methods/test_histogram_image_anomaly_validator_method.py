@@ -6,11 +6,10 @@ import torch
 from torchvision.transforms import transforms
 
 from constants import SEED
-from src.datasets import synthetic_data_generators
+from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.my_cifar_10 import MyCIFAR10
 from src.datasets.my_fashion_mnist import MyFashionMNIST
 from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
-from src.utils import validate_from_schema
 
 @pytest.fixture()
 def fashion_mnist():
@@ -99,7 +98,7 @@ class TestHistogramImageAnomalyValidatorMethod:
 
 
 
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         experiment_results = results['unsupervised_anomaly_data_validator']['histogram_image_anomaly_validator_method']['results']
 
         index_lst, label, (score, anom_pred) = experiment_results
@@ -145,7 +144,7 @@ class TestHistogramImageAnomalyValidatorMethod:
             "entire_set": fashion_mnist
         }
 
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         experiment_results = results['unsupervised_anomaly_data_validator']['histogram_image_anomaly_validator_method']['results']
 
         index_lst, label, (score, anom_pred) = experiment_results

@@ -3,8 +3,8 @@ from typing import Dict
 import numpy as np
 import torch
 
+from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
-from src.utils import validate_from_schema
 
 
 class TestIsolationForestAnomalyValidatorMethod:
@@ -47,7 +47,7 @@ class TestIsolationForestAnomalyValidatorMethod:
 
         # results are 0 if sample is anomalous, 1 if not
         # results == {'unsupervised_anomaly_data_validator': {'isolation_forest_anomaly_validator_method': {'results': array([1, 1, 1, ..., 1, 1, 1])}}}
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
 
 
 

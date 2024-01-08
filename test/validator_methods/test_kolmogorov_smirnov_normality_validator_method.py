@@ -3,8 +3,8 @@ from typing import Dict
 import numpy as np
 import torch
 
-from src.utils import validate_from_schema
-from src.datasets.synthetic_data_generators import SyntheticNormalDataset
+from src.data_detective_engine import DataDetectiveEngine
+from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 
 
 class TestKolmogorovSmirnovNormalityValidatorMethod:
@@ -37,7 +37,7 @@ class TestKolmogorovSmirnovNormalityValidatorMethod:
         }
 
         # results == {'normality_data_validator': {'kolmogorov_smirnov_normality_validator_method': {'feature_0': KstestResult(statistic=0.003674476700887941, pvalue=0.9992074462469855)}}}
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         d_statistic, p_value = results['normality_data_validator']['kolmogorov_smirnov_normality_validator_method']['feature_0']
 
         assert(p_value > 0.05)
@@ -73,7 +73,7 @@ class TestKolmogorovSmirnovNormalityValidatorMethod:
         }
 
         # results == {'normality_data_validator': {'kolmogorov_smirnov_normality_validator_method': {'feature_0': KstestResult(statistic=0.10025403366385621, pvalue=5.984973888392497e-88)}}}
-        results = validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         d_statistic, p_value = results['normality_data_validator']['kolmogorov_smirnov_normality_validator_method']['feature_0']
 
         assert(p_value < 0.05)
