@@ -113,7 +113,9 @@ class TestADBenchIntegration:
             #############
             anomaly_results_dict = results['unsupervised_anomaly_data_validator']
             for validator_method in anomaly_results_dict.keys():
-                predicted_scores = anomaly_results_dict[validator_method]['results']
+                predicted_scores = anomaly_results_dict[validator_method]
+                result_key = list(predicted_scores.keys())[0]
+                predicted_scores = predicted_scores[result_key]
 
                 true_scores = adbench_dataset.y
                 roc_auc_score = sklearn.metrics.roc_auc_score(true_scores, predicted_scores)
@@ -128,7 +130,7 @@ class TestADBenchIntegration:
                     "metric_unit": "aucroc"
                 })
 
-            iforest_results = anomaly_results_dict['isolation_forest_anomaly_validator_method']['results']
+            iforest_results = anomaly_results_dict['iforest_anomaly_validator_method']['results']
             pca_results = anomaly_results_dict['pca_anomaly_validator_method']['results']
             cblof_results = anomaly_results_dict['cblof_anomaly_validator_method']['results']
             true_results = adbench_dataset.y

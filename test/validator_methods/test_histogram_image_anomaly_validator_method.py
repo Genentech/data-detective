@@ -57,18 +57,23 @@ def synthetic_anomalous_dataset():
 
     yield synthetic_anomalous_dataset
 
-
-
 class TestHistogramImageAnomalyValidatorMethod:
     def test_positive_example(self, synthetic_anomalous_dataset):
         np.random.seed(42)
 
         test_validation_schema : dict = {
             "default_inclusion": False,
+            "transforms": {
+                "cifar_image": [{
+                    "name": "histogram",
+                    "in_place": "False",
+                    "options": {},
+                }],
+            },
             "validators": {
                 "unsupervised_anomaly_data_validator": {
                     "include": [
-                        "image",
+                        "cifar_image",
                         "label"
                     ],
                     "validator_kwargs": {
@@ -87,14 +92,14 @@ class TestHistogramImageAnomalyValidatorMethod:
             "entire_set": synthetic_anomalous_dataset
         }
 
-        data_object: Dict[str, torch.utils.data.Dataset] = {
-            "rename: splits": {
-                "entire_set": synthetic_anomalous_dataset
-            },
-            # "transforms": {
-            #     "column": [transform1, transform2]
-            # }
-        }
+        # data_object: Dict[str, torch.utils.data.Dataset] = {
+        #     "rename: splits": {
+        #         "entire_set": synthetic_anomalous_dataset
+        #     },
+        #     # "transforms": {
+        #     #     "column": [transform1, transform2]
+        #     # }
+        # }
 
 
 
@@ -125,7 +130,7 @@ class TestHistogramImageAnomalyValidatorMethod:
             "validators": {
                 "unsupervised_anomaly_data_validator": {
                     "include": [
-                        "image",
+                        "cifar_image",
                         "label"
                     ],
                     "validator_kwargs": {

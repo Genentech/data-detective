@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 
 from src.enums.enums import DataType
@@ -65,7 +66,24 @@ def get_bert(**kwargs):
 def bert_backbone_name(original_name):
     return f"bert_backbone_{original_name}"
 
+def get_histogram(**kwargs):
+    num_bins = kwargs.get("bins", 10)
+
+    def full_impl(x):
+        x_norm = (x - x.min()) / (x.max() - x.min())
+        return np.histogram(x_norm, bins=num_bins)
+
+    return full_impl
+
+def histogram_name(original_name): 
+    return f"histogram_{original_name}"
+
 TRANSFORM_LIBRARY = {
+    "histogram": Transform(
+        transform_class=get_histogram,
+        new_column_name_fn=histogram_name,
+        new_column_datatype=DataType.MULTIDIMENSIONAL
+    ),
     "resnet50": Transform(
         transform_class=get_resnet50,
         new_column_name_fn=resnet50_backbone_name,

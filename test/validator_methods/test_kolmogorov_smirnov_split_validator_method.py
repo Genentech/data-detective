@@ -72,7 +72,7 @@ class TestKolmogorovSmirnovSplitValidatorMethod:
         }
 
         # {'split_covariate_data_validator': {'kolmogorov_smirnov_split_validator_method': {'training_set/test_set/feature_0': KstestResult(statistic=0.6772, pvalue=0.0), 'training_set/validation_set/feature_0': KstestResult(statistic=0.3886, pvalue=0.0), 'test_set/validation_set/feature_0': KstestResult(statistic=0.3776, pvalue=0.0)}, 'kruskal_wallis_split_validator_method': {'training_set/test_set/feature_0': KruskalResult(statistic=10622.043853937459, pvalue=0.0), 'training_set/validation_set/feature_0': KruskalResult(statistic=4177.829853541334, pvalue=0.0), 'test_set/validation_set/feature_0': KruskalResult(statistic=3899.0755428250777, pvalue=0.0)}, 'mann_whitney_split_validator_method': {'training_set/test_set/feature_0': MannwhitneyuResult(statistic=7923532.0, pvalue=0.0), 'training_set/validation_set/feature_0': MannwhitneyuResult(statistic=23611749.0, pvalue=0.0), 'test_set/validation_set/feature_0': MannwhitneyuResult(statistic=75492713.0, pvalue=0.0)}}}
-        results = src.utils.validate_from_schema(test_validation_schema, data_object)
+        results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         method_results = results['split_covariate_data_validator']['kolmogorov_smirnov_split_validator_method']
         p_value = method_results['training_set/validation_set/feature_0'].pvalue
         assert(p_value < 0.05)
