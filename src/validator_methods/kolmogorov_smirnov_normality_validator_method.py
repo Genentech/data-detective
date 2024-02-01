@@ -21,7 +21,7 @@ class KolmogorovSmirnovNormalityValidatorMethod(DataValidatorMethod):
         """
         @return: the datatype the validators method operates on
         """
-        return {DataType.CONTINUOUS}
+        return {DataType.MULTIDIMENSIONAL}
 
     @staticmethod
     def param_keys() -> Set[ValidatorMethodParameter]:

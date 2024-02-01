@@ -63,7 +63,7 @@ class TestCSVDataset:
 
         transform_schema: Dict = {
             "transforms": {
-                "image": [{
+                "openbhb_image": [{
                     "name": "resnet50",
                     "in_place": "False",
                     "options": {},
