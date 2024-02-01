@@ -73,6 +73,7 @@ class TestHistogramImageAnomalyValidatorMethod:
             "validators": {
                 "unsupervised_anomaly_data_validator": {
                     "include": [
+                        "histogram_cifar_image",
                         "cifar_image",
                         "label"
                     ],
@@ -104,7 +105,7 @@ class TestHistogramImageAnomalyValidatorMethod:
 
 
         results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
-        experiment_results = results['unsupervised_anomaly_data_validator']['histogram_image_anomaly_validator_method']['results']
+        experiment_results = results['unsupervised_anomaly_data_validator']['histogram_cifar_image_anomaly_validator_method']['results']
 
         index_lst, label, (score, anom_pred) = experiment_results
         lst = [(l, s, a, i) for l, s, a, i in zip(label, score, anom_pred, index_lst)]

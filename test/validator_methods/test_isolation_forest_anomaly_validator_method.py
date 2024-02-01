@@ -15,16 +15,15 @@ class TestIsolationForestAnomalyValidatorMethod:
             "default_inclusion": False,
             "validators": {
                 "unsupervised_anomaly_data_validator": {
-                    "include": [
-                        "feature_\d+"
-                    ],
-                    "validator_kwargs": {
-
-                        # "contamination": "auto",
-                        # "max_features": 10,
-                        # "max_samples": 10000,
-                        # "n_estimators": 5000,
-                    }
+                    # "include": [
+                    #     "feature_\d+"
+                    # ],
+                    # "validator_kwargs": {
+                    #     # "contamination": "auto",
+                    #     # "max_features": 10,
+                    #     # "max_samples": 10000,
+                    #     # "n_estimators": 5000,
+                    # }
                 }
             }
         }
@@ -48,7 +47,7 @@ class TestIsolationForestAnomalyValidatorMethod:
         # results are 0 if sample is anomalous, 1 if not
         # results == {'unsupervised_anomaly_data_validator': {'isolation_forest_anomaly_validator_method': {'results': array([1, 1, 1, ..., 1, 1, 1])}}}
         results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
-
+        assert(not not results)
 
 
         # _, predictions = results['unsupervised_anomaly_data_validator']['isolation_forest_anomaly_validator_method']['results']

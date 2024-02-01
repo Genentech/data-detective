@@ -96,7 +96,6 @@ class DataValidator:
         method_specific_data_object = {
             key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
             for key, dataset in data_object.items()
-            if key in {e.value for e in validator_method.param_keys()}
         }
 
         for result_key, method_kwargs in validator_method.get_method_kwargs(data_object=method_specific_data_object,

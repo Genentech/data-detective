@@ -58,6 +58,6 @@ class SyntheticNormalDataset(Dataset):
 
     def datatypes(self) -> Dict[str, DataType]:
         return {
-            column_name: DataType.CONTINUOUS
+            column_name: DataType.MULTIDIMENSIONAL
             for column_name in self.columns
         }

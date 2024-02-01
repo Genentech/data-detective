@@ -72,10 +72,20 @@ class TransformedDataset:
 
                 filepath = f"data/tmp/{hash_value}.pkl"
                 if os.path.isfile(filepath):
-                    with open(filepath, "rb") as f:
-                        self.cache_statistics_dict['cache_hits'] += 1
-                        new_value = pickle.load(f)
-                        new_item[new_column_name] = new_value
+                    try: 
+                        with open(filepath, "rb") as f:
+                            new_value = pickle.load(f)
+                            new_item[new_column_name] = new_value
+                            self.cache_statistics_dict['cache_hits'] += 1
+                    except: 
+                        if not os.path.isdir("data/tmp"):
+                            os.makedirs("data/tmp")
+
+                        new_value = transform(new_item[col_name])
+                        with open(filepath, "wb") as f:
+                            self.cache_statistics_dict['cache_misses'] += 1
+                            pickle.dump(new_value, f)
+                            new_item[new_column_name] = new_value
                 else:
                     if not os.path.isdir("data/tmp"):
                         os.makedirs("data/tmp")

@@ -130,16 +130,16 @@ class TestADBenchIntegration:
                     "metric_unit": "aucroc"
                 })
 
-            iforest_results = anomaly_results_dict['iforest_anomaly_validator_method']['results']
-            pca_results = anomaly_results_dict['pca_anomaly_validator_method']['results']
-            cblof_results = anomaly_results_dict['cblof_anomaly_validator_method']['results']
+            iforest_results = anomaly_results_dict['iforest_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
+            pca_results = anomaly_results_dict['pca_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
+            cblof_results = anomaly_results_dict['cblof_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
             true_results = adbench_dataset.y
             np.savez(f"anomaly_results_{npz_filename}", iforest_results=iforest_results, pca_results=pca_results, cblof_results=cblof_results, true_results=true_results)
 
             ood_inference_results_dict = results['ood_inference_data_validator']
-            iforest_results = ood_inference_results_dict['isolation_forest_ood_inference_validator_method']['results']
-            pca_results = ood_inference_results_dict['pca_ood_inference_validator_method']['results']
-            cblof_results = ood_inference_results_dict['cblof_ood_inference_validator_method']['results']
+            iforest_results = ood_inference_results_dict['iforest_ood_inference_validator_method']['results']['ood_scores']
+            pca_results = ood_inference_results_dict['pca_ood_inference_validator_method']['results']['ood_scores']
+            cblof_results = ood_inference_results_dict['cblof_ood_inference_validator_method']['results']['ood_scores']
 
             true_results = []
             for idx in range(inference_dataset.__len__()):
@@ -148,7 +148,7 @@ class TestADBenchIntegration:
             true_results = np.array(true_results)
 
             for validator_method in ood_inference_results_dict.keys():
-                predicted_results = ood_inference_results_dict[validator_method]['results']
+                predicted_results = ood_inference_results_dict[validator_method]['results']['ood_scores']
 
                 roc_auc_score = sklearn.metrics.roc_auc_score(true_results, predicted_results)
                 auc_dict[validator_method] = roc_auc_score

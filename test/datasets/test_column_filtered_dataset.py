@@ -34,4 +34,4 @@ class TestColumnFilteredDataset:
         for key, value in filtered_dataset.datatypes().items():
             assert(key == f"feature_{count}")
             count += 1
-            assert(value.value == DataType.CONTINUOUS.value)
+            assert(value.value == DataType.MULTIDIMENSIONAL.value)

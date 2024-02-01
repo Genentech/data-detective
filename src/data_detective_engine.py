@@ -173,12 +173,17 @@ class DataDetectiveEngine:
             sample_dataset = sample_dataset.dataset
         datatypes = sample_dataset.datatypes()
 
-        for data_type, transform_specification_list in transform_dict.items():
-            if data_type not in DataType._value2member_map_:
+        for data_type_or_column_name, transform_specification_list in transform_dict.items():
+            if data_type_or_column_name not in DataType._value2member_map_ and data_type_or_column_name not in datatypes.keys():
                 raise Exception(
-                    f"datasets type {data_type} from transform dict does not exist in DataType enumeration.")
+                    f"{data_type_or_column_name} key in transforms_dict should be a data type or a column name. please make sure \
+                    that it is either exists in the DataType enumeration or as one of the column keys in your dataset.")
 
-            relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value]
+            if data_type_or_column_name in DataType._value2member_map_:
+                relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value]
+            else: 
+                column_name = data_type_or_column_name
+                relevant_columns = [data_type_or_column_name]
 
             for transform_specification in transform_specification_list:
                 name = transform_specification['name']

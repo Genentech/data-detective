@@ -62,7 +62,7 @@ class TestEmbeddingTransformer:
             "validators": {
                 "unsupervised_anomaly_data_validator": {
                     "include": [
-                        "image",
+                        "cifar_image",
                         "label",
                     ],
                     "validator_kwargs": {
