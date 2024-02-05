@@ -32,6 +32,7 @@ class KruskalWallisMultidimensionalSplitValidatorMethod(DataValidatorMethod):
             DataType.MULTIDIMENSIONAL
         }
 
+
     @staticmethod
     def param_keys() -> Set[ValidatorMethodParameter]:
         """
@@ -40,9 +41,7 @@ class KruskalWallisMultidimensionalSplitValidatorMethod(DataValidatorMethod):
         @return: a list of parameters for the .validate() method.
         """
         return {
-            ValidatorMethodParameter.TRAINING_SET,
-            ValidatorMethodParameter.VALIDATION_SET,
-            ValidatorMethodParameter.TEST_SET,
+            ValidatorMethodParameter.SPLIT_GROUP_SET
         }
 
     @staticmethod
@@ -60,50 +59,49 @@ class KruskalWallisMultidimensionalSplitValidatorMethod(DataValidatorMethod):
         # test_dataset = data_object["test_set"]
         # training_dataset = data_object["training_set"]
         # validation_dataset = data_object["validation_set"]
-        dataset_keys = sorted([param_key.value for param_key in KruskalWallisMultidimensionalSplitValidatorMethod.param_keys()])
-        # train, val, test order
-        dataset_keys[0], dataset_keys[1] = dataset_keys[1], dataset_keys[0]
-        alpha = validator_kwargs.get("alpha", KruskalWallisMultidimensionalSplitValidatorMethod.DEFAULT_ALPHA)
 
-        # columns = list(test_dataset.datatypes().keys())
+        
+        for split_group_name, split_group_data_object in data_object["split_group_set"].items():
+            dataset_keys = list(split_group_data_object.keys())
+            alpha = validator_kwargs.get("alpha", KruskalWallisMultidimensionalSplitValidatorMethod.DEFAULT_ALPHA)
 
-        # the number of combinations over the splits (used for bonferroni correction)
-        num_combinations = len(list(itertools.combinations(dataset_keys, 2)))
-        for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
-            dataset_0 = data_object[dataset_0_key]
-            dataset_1 = data_object[dataset_1_key]
+            # the number of combinations over the splits (used for bonferroni correction)
+            num_combinations = len(list(itertools.combinations(dataset_keys, 2)))
+            for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
+                dataset_0 = split_group_data_object[dataset_0_key]
+                dataset_1 = split_group_data_object[dataset_1_key]
 
-            dataset_combination_str = f"{dataset_0_key}/{dataset_1_key}"
+                dataset_combination_str = f"{split_group_name}/{dataset_0_key}/{dataset_1_key}"
 
-            columns_0 = sorted(list(dataset_0.datatypes().keys()))
-            columns_1 = sorted(list(dataset_1.datatypes().keys()))
-            if columns_0 != columns_1:
-                raise Exception("Columns in datasets splits are not the same")
-            else:
-                columns = columns_0
+                columns_0 = sorted(list(dataset_0.datatypes().keys()))
+                columns_1 = sorted(list(dataset_1.datatypes().keys()))
+                if columns_0 != columns_1:
+                    raise Exception("Columns in datasets splits are not the same")
+                else:
+                    columns = columns_0
 
-            for column_name in columns:
-                def get_matrix(column_key, dataset):
-                    matrix_lst = []
+                for column_name in columns:
+                    def get_matrix(column_key, dataset):
+                        matrix_lst = []
 
-                    for idx in range(dataset.__len__()):
-                        sample = dataset[idx]
-                        column_data = sample[column_key]
-                        matrix_lst.append(column_data)
+                        for idx in range(dataset.__len__()):
+                            sample = dataset[idx]
+                            column_data = sample[column_key]
+                            matrix_lst.append(column_data)
 
-                    matrix_lst = np.vstack(matrix_lst)
+                        matrix_lst = np.vstack(matrix_lst)
 
-                    return matrix_lst
+                        return matrix_lst
 
-                matrix_0 = get_matrix(column_name, dataset_0)
-                matrix_1 = get_matrix(column_name, dataset_1)
+                    matrix_0 = get_matrix(column_name, dataset_0)
+                    matrix_1 = get_matrix(column_name, dataset_1)
 
-                kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
-                    "matrix_0" : matrix_0,
-                    "matrix_1" : matrix_1,
-                    "alpha": alpha,
-                    "num_combinations": num_combinations,
-                }
+                    kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
+                        "matrix_0" : matrix_0,
+                        "matrix_1" : matrix_1,
+                        "alpha": alpha,
+                        "num_combinations": num_combinations,
+                    }
 
         return kwargs_dict
 

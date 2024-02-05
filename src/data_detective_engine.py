@@ -51,21 +51,61 @@ class DataDetectiveEngine:
         validator_kwargs: Dict = validator_params.get("validator_kwargs", {})
 
         # filter the datasets by the inclusion criteria.
-        filtered_data_object = {}
+        # has to be recursive to accommodate split_group_sets
+        def get_filtered_data_object(data_object):
+            filtered_data_object = {}
 
-        for key, dataset in data_object.items():
-            # TODO: implement filtering correctly on the torch datasets.
-            filtered_data_object[key] = filter_dataset(dataset, include_lst)
-            filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
+            for key, dataset_or_data_object in data_object.items():
+                if isinstance(dataset_or_data_object, dict): 
+                    sub_data_object = dataset_or_data_object
+                    filtered_data_object[key] = get_filtered_data_object(sub_data_object)
+                else: 
+                    # TODO: implement filtering correctly on the torch datasets.
+                    dataset = dataset_or_data_object
+                    filtered_data_object[key] = filter_dataset(dataset, include_lst)
+                    filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
 
-        if 'transforms' in config_dict.keys():
-            transforms_dict = config_dict['transforms']
-            transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
-            filtered_transformed_data_object = {
-                data_object_name: TransformedDataset(data_object_part, transforms_dict) for
-                data_object_name, data_object_part in filtered_data_object.items()}
-        else:
-            filtered_transformed_data_object = filtered_data_object
+            return filtered_data_object
+
+        def get_filtered_transformed_data_object(filtered_data_object, transforms_dict=None):
+            if 'transforms' not in config_dict.keys():
+                return filtered_data_object
+                
+            if transforms_dict is None:
+                transforms_dict = config_dict['transforms']
+                transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
+
+            filtered_transformed_data_object = {}
+
+            for key, dataset_or_data_object in filtered_data_object.items():
+                if isinstance(dataset_or_data_object, dict): 
+                    sub_data_object = dataset_or_data_object
+                    filtered_transformed_data_object[key] = get_filtered_transformed_data_object(sub_data_object)
+                else: 
+                    dataset = dataset_or_data_object
+                    filtered_transformed_data_object[key] = TransformedDataset(dataset, transforms_dict) 
+
+            return filtered_transformed_data_object
+
+        filtered_data_object = get_filtered_data_object(data_object)
+        filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
+            
+        
+        # filtered_data_object = {}
+
+        # for key, dataset in data_object.items():
+        #     # TODO: implement filtering correctly on the torch datasets.
+        #     filtered_data_object[key] = filter_dataset(dataset, include_lst)
+        #     filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
+
+        # if 'transforms' in config_dict.keys():
+        #     transforms_dict = config_dict['transforms']
+        #     transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
+        #     filtered_transformed_data_object = {
+        #         data_object_name: TransformedDataset(data_object_part, transforms_dict) for
+        #         data_object_name, data_object_part in filtered_data_object.items()}
+        # else:
+        #     filtered_transformed_data_object = filtered_data_object
 
         return filtered_transformed_data_object, validator_class_object.get_task_list(
             data_object=filtered_transformed_data_object,

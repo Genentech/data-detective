@@ -39,9 +39,7 @@ class MannWhitneySplitValidatorMethod(DataValidatorMethod):
         @return: a list of parameters for the .validate() method.
         """
         return {
-            ValidatorMethodParameter.TRAINING_SET,
-            ValidatorMethodParameter.VALIDATION_SET,
-            ValidatorMethodParameter.TEST_SET,
+            ValidatorMethodParameter.SPLIT_GROUP_SET
         }
 
     @staticmethod
@@ -59,9 +57,6 @@ class MannWhitneySplitValidatorMethod(DataValidatorMethod):
         # test_dataset = data_object["test_set"]
         # training_dataset = data_object["training_set"]
         # validation_dataset = data_object["validation_set"]
-        dataset_keys = sorted([param_key.value for param_key in MannWhitneySplitValidatorMethod.param_keys()])
-        # train, val, test order
-        dataset_keys[0], dataset_keys[1] = dataset_keys[1], dataset_keys[0]
 
         def get_series(column_key, dataset):
             matrix_dict = {
@@ -78,27 +73,29 @@ class MannWhitneySplitValidatorMethod(DataValidatorMethod):
 
             return matrix_dict[column_key].flatten()
 
-        for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
-            dataset_0 = data_object[dataset_0_key]
-            dataset_1 = data_object[dataset_1_key]
+        for split_group_name, split_group_data_object in data_object["split_group_set"].items():
+            dataset_keys = list(split_group_data_object.keys())
+            for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
+                dataset_0 = split_group_data_object[dataset_0_key]
+                dataset_1 = split_group_data_object[dataset_1_key]
 
-            columns_0 = sorted(list(dataset_0.datatypes().keys()))
-            columns_1 = sorted(list(dataset_1.datatypes().keys()))
-            if columns_0 != columns_1:
-                raise Exception("Columns in datasets splits are not the same")
-            else:
-                columns = columns_0
+                columns_0 = sorted(list(dataset_0.datatypes().keys()))
+                columns_1 = sorted(list(dataset_1.datatypes().keys()))
+                if columns_0 != columns_1:
+                    raise Exception("Columns in datasets splits are not the same")
+                else:
+                    columns = columns_0
 
-            for column_name in columns:
-                series_0 = get_series(column_name, dataset_0)
-                series_1 = get_series(column_name, dataset_1)
+                for column_name in columns:
+                    series_0 = get_series(column_name, dataset_0)
+                    series_1 = get_series(column_name, dataset_1)
 
-                # series_0 = np.array(list(dataset_0[:][column_name].values()))
-                # series_1 = np.array(list(dataset_1[:][column_name].values()))
-                kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
-                    "series_0" : series_0,
-                    "series_1" : series_1,
-                }
+                    # series_0 = np.array(list(dataset_0[:][column_name].values()))
+                    # series_1 = np.array(list(dataset_1[:][column_name].values()))
+                    kwargs_dict[f"{split_group_name}/{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
+                        "series_0" : series_0,
+                        "series_1" : series_1,
+                    }
 
         return kwargs_dict
 

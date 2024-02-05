@@ -84,10 +84,14 @@ class TestEmbeddingTransformer:
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
-            "training_set": train_dataset,
-            "validation_set": val_dataset,
-            "test_set": test_dataset,
-            "entire_set": cifar_10,
+            # "split_group_set": {
+            #     "standard_split": {
+            #         "training_set": train_dataset,
+            #         "validation_set": val_dataset,
+            #         "test_set": test_dataset,
+            #     }
+            # },
+            "entire_set": cifar_10
         }
 
         results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)

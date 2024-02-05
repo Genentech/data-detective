@@ -43,9 +43,6 @@ class TestFCITValidatorMethod:
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
-            "training_set": train_dataset,
-            "validation_set": val_dataset,
-            "test_set": test_dataset,
             "entire_set": ci_dataset
         }
 
@@ -87,9 +84,6 @@ class TestFCITValidatorMethod:
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
-            "training_set": train_dataset,
-            "validation_set": val_dataset,
-            "test_set": test_dataset,
             "entire_set": ci_dataset
         }
 

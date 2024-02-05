@@ -59,10 +59,16 @@ class DataValidator:
         @return:
         """
         for key, filtered_dataset in data_object.items():
-            filtered_dataset_datatype_set = set(filtered_dataset.datatypes().values())
-            validator_method_datatype_set = validator_method.datatype()
-            if len(filtered_dataset_datatype_set.intersection(validator_method_datatype_set)) == 0:
-                return False
+            if isinstance(filtered_dataset, dict): 
+                result = DataValidator._method_applies(data_object=filtered_dataset, validator_method=validator_method)
+                # only return if False
+                if result == False: 
+                    return result
+            else: 
+                filtered_dataset_datatype_set = set(filtered_dataset.datatypes().values())
+                validator_method_datatype_set = validator_method.datatype()
+                if len(filtered_dataset_datatype_set.intersection(validator_method_datatype_set)) == 0:
+                    return False
 
         return True
 
@@ -93,10 +99,21 @@ class DataValidator:
         # for every datasets object:
         # add an .item from data_object key to filtered dataset (by datatype matching method/dataset)
         # if the datasets object is included in the method's param_keys
-        method_specific_data_object = {
-            key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
-            for key, dataset in data_object.items()
-        }
+        def get_method_specific_data_object(data_object):
+            method_specific_data_object = {}
+            for key, dataset in data_object.items(): 
+                if isinstance(dataset, dict): 
+                    method_specific_data_object[key] = get_method_specific_data_object(dataset)
+                else: 
+                    method_specific_data_object[key] = ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
+
+            return method_specific_data_object
+
+        method_specific_data_object = get_method_specific_data_object(data_object)
+        # method_specific_data_object = {
+        #     key: ColumnFilteredDataset(dataset, matching_datatypes=[e.value for e in list(validator_method.datatype())])
+        #     for key, dataset in data_object.items()
+        # }
 
         for result_key, method_kwargs in validator_method.get_method_kwargs(data_object=method_specific_data_object,
                                                                             validator_kwargs=validator_kwargs).items():

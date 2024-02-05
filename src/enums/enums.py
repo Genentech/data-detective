@@ -17,4 +17,5 @@ class ValidatorMethodParameter(Enum):
     ENTIRE_SET = "entire_set"
     EVERYTHING_BUT_INFERENCE_SET = "everything_but_inference_set"
     INFERENCE_SET = "inference_set"
+    SPLIT_GROUP_SET = "split_group_set"
 
