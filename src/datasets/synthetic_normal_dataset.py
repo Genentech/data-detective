@@ -115,3 +115,21 @@ class SyntheticNormalDatasetContinuous(Dataset):
             column_name: DataType.CONTINUOUS
             for column_name in self.columns
         }
+
+class SyntheticCategoricalDataset(SyntheticNormalDataset):
+    def __init__(self, num_cols: int = 1, dataset_size: int = 10000, p: float = 0.25):
+        self.dataset_size = dataset_size
+        self.columns = [f"feature_{j}" for j in range(num_cols)]
+
+        dataframe: DataFrame = pd.DataFrame({
+            f"feature_{i}": np.array(["heads" if x else "tails" for x in np.random.binomial(1, p, size=dataset_size)])
+            for i in range(self.num_columns)
+        }, columns=self.columns)
+
+        self.dataframe = dataframe
+
+    def datatypes(self) -> Dict[str, DataType]:
+        return {
+            column_name: DataType.CATEGORICAL
+            for column_name in self.columns
+        }

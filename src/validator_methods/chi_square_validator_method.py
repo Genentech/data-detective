@@ -52,6 +52,7 @@ class ChiSquareValidatorMethod(DataValidatorMethod):
 
     @staticmethod
     def validate(x: np.array, y: np.array) -> object:
-        df = pd.DataFrame({'x': x, 'y': y})
+        min_length = min(len(x), len(y))
+        df = pd.DataFrame({'x': x[:min_length], 'y': y[:min_length]})
         contingency_table = pd.crosstab(index=df['x'], columns=df['y']).to_numpy()
         return scipy.stats.chi2_contingency(contingency_table)

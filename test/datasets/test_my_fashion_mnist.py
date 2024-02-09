@@ -1,5 +1,3 @@
-import src.datasets.synthetic_data_generators as synthetic_data_generators
-
 import torchvision.transforms as transforms
 
 from constants import FloatTensor

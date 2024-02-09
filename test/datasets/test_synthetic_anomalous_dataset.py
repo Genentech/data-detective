@@ -3,7 +3,6 @@ import torch
 import torchvision.transforms as transforms
 from tqdm import tqdm
 
-from src.datasets import synthetic_data_generators
 from src.datasets.my_fashion_mnist import MyFashionMNIST
 from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 

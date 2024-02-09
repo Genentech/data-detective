@@ -11,6 +11,7 @@ from src.validator_methods.mann_whitney_multidimensional_split_validator_method 
     MannWhitneyMultidimensionalSplitValidatorMethod
 from src.validator_methods.mann_whitney_split_validator_method import MannWhitneySplitValidatorMethod
 from src.validators.data_validator import DataValidator
+from src.validator_methods.chi_square_split_validator_method import ChiSquareSplitValidatorMethod
 
 class SplitCovariateDataValidator(DataValidator):
     """
@@ -31,4 +32,5 @@ class SplitCovariateDataValidator(DataValidator):
             KruskalWallisMultidimensionalSplitValidatorMethod,
             MannWhitneySplitValidatorMethod,
             MannWhitneyMultidimensionalSplitValidatorMethod,
+            ChiSquareSplitValidatorMethod
         }

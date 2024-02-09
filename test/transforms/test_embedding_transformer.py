@@ -6,8 +6,6 @@ import torchvision.transforms.functional
 from torchvision.models import resnet50, ResNet50_Weights
 from torchvision.transforms import GaussianBlur
 
-import src.datasets.synthetic_data_generators as synthetic_data_generators
-
 import torchvision.transforms as transforms
 
 from src.datasets.my_cifar_10 import MyCIFAR10
