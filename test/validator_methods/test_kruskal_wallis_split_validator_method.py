@@ -45,7 +45,7 @@ class TestKruskalWallisSplitValidatorMethod:
         method_results = results['split_covariate_data_validator']['kruskal_wallis_split_validator_method']
         p_value = method_results['standard_split/training_set_vs_validation_set/feature_0'].pvalue
         assert(p_value > 0.05)
-        p_value = method_results['standard_split/training_se_vs_test_set/feature_0'].pvalue
+        p_value = method_results['standard_split/training_set_vs_test_set/feature_0'].pvalue
         assert(p_value > 0.05)
         p_value = method_results['standard_split/validation_set_vs_test_set/feature_0'].pvalue
         assert(p_value > 0.05)

@@ -204,7 +204,7 @@ class DataDetectiveEngine:
         output_dict = defaultdict(lambda: [])
 
         sample_dataset = list(data_object.items())[0][1]
-        if isinstance(sample_dataset, dict):
+        while isinstance(sample_dataset, dict):
             sample_dataset = list(sample_dataset.values())[0]
 
         while isinstance(sample_dataset, torch.utils.data.Subset):

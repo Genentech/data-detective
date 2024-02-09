@@ -36,9 +36,13 @@ class TestCSVDataset:
                                                                                  [train_size, val_size, test_size])
 
         data_object: Dict[str, torch.utils.data.Dataset] = {
-            "training_set": train_dataset,
-            "validation_set": val_dataset,
-            "test_set": test_dataset,
+            "split_group_set": {
+                "standard_split":  {
+                    "training_set": train_dataset,
+                    "validation_set": val_dataset,
+                    "test_set": test_dataset,
+                }
+            },
             "entire_set": dataset,
             "everything_but_inference_set": everything_but_inference_dataset,
             "inference_set": inference_dataset
