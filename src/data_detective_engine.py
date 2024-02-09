@@ -198,17 +198,15 @@ class DataDetectiveEngine:
 
             result_dict[validator][validator_method] = results
 
-        if default_inclusion:
-            # TODO: need results from the rest of validators that are listed.
-            # TODO: do this later
-            pass
-
         return result_dict
 
     def parse_transforms(self, transform_dict: Dict[str, Any], data_object):
         output_dict = defaultdict(lambda: [])
 
         sample_dataset = list(data_object.items())[0][1]
+        if isinstance(sample_dataset, dict):
+            sample_dataset = list(sample_dataset.values())[0]
+
         while isinstance(sample_dataset, torch.utils.data.Subset):
             sample_dataset = sample_dataset.dataset
         datatypes = sample_dataset.datatypes()
@@ -220,6 +218,7 @@ class DataDetectiveEngine:
                     that it is either exists in the DataType enumeration or as one of the column keys in your dataset.")
 
             if data_type_or_column_name in DataType._value2member_map_:
+                data_type = data_type_or_column_name
                 relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value]
             else: 
                 column_name = data_type_or_column_name

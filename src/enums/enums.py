@@ -7,7 +7,8 @@ class DataType(Enum):
     CATEGORICAL = "categorical"
     MULTIDIMENSIONAL = "multidimensional"
     IMAGE = "image"
-    TIME_SERIES = "sequential"
+    SEQUENTIAL = "sequential"
+    TEXT = "text"
     CUSTOM = "custom"
 
 class ValidatorMethodParameter(Enum):
