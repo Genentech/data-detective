@@ -70,7 +70,7 @@ class KolmogorovSmirnovMultidimensionalSplitValidatorMethod(DataValidatorMethod)
                 dataset_0 = split_group_data_object[dataset_0_key]
                 dataset_1 = split_group_data_object[dataset_1_key]
 
-                dataset_combination_str = f"{split_group_name}/{dataset_0_key}/{dataset_1_key}"
+                dataset_combination_str = f"{split_group_name}/{dataset_0_key}_vs_{dataset_1_key}"
 
                 columns_0 = sorted(list(dataset_0.datatypes().keys()))
                 columns_1 = sorted(list(dataset_1.datatypes().keys()))
@@ -95,7 +95,7 @@ class KolmogorovSmirnovMultidimensionalSplitValidatorMethod(DataValidatorMethod)
                     matrix_0 = get_matrix(column_name, dataset_0)
                     matrix_1 = get_matrix(column_name, dataset_1)
 
-                    kwargs_dict[f"{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
+                    kwargs_dict[f"{dataset_combination_str}/{column_name}"] = {
                         "matrix_0" : matrix_0,
                         "matrix_1" : matrix_1,
                         "alpha": alpha,

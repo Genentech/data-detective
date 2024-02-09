@@ -89,7 +89,7 @@ class KolmogorovSmirnovSplitValidatorMethod(DataValidatorMethod):
 
                     # series_0 = np.array(list(dataset_0[:][column_name].values()))
                     # series_1 = np.array(list(dataset_1[:][column_name].values()))
-                    kwargs_dict[f"{split_group_name}/{dataset_0_key}/{dataset_1_key}/{column_name}"] = {
+                    kwargs_dict[f"{split_group_name}/{dataset_0_key}_vs_{dataset_1_key}/{column_name}"] = {
                         "series_0" : series_0,
                         "series_1" : series_1,
                     }
