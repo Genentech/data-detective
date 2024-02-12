@@ -3,12 +3,18 @@ from typing import Dict
 import numpy as np
 import torch
 
-from src.aggregation.rankings import RankingAggregator, RankingAggregationMethod
+from src.aggregation.rankings import ResultAggregator, RankingAggregationMethod
 from src.datasets.adbench_dataset import ADBenchDataset
 from src.data_detective_engine import DataDetectiveEngine
 from src.enums.enums import DataType
 
 INFERENCE_SIZE = 20
+
+"""
+Tests to add for coverage:
+- unit test for both score and non score type aggregations
+- unit test for both modal and multimodal aggregation
+"""
 
 class TestADBenchIntegration:
     SEED = 142
@@ -110,10 +116,17 @@ class TestADBenchIntegration:
             
             results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
 
-            aggregator = RankingAggregator(results)
-            aggregated_results = aggregator.aggregate_rankings(
+            aggregator = ResultAggregator(results)
+
+            aggregated_results = aggregator.aggregate_rankings_multimodally(
                 validator_name="unsupervised_anomaly_data_validator",
                 aggregation_methods=[RankingAggregationMethod.ROUND_ROBIN]
+            )
+
+            aggregated_results = aggregator.aggregate_rankings_modally(
+                validator_name="unsupervised_anomaly_data_validator",
+                aggregation_methods=[RankingAggregationMethod.ROUND_ROBIN],
+                given_data_modality=adbench_dataset.input_data_name
             )
 
             x=3
