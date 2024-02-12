@@ -10,13 +10,14 @@ from src.data_detective_engine import DataDetectiveEngine
 class TestKolmogorovSmirnovSplitValidatorMethod:
     def test_positive_example(self):
         np.random.seed(42)
+        torch.manual_seed(42)
 
         test_validation_schema: Dict = {
             "default_inclusion": False,
             "validators": {
                 "split_covariate_data_validator": {
                     "include": [
-                        "feature_\d+"
+                        r"feature_\d+"
                     ]
                 }
             }
@@ -49,17 +50,19 @@ class TestKolmogorovSmirnovSplitValidatorMethod:
         p_value = method_results['standard_split/training_set_vs_test_set/feature_0'].pvalue
         assert(p_value > 0.05)
         p_value = method_results['standard_split/validation_set_vs_test_set/feature_0'].pvalue
+        print(p_value)
         assert(p_value > 0.05)
 
     def test_negative_example(self):
         np.random.seed(42)
+        torch.manual_seed(42)
 
         test_validation_schema: Dict = {
             "default_inclusion": False,
             "validators": {
                 "split_covariate_data_validator": {
                     "include": [
-                        "feature_\d+"
+                        r"feature_\d+"
                     ]
                 }
             }

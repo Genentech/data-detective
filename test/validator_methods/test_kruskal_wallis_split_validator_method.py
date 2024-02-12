@@ -10,13 +10,14 @@ from src.data_detective_engine import DataDetectiveEngine
 class TestKruskalWallisSplitValidatorMethod:
     def test_positive_example(self):
         np.random.seed(43)
+        torch.manual_seed(42)
 
         test_validation_schema: Dict = {
             "default_inclusion": False,
             "validators": {
                 "split_covariate_data_validator": {
                     "include": [
-                        "feature_\d+"
+                        r"feature_\d+"
                     ]
                 }
             }
@@ -52,13 +53,14 @@ class TestKruskalWallisSplitValidatorMethod:
 
     def test_negative_example(self):
         np.random.seed(42)
+        torch.manual_seed(42)
 
         test_validation_schema: Dict = {
             "default_inclusion": False,
             "validators": {
                 "split_covariate_data_validator": {
                     "include": [
-                        "feature_\d+"
+                        r"feature_\d+"
                     ]
                 }
             }

@@ -16,7 +16,7 @@ class TestKolmogorovSmirnovNormalityValidatorMethod:
             "validators": {
                 "normality_data_validator": {
                     "include": [
-                        "feature_\d+"
+                        r"feature_\d+"
                     ]
                 }
             }
@@ -47,7 +47,7 @@ class TestKolmogorovSmirnovNormalityValidatorMethod:
             "validators": {
                 "normality_data_validator": {
                     "include": [
-                        "feature_\d+"
+                        r"feature_\d+"
                     ]
                 }
             }

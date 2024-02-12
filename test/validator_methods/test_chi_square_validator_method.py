@@ -17,7 +17,7 @@ class TestChiSquareSplitValidatorMethod:
             # "validators": {
             #     "split_covariate_data_validator": {
             #         "include": [
-            #             "feature_\d+"
+            #             r"feature_\d+"
             #         ]
             #     }
             # }
@@ -55,7 +55,7 @@ class TestChiSquareSplitValidatorMethod:
             # "validators": {
             #     "split_covariate_data_validator": {
             #         "include": [
-            #             "feature_\d+"
+            #             r"feature_\d+"
             #         ]
             #     }
             # }

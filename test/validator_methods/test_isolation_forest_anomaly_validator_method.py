@@ -16,7 +16,7 @@ class TestIsolationForestAnomalyValidatorMethod:
             "validators": {
                 "unsupervised_anomaly_data_validator": {
                     # "include": [
-                    #     "feature_\d+"
+                    #     r"feature_\d+"
                     # ],
                     # "validator_kwargs": {
                     #     # "contamination": "auto",
