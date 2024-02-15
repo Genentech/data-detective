@@ -12,7 +12,7 @@ class ADBenchDataset(Dataset):
     """
     Base class for using the ADBench datasets.
     """
-    ROOT_PATH = "/Users/mcconnl3/Code/ADBench/datasets/Classical/"
+    ROOT_PATH = "data/ADBench/dataset/Classical"
 
     def __init__(self, npz_filename="", input_data_type=DataType.MULTIDIMENSIONAL, output_data_type=DataType.CONTINUOUS):
         data_path = os.path.join(ADBenchDataset.ROOT_PATH, npz_filename)

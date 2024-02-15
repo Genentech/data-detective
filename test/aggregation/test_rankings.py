@@ -118,12 +118,12 @@ class TestADBenchIntegration:
 
             aggregator = ResultAggregator(results)
 
-            aggregated_results = aggregator.aggregate_rankings_multimodally(
+            aggregated_results = aggregator.aggregate_results_multimodally(
                 validator_name="unsupervised_anomaly_data_validator",
                 aggregation_methods=[RankingAggregationMethod.ROUND_ROBIN]
             )
 
-            aggregated_results = aggregator.aggregate_rankings_modally(
+            aggregated_results = aggregator.aggregate_results_modally(
                 validator_name="unsupervised_anomaly_data_validator",
                 aggregation_methods=[RankingAggregationMethod.ROUND_ROBIN],
                 given_data_modality=adbench_dataset.input_data_name

@@ -148,18 +148,18 @@ class ResultAggregator:
         rankings_df = self.construct_rankings_df(validator_name)
         rankings_output_df = rankings_df.copy()
 
-        score_df = self.construct_score_df(validator_name)
-        score_output_df = score_df.copy()
+        # score_df = self.construct_score_df(validator_name)
+        # score_output_df = score_df.copy()
 
         for aggregation_method in aggregation_methods:
-            if aggregation_method.value in RankingAggregationMethod.__members__.values():
+            if aggregation_method in RankingAggregationMethod.__members__.values():
                 aggregation_method_name = aggregation_method.value
                 scorelist = self.convert_to_scorelist(rankings_df)
                 agg_method = getattr(ResultAggregator.FLRA, aggregation_method_name)
                 agg_rankings = agg_method(scorelist)[1]
 
                 rankings_output_df[f"{aggregation_method_name}_agg_rank"] = list(agg_rankings.values())
-            elif aggregation_method.value in ScoreAggregationMethod.__members__.values():
+            elif aggregation_method in ScoreAggregationMethod.__members__.values():
                 #TODO: implement
                 pass
             else:
