@@ -9,7 +9,7 @@ from numpy import ndarray
 from torch.utils.data import Dataset
 
 from src.enums.enums import DataType, ValidatorMethodParameter
-from src.utils import filter_dataset
+from src.utils import filter_dataset, get_split_group_keys
 from src.validator_methods.data_validator_method import DataValidatorMethod
 
 from scipy import stats
@@ -73,7 +73,11 @@ class MannWhitneySplitValidatorMethod(DataValidatorMethod):
 
             return matrix_dict[column_key].flatten()
 
-        for split_group_name, split_group_data_object in data_object["split_group_set"].items():
+        only_split_groups_data_object = {split_group_name: split_group_data_object 
+                            for split_group_name, split_group_data_object in data_object.items()
+                            if split_group_name in get_split_group_keys(data_object)}
+
+        for split_group_name, split_group_data_object in only_split_groups_data_object.items():
             dataset_keys = list(split_group_data_object.keys())
             for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
                 dataset_0 = split_group_data_object[dataset_0_key]

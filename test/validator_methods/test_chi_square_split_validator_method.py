@@ -30,13 +30,11 @@ class TestChiSquareSplitValidatorMethod:
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
-            "split_group_set": {
-                "standard_split": {
-                    "training_set": train_dataset,
-                    "validation_set": val_dataset,
-                    "test_set": test_dataset,
-                }
-            },
+            "standard_split": {
+                "training_set": train_dataset,
+                "validation_set": val_dataset,
+                "test_set": test_dataset,
+            }
         }
 
 
@@ -70,13 +68,11 @@ class TestChiSquareSplitValidatorMethod:
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
-            "split_group_set": {
-                "standard_split": {
-                    "training_set": train_dataset,
-                    "validation_set": val_dataset,
-                    "test_set": test_dataset,
-                }
-            },
+            "standard_split": {
+                "training_set": train_dataset,
+                "validation_set": val_dataset,
+                "test_set": test_dataset,
+            }
             # "entire_set": normal_dataset
         }
 

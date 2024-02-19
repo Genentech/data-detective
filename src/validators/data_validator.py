@@ -54,7 +54,7 @@ class DataValidator:
         and the datasets object's datatypes.
 
         @param data_object: the data object to use to determine overlap with the validator method.
-        @param validator_method: the method to use to determinne overlap with the data object
+        @param validator_method: the method to use to determine overlap with the data object
 
         @return:
         """

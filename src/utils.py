@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from src.datasets.column_filtered_dataset import ColumnFilteredDataset
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
-from src.enums.enums import DataType
+from src.enums.enums import DataType, ValidatorMethodParameter
 from src.transforms.embedding_transformer import TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
 from src.validators.data_validator import DataValidator
@@ -396,3 +396,26 @@ def fcit_test(x, y, z=None, num_perm=8, prop_test=.1,
 """
 </ FCIT UTILITIES>
 """
+
+def get_split_group_keys(data_object): 
+    split_group_keys = []
+
+    for key, potential_split_group_set in data_object.items(): 
+        if key not in  [member.value for member in ValidatorMethodParameter]:
+            # then it must be a split group; so make sure it is not malformed
+            split_group_set = potential_split_group_set
+            assert(isinstance(split_group_set, dict))
+            assert(len(split_group_set.items()) > 1)
+
+            for dataset_name, dataset in split_group_set.items(): 
+                assert(isinstance(dataset_name, str))
+                assert(isinstance(dataset, torch.utils.data.Dataset))
+
+            split_group_keys.append(key)
+        else: 
+            assert(isinstance(key, str))
+            assert(isinstance(potential_split_group_set, torch.utils.data.Dataset))
+
+
+    return split_group_keys
+

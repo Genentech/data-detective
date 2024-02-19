@@ -9,6 +9,7 @@ from torch.utils.data import Dataset
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
 from src.validator_methods.chi_square_validator_method import ChiSquareValidatorMethod
+from src.utils import get_split_group_keys
 
 
 class ChiSquareSplitValidatorMethod(ChiSquareValidatorMethod):
@@ -31,8 +32,6 @@ class ChiSquareSplitValidatorMethod(ChiSquareValidatorMethod):
         @param validator_kwargs:
         @return:
         """
-        split_groups = data_object['split_group_set']
-        
         kwargs_dict = {}
 
         def get_series(column_key, dataset):
@@ -52,7 +51,11 @@ class ChiSquareSplitValidatorMethod(ChiSquareValidatorMethod):
             return np.argmax(matrix_dict[column_key], axis=1)
 
 
-        for split_group_name, split_group_data_object in split_groups.items(): 
+        only_split_groups_data_object = {split_group_name: split_group_data_object 
+                            for split_group_name, split_group_data_object in data_object.items()
+                            if split_group_name in get_split_group_keys(data_object)}
+
+        for split_group_name, split_group_data_object in only_split_groups_data_object.items():
             dataset_keys = list(split_group_data_object.keys())
             for dataset_0_key, dataset_1_key in itertools.combinations(dataset_keys, 2):
                 dataset_0 = split_group_data_object[dataset_0_key]
