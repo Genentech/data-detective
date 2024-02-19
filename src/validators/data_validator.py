@@ -33,12 +33,6 @@ class DataValidator:
         # raise NotImplementedError()
         pass
 
-    @staticmethod
-    @abstractmethod
-    def is_default() -> bool:
-        # raise NotImplementedError()
-        pass
-
     @classmethod
     def supported_datatypes(cls) -> Set[DataType]:
         """

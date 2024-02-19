@@ -13,10 +13,6 @@ class UnsupervisedAnomalyDataValidator(DataValidator):
     datatype. A DataValidator is a collection of ValidatorMethods for a unique purpose.
     """
     @staticmethod
-    def is_default():
-        return True
-
-    @staticmethod
     def validator_methods() -> Set[Type[DataValidatorMethod]]:
         return {
             ADBenchValidatorMethodFactory.get_validator_method("cblof"),

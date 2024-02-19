@@ -11,10 +11,6 @@ class ConditionalIndependenceDataValidator(DataValidator):
     datatype. A DataValidator is a collection of ValidatorMethods for a unique purpose.
     """
     @staticmethod
-    def is_default():
-        return False
-
-    @staticmethod
     def validator_methods() -> Set[Type[DataValidatorMethod]]:
         return {
             FCITValidatorMethod
