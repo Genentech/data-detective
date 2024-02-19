@@ -212,14 +212,19 @@ class DataDetectiveEngine:
         datatypes = sample_dataset.datatypes()
 
         for data_type_or_column_name, transform_specification_list in transform_dict.items():
-            if data_type_or_column_name not in DataType._value2member_map_ and data_type_or_column_name not in datatypes.keys():
+            if data_type_or_column_name not in [data_type.upper() for data_type in DataType._value2member_map_.keys()] \
+                and data_type_or_column_name not in datatypes.keys():
                 raise Exception(
-                    f"{data_type_or_column_name} key in transforms_dict should be a data type or a column name. please make sure \
+                    f"{data_type_or_column_name} key in transforms_dict should be a data type (just remember ALL CAPS, like IMAGE) or a column name. please make sure \
                     that it is either exists in the DataType enumeration or as one of the column keys in your dataset.")
 
-            if data_type_or_column_name in DataType._value2member_map_:
+            if data_type_or_column_name in [data_type.upper() for data_type in DataType._value2member_map_.keys()]:
                 data_type = data_type_or_column_name
                 relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value]
+            elif data_type_or_column_name.lower() in [data_type.lower() for data_type in DataType._value2member_map_.keys()]: 
+                raise Exception("It looks like you may be trying to apply a transform to a data type (such as {data_type_or_column_name}). Please use ALL CAPS in the datatype \
+                                if this is what you are trying to do. If you would like to target an individual column name, please avoid data column names that conflict with datatype names \
+                                ({", ".join([data_type.lower() for data_type in DataType._value2member_map_.keys()])})")
             else: 
                 column_name = data_type_or_column_name
                 relevant_columns = [data_type_or_column_name]
