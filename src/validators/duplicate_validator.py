@@ -5,6 +5,9 @@ from torch.utils.data import Dataset
 from src.enums.enums import DataType
 from src.validator_methods.data_validator_method import DataValidatorMethod
 from src.validators.data_validator import DataValidator
+from src.validator_methods.duplicate_high_dimensional_validator_method import DuplicateHighDimensionalValidatorMethod
+from src.validator_methods.duplicate_sample_validator_method import DuplicateSampleValidatorMethod
+from src.validator_methods.near_duplicate_multidimensional_validator_method import NearDuplicateMultidimensionalValidatorMethod
 
 class DuplicateDataValidator(DataValidator):
     """
@@ -16,4 +19,5 @@ class DuplicateDataValidator(DataValidator):
         return {
             DuplicateHighDimensionalValidatorMethod,
             DuplicateSampleValidatorMethod,
+            NearDuplicateMultidimensionalValidatorMethod
         }
