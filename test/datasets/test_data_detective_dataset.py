@@ -47,15 +47,39 @@ class TestDataDetectiveDataset:
         data_dict = sample['data']
         assert("feature_0" in data_dict.keys())
 
+        sample = synth_normal[0]
+        assert("id" in sample.keys())
+        assert("data" in sample.keys())
+
+    def test_data_detective_dataset_through_synth_normal_sample_int_key(self):
+        synth_normal = SyntheticNormalDatasetForIdsWithSampleIds()
+        test_key = 0
+
+        sample = synth_normal[test_key]
+        assert("id" in sample.keys())
+        assert("data" in sample.keys())
+
+        id_dict = sample['id']
+        assert("subject_id" in id_dict.keys())
+        assert("sample_id" in id_dict.keys())
+        assert(id_dict['subject_id'] == id_dict['sample_id'])
+
+        data_dict = sample['data']
+        assert("feature_0" in data_dict.keys())
+
+        sample = synth_normal[0]
+        assert("id" in sample.keys())
+        assert("data" in sample.keys())
+
 
         # this is how it should work 
         # with sample id
         # synth_normal.__getitem__(sample_id) => item
-        # synth_normal.__getitem__(data_id) => error
+        # synth_normal.__getitem__(data_id) => item
 
         # without sample id
         # synth_normal.__getitem__(data_id) => item
-        # synth_normal.__getitem__(sample_id) => error (for now, eventually extend) 
+        # synth_normal.__getitem__(sample_id) => item
             # (in this case we need to be generating sample IDs so that we can reidentify columns.)  
               
         # how do we manage duplicates? 
@@ -141,6 +165,8 @@ class TestDataDetectiveDataset:
                 "test_set": test_dataset_1,
             },
         }
+
+        
 
 
 

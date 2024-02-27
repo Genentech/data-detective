@@ -30,7 +30,20 @@ class DatatypesAndGetItemMeta(type):
             # Wrap the 'get_data' method with additional behavior
             original_getitem = dct['__getitem__']
             def wrapped_getitem(self, *args, **kwargs):
-                data_dict = original_getitem(self, *args, **kwargs)
+                try: 
+                    data_dict = original_getitem(self, *args, **kwargs)
+                    if not self.show_id and not self.include_subject_id_in_data: 
+                        return data_dict 
+                except:
+                    if isinstance(args[0], int): 
+                        idx = self.index_df[self.index_df["data_idx"] == args[0]]['sample_id'][0]
+                    else: 
+                        idx = self.index_df[self.index_df["sample_id"] == args[0]]['data_idx'][0]
+
+                    data_dict = original_getitem(self, *(idx,), **kwargs)
+                    if not self.show_id and not self.include_subject_id_in_data: 
+                        return data_dict 
+
                 data_idx_or_sample_id = args[0] 
                 if self.include_subject_id_in_data: 
                     data_dict["subject_id"] = self.get_subject_id(data_idx_or_sample_id=data_idx_or_sample_id)
@@ -53,7 +66,6 @@ class DatatypesAndGetItemMeta(type):
             dct['__getitem__'] = wrapped_getitem
         return super().__new__(cls, name, bases, dct)
 
-
 class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetItemMeta):
     """
     What should be true of every Data Detective Dataset?
@@ -71,8 +83,8 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     """
     def __init__(self, sample_ids: list = None, subject_ids: list = None, show_id: bool = True, include_subject_id_in_data=True):
     # def __init__(self, sample_id_key: str = None, subject_ids: list = None, show_id: bool = True):
-        self.show_id = show_id
         self.include_subject_id_in_data = include_subject_id_in_data
+        self.show_id = False # only for initialization
         
         if sample_ids and subject_ids: 
             assert(len(sample_ids) == len(subject_ids))
@@ -88,55 +100,78 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
         index_objects = []
         
         for data_idx in range(self.__len__()):
-            index_objects.append({
-                "data_idx": data_idx, 
-                "sample_id": self.get_sample_id(data_idx, sample_ids=sample_ids),
-                "subject_id": self.get_subject_id(data_idx, subject_ids=subject_ids, sample_ids=sample_ids),
-            })
+            """
+            Here is the general idea / design considerations behind this section. 
+            - we have accepted that multiple objects can have the same sample IDs, 
+            given that they have the same data AND subject ids. so the sample id is 
+            contingent on the subject id. 
+            - however, we also know that in the case that there is no subject id, the
+            subject id is dependent on the sample id (because they should be the same)
+            and the sample id is no longer dependent on the subject id
+            - SO. we try to fill in the subject id first based on the given list. if we 
+            are able to, then we can fill in the sample_id first by either given list or 
+            by hashing the data object, turning off any ID 
+            """
+            optional_sample_id = sample_ids[data_idx] if sample_ids is not None else None
+            optional_subject_id = subject_ids[data_idx] if subject_ids is not None else None
+
+            if optional_sample_id is not None: 
+                sample_id = optional_sample_id
+            else: 
+                sample_id = self.get_default_sample_id(data_idx, subject_id = optional_subject_id)
+
+            if optional_subject_id is not None: 
+                subject_id = optional_subject_id
+            else: 
+                subject_id = self.get_default_subject_id(data_idx, sample_id = sample_id)
+
+            index_object = {
+                "data_idx": data_idx,
+                "sample_id": sample_id,
+                "subject_id": subject_id,
+            }
+
+            index_objects.append(index_object)
 
         self.index_df = pd.DataFrame(index_objects)
+        self.show_id = self.show_id
+    
+    def get_default_sample_id(self, data_idx, subject_id=None):
+        saved_show_id = self.show_id
+        saved_include_subject_id_in_data = self.include_subject_id_in_data
 
-    def should_include_subject_id_in_data(self): 
-        return self.include_subject_id_in_data 
+        self.show_id = False
+        self.include_subject_id_in_data = False
+        
+        data_dict = joblib.hash(self.__getitem__(data_idx))
+        if subject_id is not None and saved_include_subject_id_in_data: 
+            data_dict['subject_id'] = subject_id
+
+        self.show_id = saved_show_id
+        self.include_subject_id_in_data = saved_include_subject_id_in_data
+        return joblib.hash(data_dict)
+                
+    def get_default_subject_id(self, data_idx, sample_id=None):
+        if sample_id is None: 
+            sample_id = self.default_sample_id(data_idx, subject_id=None)
+        
+        return sample_id
 
     # can be overridden
     # let's try to avoid using idx and focus on data_idx, sample_idx, and subject_idx
     # should this map from internal id or 
     def get_subject_id(self, data_idx_or_sample_id: int, subject_ids: list = None, sample_ids: list = None) -> str: 
-        # get the value from the index_df first usually
-        if hasattr(self, "index_df"): 
-            if isinstance(data_idx_or_sample_id, int): 
-                data_idx = data_idx_or_sample_id
-                return self.index_df[self.index_df['data_idx'] == data_idx]['subject_id'][0]
-            else: 
-                sample_id = data_idx_or_sample_id
-                return self.index_df[self.index_df['sample_id'] == sample_id]['subject_id'][0]
-        
-        # only called in __init__
         if isinstance(data_idx_or_sample_id, int): 
             data_idx = data_idx_or_sample_id
-            if subject_ids is not None: 
-                return subject_ids[data_idx]
-
-            sample_id = self.get_sample_id(data_idx, sample_ids=sample_ids)
+            return self.index_df[self.index_df['data_idx'] == data_idx]['subject_id'][0]
         else: 
-            # this branch is only called in the pre-index-df regime
-            # in other words, you never need to check 
             sample_id = data_idx_or_sample_id
-
-        return sample_id
+            return self.index_df[self.index_df['sample_id'] == sample_id]['subject_id'][0]
 
     # can be overridden
     # maps from data index 
     def get_sample_id(self, data_idx: int, sample_ids: list = None) -> str: 
-        if hasattr(self, "index_df"): 
-            return self.index_df[self.index_df['data_idx'] == data_idx]['sample_id'][0]
-
-        # only called in __init__
-        if sample_ids is not None:
-            return sample_ids[data_idx]
-        else: 
-            return joblib.hash(self.get_data(data_idx))
+        return self.index_df[self.index_df['data_idx'] == data_idx]['sample_id'][0]
 
     def get_id(self, sample_idx) -> Dict[int, Union[str, int]]: 
         id_dict = {
@@ -146,30 +181,9 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
 
         return id_dict
 
-    @abstractmethod
-    def get_data(self, data_idx_or_sample_id: Union[int, str]) -> Any: 
-        pass
-
     # idx here can be sample idx or normal idx, hard to say. 
     def __getitem__(self, data_idx_or_sample_id) -> Dict[str, Any]: 
-        if isinstance(data_idx_or_sample_id, int): 
-            data_idx = data_idx_or_sample_id
-            sample_id = self.get_sample_id(data_idx)
-        else:
-            sample_id = data_idx_or_sample_id
-
-        if sample_id not in set(self.index_df['sample_id']):
-            raise Exception(f"Sample ID {sample_id} not found in index dataframe.")
-
-        data_dict = self.get_data(data_idx_or_sample_id) 
-        if self.include_subject_id_in_data: 
-            data_dict["subject_id"] = self.get_subject_id(data_idx_or_sample_id=data_idx_or_sample_id)
-
-        # lets enforce this to be
-        return {
-            "id": self.get_id(sample_id),
-            "data": data_dict
-        }
+        pass
 
     # not necessary to override
     def __len__(self) -> int: 
@@ -199,6 +213,8 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
             modified_dataset = self
 
         modified_dataset.index_df = modified_dataset.index_df[~modified_dataset.index_df['data_idx'].isin(data_idxs)]
+        modified_dataset.index_df.reset_index(inplace=True, drop=True)
+        modified_dataset.index_df['data_idx'] = range(len(modified_dataset.index_df))
 
         return modified_dataset
 
@@ -209,6 +225,8 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
             modified_dataset = self
 
         modified_dataset.index_df = modified_dataset.index_df[modified_dataset.index_df['data_idx'].isin(data_idxs)]
+        modified_dataset.index_df.reset_index(inplace=True, drop=True)
+        modified_dataset.index_df['data_idx'] = range(len(modified_dataset.index_df))
 
         return modified_dataset
 

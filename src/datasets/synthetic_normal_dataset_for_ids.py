@@ -28,14 +28,8 @@ class SyntheticNormalDatasetForIds(DataDetectiveDataset):
 
     # idx represents samddple index if exists
     # otherwise represents internal idx. 
-    def get_data(self, index: int):
+    def __getitem__(self, index: int):
         return self.dataframe.iloc[index].to_dict()
-    
-    # def get_subject_id(self, index: int):
-    #     pass
-
-    # def get_sample_id(self, index: int):
-    #     pass
 
     def __len__(self) -> int:
         return self.dataset_size
@@ -75,12 +69,11 @@ class SyntheticNormalDatasetForIds(DataDetectiveDataset):
             for column_name in self.columns
         }
 
-
 class SyntheticNormalDatasetForIdsWithSampleIds(SyntheticNormalDatasetForIds):
     def __init__(self, num_cols: int = 1, dataset_size: int = 10000, loc: float = 0.):
         super().__init__(num_cols=num_cols, dataset_size=dataset_size, loc=loc, sample_ids=[joblib.hash(i) for i in range(dataset_size)])
         self.dataframe["sample_id"] = [joblib.hash(idx) for idx in self.dataframe.index]
         self.dataframe = self.dataframe.set_index("sample_id")
 
-    def get_data(self, index: int):
+    def __getitem__(self, index: int):
         return self.dataframe.loc[index].to_dict()
