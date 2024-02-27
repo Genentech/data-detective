@@ -11,8 +11,9 @@ from src.enums.enums import DataType
 
 
 class SyntheticNormalDatasetForIds(DataDetectiveDataset):
-    def __init__(self, num_cols: int = 1, dataset_size: int = 10000, loc: float = 0.):
+    def __init__(self, num_cols: int = 1, dataset_size: int = 10000, loc: float = 0., **kwargs):
         self.dataset_size = dataset_size
+
         self.columns = [f"feature_{j}" for j in range(num_cols)]
         self.outlier_index_set: Set[int] = set()
 
@@ -23,7 +24,9 @@ class SyntheticNormalDatasetForIds(DataDetectiveDataset):
 
         self.dataframe = dataframe
 
-    # idx represents sample index if exists
+        super().__init__(**kwargs)
+
+    # idx represents samddple index if exists
     # otherwise represents internal idx. 
     def get_data(self, index: int):
         return self.dataframe.iloc[index].to_dict()
@@ -75,13 +78,9 @@ class SyntheticNormalDatasetForIds(DataDetectiveDataset):
 
 class SyntheticNormalDatasetForIdsWithSampleIds(SyntheticNormalDatasetForIds):
     def __init__(self, num_cols: int = 1, dataset_size: int = 10000, loc: float = 0.):
-        super().__init__(num_cols=num_cols, dataset_size=dataset_size, loc=loc)
+        super().__init__(num_cols=num_cols, dataset_size=dataset_size, loc=loc, sample_ids=[joblib.hash(i) for i in range(dataset_size)])
         self.dataframe["sample_id"] = [joblib.hash(idx) for idx in self.dataframe.index]
         self.dataframe = self.dataframe.set_index("sample_id")
 
-    def get_sample_id(self, data_idx: int) -> str:
-        return joblib.hash(data_idx)
-
     def get_data(self, index: int):
         return self.dataframe.loc[index].to_dict()
-    

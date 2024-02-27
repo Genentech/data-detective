@@ -4,6 +4,7 @@ import time
 import torch
 
 from typing import Dict
+from src.datasets.data_detective_dataset import dd_random_split
 from src.datasets.synthetic_normal_dataset_for_ids import SyntheticNormalDatasetForIds, SyntheticNormalDatasetForIdsWithSampleIds
 
 from src.data_detective_engine import DataDetectiveEngine
@@ -30,7 +31,7 @@ class TestDataDetectiveDataset:
         data_dict = sample['data']
         assert("feature_0" in data_dict.keys())
 
-    def test_data_detective_dataset_through_synth_normal_sample_no_subject(self):
+    def test_data_detective_dataset_through_synth_normal_sample(self):
         synth_normal = SyntheticNormalDatasetForIdsWithSampleIds()
         test_sample_id = synth_normal.get_sample_id(0)
 
@@ -68,27 +69,78 @@ class TestDataDetectiveDataset:
 
         c=3
 
-    def test_data_detective_dataset_splitting(self):
+    def test_data_detective_dataset_splits(self):
+        synth_normal = SyntheticNormalDatasetForIds()
+        train_size: int = int(0.6 * len(synth_normal))
+        val_size: int = int(0.2 * len(synth_normal))
+        test_size: int = len(synth_normal) - train_size - val_size
+
+        train, val, test = dd_random_split(synth_normal, [train_size, val_size, test_size])
+        
+        test_dd_idx = 0
+        sample = train[test_dd_idx]
+        assert("id" in sample.keys())
+        assert("data" in sample.keys())
+
+        id_dict = sample['id']
+        assert("subject_id" in id_dict.keys())
+        assert("sample_id" in id_dict.keys())
+        assert(id_dict['subject_id'] == id_dict['sample_id'])
+
+        data_dict = sample['data']
+        assert("feature_0" in data_dict.keys())
+
+    def test_data_detective_dataset_splitting_sample(self):
+        synth_normal = SyntheticNormalDatasetForIdsWithSampleIds()
+        train_size: int = int(0.6 * len(synth_normal))
+        val_size: int = int(0.2 * len(synth_normal))
+        test_size: int = len(synth_normal) - train_size - val_size
+
+        train_dataset_0, val_dataset_0, test_dataset_0 = dd_random_split(synth_normal, [train_size, val_size, test_size])
+        test_sample_id = train_dataset_0.get_sample_id(0)
+
+        sample = train_dataset_0[test_sample_id]
+        assert("id" in sample.keys())
+        assert("data" in sample.keys())
+
+        id_dict = sample['id']
+        assert("subject_id" in id_dict.keys())
+        assert("sample_id" in id_dict.keys())
+        assert(id_dict['subject_id'] == id_dict['sample_id'])
+
+        data_dict = sample['data']
+        assert("feature_0" in data_dict.keys())
+
+    def test_data_detective_dataset_metaclass_behavior(self):
+        synth_normal_subject = SyntheticNormalDatasetForIds(include_subject_id_in_data=True)
+        synth_normal_no_subject = SyntheticNormalDatasetForIds(include_subject_id_in_data=False)
+        synth_normal_subject.datatypes()
+        synth_normal_no_subject.datatypes()
+        c=3
+
+
+    def test_data_detective_dataset_splitting_and_reidentiication(self):
         synth_normal = SyntheticNormalDatasetForIds()
 
         train_size: int = int(0.6 * len(synth_normal))
         val_size: int = int(0.2 * len(synth_normal))
         test_size: int = len(synth_normal) - train_size - val_size
 
-        train_dataset_0, val_dataset_0, test_dataset_0 = torch.utils.data.random_split(synth_normal, [train_size, val_size, test_size])
-        c=3
-        # train_dataset_1, val_dataset_1, test_dataset_1 = torch.utils.data.random_split(synth_normal, [train_size, val_size, test_size])
+        train_dataset_0, val_dataset_0, test_dataset_0 = dd_random_split(synth_normal, [train_size, val_size, test_size])
+        train_dataset_1, val_dataset_1, test_dataset_1 = dd_random_split(synth_normal, [train_size, val_size, test_size])
 
-        # data_object = {
-        #     "train/val/test_0": {
-        #         "training_set": train_dataset_0,
-        #         "validation_set": val_dataset_0,
-        #         "test_set": test_dataset_0,
-        #     },
-        #     "train/val/test_1": {
-        #         "training_set": train_dataset_1,
-        #         "validation_set": val_dataset_1,
-        #         "test_set": test_dataset_1,
-        #     },
-        # }
+        data_object = {
+            "train/val/test_0": {
+                "training_set": train_dataset_0,
+                "validation_set": val_dataset_0,
+                "test_set": test_dataset_0,
+            },
+            "train/val/test_1": {
+                "training_set": train_dataset_1,
+                "validation_set": val_dataset_1,
+                "test_set": test_dataset_1,
+            },
+        }
+
+
 

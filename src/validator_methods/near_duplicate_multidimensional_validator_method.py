@@ -79,6 +79,7 @@ class NearDuplicateMultidimensionalValidatorMethod(DataValidatorMethod):
         rows, cols = np.where(cos_sims >= cos_sim_threshold)
 
         # Create a list of pairs
+        # todo: add scores in too. 
         pairs = list(zip(rows, cols))
 
         return pairs

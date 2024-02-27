@@ -28,8 +28,9 @@ class Action:
         pass
 
 class RemoveTopKAnomalousSamplesAction(Action):
-    def __init__(self, k=10):
+    def __init__(self, k=10, remove_all_duplicates=True):
         self.k = k
+        self.remove_all_duplicates = remove_all_duplicates
 
     def get_new_data_object(
         data_object: Dict[str, Union[torch.utils.data.Dataset, Dict[str, torch.utils.data.Dataset]]],
