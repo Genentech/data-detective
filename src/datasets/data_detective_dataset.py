@@ -97,6 +97,12 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
             or sample_ids is not None
             or self.__len__() is not None
         )
+        if self.__len__() is not None: 
+            initial_length = self.__len__()
+        elif sample_ids is not None: 
+            initial_length = len(sample_ids)
+        else: 
+            initial_length = len(subject_ids)
 
         index_objects = []
         
