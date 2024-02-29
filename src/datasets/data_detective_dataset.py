@@ -32,21 +32,22 @@ class DatatypesAndGetItemMeta(type):
             def wrapped_getitem(self, *args, **kwargs):
                 try: 
                     data_dict = original_getitem(self, *args, **kwargs)
-                    if not self.show_id and not self.include_subject_id_in_data: 
-                        return data_dict 
-                except:
+                except KeyError:
                     if isinstance(args[0], int): 
                         idx = self.index_df[self.index_df["data_idx"] == args[0]]['sample_id'][0]
                     else: 
                         idx = self.index_df[self.index_df["sample_id"] == args[0]]['data_idx'][0]
 
                     data_dict = original_getitem(self, *(idx,), **kwargs)
-                    if not self.show_id and not self.include_subject_id_in_data: 
-                        return data_dict 
+
+                if not self.show_id and not self.include_subject_id_in_data: 
+                    return data_dict 
 
                 data_idx_or_sample_id = args[0] 
                 if self.include_subject_id_in_data: 
                     data_dict["subject_id"] = self.get_subject_id(data_idx_or_sample_id=data_idx_or_sample_id)
+                if not self.show_id: 
+                    return data_dict
 
                 if isinstance(data_idx_or_sample_id, int): 
                     data_idx = data_idx_or_sample_id
@@ -160,6 +161,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     # can be overridden
     # let's try to avoid using idx and focus on data_idx, sample_idx, and subject_idx
     # should this map from internal id or 
+    # note: all ids must not be ints, to avoid conflict with data indexing.
     def get_subject_id(self, data_idx_or_sample_id: int, subject_ids: list = None, sample_ids: list = None) -> str: 
         if isinstance(data_idx_or_sample_id, int): 
             data_idx = data_idx_or_sample_id
