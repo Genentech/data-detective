@@ -106,7 +106,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
 
         index_objects = []
         
-        for data_idx in range(self.__len__()):
+        for data_idx in range(initial_length):
             """
             Here is the general idea / design considerations behind this section. 
             - we have accepted that multiple objects can have the same sample IDs, 
