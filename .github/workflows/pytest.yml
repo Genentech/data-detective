@@ -18,10 +18,10 @@ jobs:
           python-version: ${{ matrix.python-version }}  
       - name: Clone pyrankagg
         run: |
-          git clone https://github.com/username/repo.git
+          git clone https://https://github.com/thelahunginjeet/pyrankagg.git
       - name: Clone kbutil
         run: |
-          git clone https://github.com/username/repo.git
+          git clone https://github.com/thelahunginjeet/kbutil.git
       - name: Install dependencies  
         run: |  
           python -m pip install --upgrade pip  
