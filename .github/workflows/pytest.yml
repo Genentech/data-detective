@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}  
       - name: Clone pyrankagg
         run: |
-          git clone https://https://github.com/thelahunginjeet/pyrankagg.git
+          git clone https://github.com/thelahunginjeet/pyrankagg.git
       - name: Clone kbutil
         run: |
           git clone https://github.com/thelahunginjeet/kbutil.git
