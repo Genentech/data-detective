@@ -5,26 +5,35 @@ from matplotlib import pyplot as plt
 from torchvision.datasets import MNIST
 
 from constants import FloatTensor
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 DATASET_SIZE = 50
 
-class TutorialDataset(MNIST):
+class TutorialDataset(DataDetectiveDataset):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        dataset_size = self.__len__()
+        self.mnist = MNIST(**kwargs)
+        # dataset_size = len(self.mnist)
+        dataset_size = DATASET_SIZE
         np.random.seed(42)
         self.normal_column = np.random.normal(size=(dataset_size, 2))
         self.normal_column_2 = np.random.normal(size=dataset_size)
+
+        super().__init__(
+            show_id=False, 
+            include_subject_id_in_data=False,
+            sample_ids = [str(s) for s in list(range(dataset_size))],
+            subject_ids = [str(s) for s in list(range(dataset_size))]
+        )
 
     def __getitem__(self, idx: Union[int, slice, list]) -> Dict[str, Union[FloatTensor, int]]:
         """
         Returns a dictionary of the image, vector, and label.
         """
-        sample = super().__getitem__(idx)
+        sample = self.mnist.__getitem__(idx)
         return {
             "mnist_image": sample[0],
-            "normal_vector": self.normal_column[idx][:],
+            # "normal_vector": self.normal_column[idx][:],
             "normal_vector_2": self.normal_column_2[idx],
             "label": sample[1],
         }
@@ -36,7 +45,7 @@ class TutorialDataset(MNIST):
     def datatypes(self) -> Dict[str, DataType]:
         return {
             "mnist_image": DataType.IMAGE,
-            "normal_vector": DataType.MULTIDIMENSIONAL,
+            # "normal_vector": DataType.MULTIDIMENSIONAL,
             "normal_vector_2": DataType.CONTINUOUS,
             "label": DataType.CATEGORICAL,
         }

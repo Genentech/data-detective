@@ -107,6 +107,8 @@ class DataDetectiveEngine:
         # else:
         #     filtered_transformed_data_object = filtered_data_object
 
+        filtered_transformed_data_object['entire_set'].__getitem__(0)
+        filtered_transformed_data_object['entire_set'].datatypes()
         return filtered_transformed_data_object, validator_class_object.get_task_list(
             data_object=filtered_transformed_data_object,
             validator_kwargs=validator_kwargs
@@ -207,8 +209,6 @@ class DataDetectiveEngine:
         while isinstance(sample_dataset, dict):
             sample_dataset = list(sample_dataset.values())[0]
 
-        while isinstance(sample_dataset, torch.utils.data.Subset):
-            sample_dataset = sample_dataset.dataset
         datatypes = sample_dataset.datatypes()
 
         for data_type_or_column_name, transform_specification_list in transform_dict.items():
@@ -220,11 +220,11 @@ class DataDetectiveEngine:
 
             if data_type_or_column_name in [data_type.upper() for data_type in DataType._value2member_map_.keys()]:
                 data_type = data_type_or_column_name
-                relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value]
+                relevant_columns = [column_name for (column_name, dtype) in datatypes.items() if data_type == dtype.value.upper()]
             elif data_type_or_column_name.lower() in [data_type.lower() for data_type in DataType._value2member_map_.keys()]: 
-                raise Exception("It looks like you may be trying to apply a transform to a data type (such as {data_type_or_column_name}). Please use ALL CAPS in the datatype \
+                raise Exception(f"It looks like you may be trying to apply a transform to a data type (such as {data_type_or_column_name}). Please use ALL CAPS in the datatype \
                                 if this is what you are trying to do. If you would like to target an individual column name, please avoid data column names that conflict with datatype names \
-                                ({", ".join([data_type.lower() for data_type in DataType._value2member_map_.keys()])})")
+                                ({', '.join([data_type.lower() for data_type in DataType._value2member_map_.keys()])})")
             else: 
                 column_name = data_type_or_column_name
                 relevant_columns = [data_type_or_column_name]

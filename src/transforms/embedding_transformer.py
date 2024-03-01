@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import typing
 
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
@@ -32,7 +33,7 @@ class Transform(torch.nn.Module):
 
 class TransformedDataset:
     def __init__(self,
-        dataset: torch.utils.data.Dataset,
+        dataset: DataDetectiveDataset,
         transforms: typing.Dict[str, typing.List[Transform]]
     ):
         self.dataset = dataset
@@ -44,8 +45,6 @@ class TransformedDataset:
 
     def datatypes(self):
         dataset = self.dataset
-        while isinstance(dataset, torch.utils.data.Subset):
-            dataset = dataset.dataset
         new_datatypes = dataset.datatypes()
 
         for col_name, transform_list in self.transforms.items():

@@ -65,6 +65,23 @@ class DatatypesAndGetItemMeta(type):
                 }
 
             dct['__getitem__'] = wrapped_getitem
+        if '__len__' in dct:
+            # length call works as follows: 
+                # if self.index_df works, use that
+            # otherwise: 
+                # try to call 
+
+            original_len = dct['__len__']
+            def wrapped_len(self, *args, **kwargs):
+                if hasattr(self, "index_df"):
+                    return len(self.index_df)
+                
+                orig_len = original_len(self, *args, **kwargs)
+                if orig_len is None: 
+                    raise Exception("Must either provide sample ids, subject ids, or a valid initial length.")
+                return orig_len
+
+            dct['__len__'] = wrapped_len
         return super().__new__(cls, name, bases, dct)
 
 class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetItemMeta):
@@ -82,7 +99,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     example: 
     dd_test = dataset(indices=indices) # these indices are then used for the data. 
     """
-    def __init__(self, sample_ids: list = None, subject_ids: list = None, show_id: bool = True, include_subject_id_in_data=True):
+    def __init__(self, sample_ids: list = None, subject_ids: list = None, show_id: bool = True, include_subject_id_in_data=True ):
     # def __init__(self, sample_id_key: str = None, subject_ids: list = None, show_id: bool = True):
         self.include_subject_id_in_data = include_subject_id_in_data
         self.show_id = False # only for initialization
@@ -90,26 +107,15 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
         if sample_ids and subject_ids: 
             assert(len(sample_ids) == len(subject_ids))
 
-        # We need either sample_ids provided, subject_ids provided, or __len__ provided
-        # otherwise we cannot register sample IDs for all of the data... 
-        assert(
-            subject_ids is not None
-            or sample_ids is not None
-            or self.__len__() is not None
-        )
-
-        #todo: patch if length is overridden
+        #todo: initial_length => __len__(): 
         if sample_ids is not None: 
             initial_length = len(sample_ids)
         elif subject_ids is not None: 
             initial_length = len(subject_ids)
-        else:
+        else: 
             initial_length = self.__len__()
-        
-        self.length = initial_length
-
+    
         index_objects = []
-        
         for data_idx in range(initial_length):
             """
             Here is the general idea / design considerations behind this section. 

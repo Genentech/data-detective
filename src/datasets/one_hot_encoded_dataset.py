@@ -3,13 +3,14 @@ from sklearn.preprocessing import OneHotEncoder
 
 import torch
 from torch.utils.data import DataLoader
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 
 from src.enums.enums import DataType
 
 
 class OneHotEncodedDataset:
     def __init__(self,
-        dataset: torch.utils.data.Dataset,
+        dataset: DataDetectiveDataset,
     ):
         self.dataset = dataset
         self.prepare_one_hot_encodings()
