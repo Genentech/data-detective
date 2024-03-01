@@ -13,7 +13,6 @@ DATASET_SIZE = 50
 class TutorialDataset(DataDetectiveDataset):
     def __init__(self, **kwargs):
         self.mnist = MNIST(**kwargs)
-        # dataset_size = len(self.mnist)
         dataset_size = DATASET_SIZE
         np.random.seed(42)
         self.normal_column = np.random.normal(size=(dataset_size, 2))
@@ -33,7 +32,7 @@ class TutorialDataset(DataDetectiveDataset):
         sample = self.mnist.__getitem__(idx)
         return {
             "mnist_image": sample[0],
-            # "normal_vector": self.normal_column[idx][:],
+            "normal_vector": self.normal_column[idx][:],
             "normal_vector_2": self.normal_column_2[idx],
             "label": sample[1],
         }
@@ -45,7 +44,7 @@ class TutorialDataset(DataDetectiveDataset):
     def datatypes(self) -> Dict[str, DataType]:
         return {
             "mnist_image": DataType.IMAGE,
-            # "normal_vector": DataType.MULTIDIMENSIONAL,
+            "normal_vector": DataType.MULTIDIMENSIONAL,
             "normal_vector_2": DataType.CONTINUOUS,
             "label": DataType.CATEGORICAL,
         }

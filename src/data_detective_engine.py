@@ -205,12 +205,11 @@ class DataDetectiveEngine:
     def parse_transforms(self, transform_dict: Dict[str, Any], data_object):
         output_dict = defaultdict(lambda: [])
 
-        while isinstance(sample_dataset, torch.utils.data.Subset):
-            sample_dataset = sample_dataset.dataset
-
         sample_dataset = list(data_object.items())[0][1]
         while isinstance(sample_dataset, dict):
             sample_dataset = list(sample_dataset.values())[0]
+        while isinstance(sample_dataset, torch.utils.data.Subset):
+            sample_dataset = sample_dataset.dataset
 
         datatypes = sample_dataset.datatypes()
 
