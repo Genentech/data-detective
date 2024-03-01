@@ -45,6 +45,8 @@ class TransformedDataset:
 
     def datatypes(self):
         dataset = self.dataset
+        while isinstance(dataset, torch.utils.data.Subset):
+            dataset = dataset.dataset
         new_datatypes = dataset.datatypes()
 
         for col_name, transform_list in self.transforms.items():

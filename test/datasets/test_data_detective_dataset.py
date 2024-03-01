@@ -4,9 +4,9 @@ import time
 import numpy as np
 import torch
 
-from typing import Dict
+from typing import Dict, Union
 from src.datasets.adbench_dataset import ADBenchDDDataset
-from src.datasets.data_detective_dataset import dd_random_split
+from src.datasets.data_detective_dataset import DataDetectiveDataset, dd_random_split
 from src.datasets.synthetic_normal_dataset_for_ids import SyntheticNormalDatasetForIds, SyntheticNormalDatasetForIdsWithSampleIds
 
 from src.data_detective_engine import DataDetectiveEngine
@@ -225,7 +225,7 @@ class TestDataDetectiveDataset:
             train_dataset, val_dataset, test_dataset = torch.utils.data.random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
             #TODO: lists for validation sets and test sets.
-            data_object: Dict[str, torch.utils.data.Dataset] = {
+            data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
                 "standard_split": {
                     "training_set": train_dataset,
                     "validation_set": val_dataset,
@@ -235,12 +235,11 @@ class TestDataDetectiveDataset:
                 "everything_but_inference_set": everything_but_inference_dataset,
                 "inference_set": inference_dataset
             }
-
             
             results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
+            assert(len(results.items()) > 0)
             c=3
             # print(results)
-
 
     def test_data_detective_dataset_splitting_and_reidentiication(self):
         synth_normal = SyntheticNormalDatasetForIds()
