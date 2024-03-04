@@ -99,7 +99,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     example: 
     dd_test = dataset(indices=indices) # these indices are then used for the data. 
     """
-    def __init__(self, sample_ids: list = None, subject_ids: list = None, show_id: bool = True, include_subject_id_in_data=True ):
+    def __init__(self, sample_ids: list = None, subject_ids: list = None, show_id: bool = False, include_subject_id_in_data=False ):
     # def __init__(self, sample_id_key: str = None, subject_ids: list = None, show_id: bool = True):
         self.include_subject_id_in_data = include_subject_id_in_data
         self.show_id = False # only for initialization
