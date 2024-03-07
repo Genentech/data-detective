@@ -83,20 +83,32 @@ class DataDetectiveEngine:
                 else: 
                     dataset = dataset_or_data_object
                     filtered_transformed_data_object[key] = TransformedDataset(dataset, transforms_dict) 
-                    
-                    has_categorical_data = DataType.CATEGORICAL in filtered_transformed_data_object[key].datatypes()
-                    if has_categorical_data: 
-                        filtered_transformed_data_object[key] = OneHotEncodedDataset(filtered_transformed_data_object[key])
 
-            return filtered_transformed_data_object
+        def get_one_hot_encoded_data_object(data_object):
+            one_hot_encoded_data_object = {}
+
+            for key, dataset_or_data_object in data_object.items():
+                if isinstance(dataset_or_data_object, dict): 
+                    sub_data_object = dataset_or_data_object
+                    one_hot_encoded_data_object[key] = get_one_hot_encoded_data_object(sub_data_object)
+                else: 
+                    # TODO: implement filtering correctly on the torch datasets.
+                    dataset = dataset_or_data_object
+                    has_categorical_data = DataType.CATEGORICAL in dataset.datatypes().values()
+                    if has_categorical_data: 
+                        one_hot_encoded_data_object[key] = OneHotEncodedDataset(dataset)
+                    else: 
+                        one_hot_encoded_data_object[key] = dataset
+
+            return one_hot_encoded_data_object
 
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
+        filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
+
             
-        filtered_transformed_data_object['entire_set'].__getitem__(0)
-        filtered_transformed_data_object['entire_set'].datatypes()
-        return filtered_transformed_data_object, validator_class_object.get_task_list(
-            data_object=filtered_transformed_data_object,
+        return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
+            data_object=filtered_transformed_onehot_encoded_data_object,
             validator_kwargs=validator_kwargs
         )
 

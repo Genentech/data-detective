@@ -3,6 +3,7 @@ from typing import Dict
 import numpy as np
 import torch
 
+from src.datasets.data_detective_dataset import dd_random_split
 from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.synthetic_ci_dataset import SyntheticCIDataset
 
@@ -39,7 +40,7 @@ class TestFCITValidatorMethod:
         train_size: int = int(0.6 * len(ci_dataset))
         val_size: int = int(0.2 * len(ci_dataset))
         test_size: int = len(ci_dataset) - train_size - val_size
-        train_dataset, val_dataset, test_dataset=torch.utils.data.random_split(ci_dataset, [train_size, val_size, test_size])
+        train_dataset, val_dataset, test_dataset=dd_random_split(ci_dataset, [train_size, val_size, test_size])
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
@@ -80,7 +81,7 @@ class TestFCITValidatorMethod:
         train_size: int = int(0.6 * len(ci_dataset))
         val_size: int = int(0.2 * len(ci_dataset))
         test_size: int = len(ci_dataset) - train_size - val_size
-        train_dataset, val_dataset, test_dataset=torch.utils.data.random_split(ci_dataset, [train_size, val_size, test_size])
+        train_dataset, val_dataset, test_dataset=dd_random_split(ci_dataset, [train_size, val_size, test_size])
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {

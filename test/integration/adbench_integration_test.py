@@ -6,9 +6,10 @@ import pandas as pd
 import sklearn.metrics
 import torch
 from torchvision.transforms import transforms
+from src.datasets.data_detective_dataset import DataDetectiveDataset, dd_random_split
 from src.data_detective_engine import DataDetectiveEngine
 
-from src.datasets.adbench_dataset import ADBenchDataset
+from src.datasets.adbench_dataset import ADBenchDDDataset
 from src.enums.enums import DataType
 
 INFERENCE_SIZE = 20
@@ -40,7 +41,7 @@ class TestADBenchIntegration:
         for npz_filename in npz_files:
             print(npz_filename)
             # TODO: add proper datasets augmentation strategy
-            adbench_dataset: ADBenchDataset = ADBenchDataset(
+            adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
                 input_data_type=DataType.MULTIDIMENSIONAL,
@@ -72,7 +73,7 @@ class TestADBenchIntegration:
             }
 
 
-            inference_dataset, everything_but_inference_dataset = torch.utils.data.random_split( adbench_dataset, [INFERENCE_SIZE, adbench_dataset.__len__() - INFERENCE_SIZE])
+            inference_dataset, everything_but_inference_dataset = dd_random_split( adbench_dataset, [INFERENCE_SIZE, adbench_dataset.__len__() - INFERENCE_SIZE])
             true_results = []
             for idx in range(inference_dataset.__len__()):
                 sample = inference_dataset[idx]
@@ -80,7 +81,7 @@ class TestADBenchIntegration:
             true_results = np.array(true_results)
 
             while len(np.unique(true_results)) < 2:
-                inference_dataset, everything_but_inference_dataset = torch.utils.data.random_split(adbench_dataset,
+                inference_dataset, everything_but_inference_dataset = dd_random_split(adbench_dataset,
                                                                                                     [INFERENCE_SIZE,
                                                                                                      adbench_dataset.__len__() - INFERENCE_SIZE])
                 true_results = []
@@ -92,10 +93,10 @@ class TestADBenchIntegration:
             train_size: int = int(0.6 * len(everything_but_inference_dataset))
             val_size: int = int(0.2 * len(everything_but_inference_dataset))
             test_size: int = len(everything_but_inference_dataset) - train_size - val_size
-            train_dataset, val_dataset, test_dataset = torch.utils.data.random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
+            train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
             #TODO: lists for validation sets and test sets.
-            data_object: Dict[str, torch.utils.data.Dataset] = {
+            data_object: Dict[str, DataDetectiveDataset] = {
                 "standard_split": {
                     "training_set": train_dataset,
                     "validation_set": val_dataset,
@@ -106,7 +107,6 @@ class TestADBenchIntegration:
                 "inference_set": inference_dataset
             }
 
-            
             results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
             # print(results)
 

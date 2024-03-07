@@ -22,17 +22,17 @@ class TestCSVDataset:
 
         # hack for setting length to 100 for testing
         desired_length = 50
-        dataset, _ = torch.utils.data.random_split(dataset, [desired_length, dataset.__len__() - desired_length])
+        dataset, _ = dd_random_split(dataset, [desired_length, dataset.__len__() - desired_length])
 
         inference_size: int = 20
         everything_but_inference_size: int = dataset.__len__() - inference_size
-        inference_dataset, everything_but_inference_dataset = torch.utils.data.random_split(dataset, [inference_size,
+        inference_dataset, everything_but_inference_dataset = dd_random_split(dataset, [inference_size,
                                                                                                       dataset.__len__() - inference_size])
 
         train_size: int = int(0.6 * len(everything_but_inference_dataset))
         val_size: int = int(0.2 * len(everything_but_inference_dataset))
         test_size: int = len(everything_but_inference_dataset) - train_size - val_size
-        train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(everything_but_inference_dataset,
+        train_dataset, val_dataset, test_dataset = dd_random_split(everything_but_inference_dataset,
                                                                                  [train_size, val_size, test_size])
 
         data_object: Dict[str, torch.utils.data.Dataset] = {

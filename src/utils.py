@@ -405,17 +405,17 @@ def get_split_group_keys(data_object):
         if key not in  [member.value for member in ValidatorMethodParameter]:
             # then it must be a split group; so make sure it is not malformed
             split_group_set = potential_split_group_set
-            assert(isinstance(split_group_set, dict))
-            assert(len(split_group_set.items()) > 1)
+            assert isinstance(split_group_set, dict)
+            assert len(split_group_set.items()) > 1, f"split group set {split_group_set} only has one item."
 
             for dataset_name, dataset in split_group_set.items(): 
-                assert(isinstance(dataset_name, str))
-                assert(isinstance(dataset, torch.utils.data.Dataset))
+                assert isinstance(dataset_name, str)
+                assert isinstance(dataset, torch.utils.data.Dataset)
 
             split_group_keys.append(key)
         else: 
-            assert(isinstance(key, str))
-            assert(isinstance(potential_split_group_set, torch.utils.data.Dataset))
+            assert isinstance(key, str)
+            assert isinstance(potential_split_group_set, torch.utils.data.Dataset)
 
 
     return split_group_keys

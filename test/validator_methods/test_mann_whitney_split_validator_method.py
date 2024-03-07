@@ -2,6 +2,7 @@ from typing import Dict
 
 import numpy as np
 import torch
+from src.datasets.data_detective_dataset import dd_random_split
 
 from src.datasets.synthetic_normal_dataset import SyntheticNormalDatasetContinuous
 from src.data_detective_engine import DataDetectiveEngine
@@ -27,7 +28,7 @@ class TestMannWhitneySplitValidatorMethod:
         train_size: int = int(0.6 * len(normal_dataset))
         val_size: int = int(0.2 * len(normal_dataset))
         test_size: int = len(normal_dataset) - train_size - val_size
-        train_dataset, val_dataset, test_dataset=torch.utils.data.random_split( normal_dataset, [train_size, val_size, test_size])
+        train_dataset, val_dataset, test_dataset=dd_random_split( normal_dataset, [train_size, val_size, test_size])
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {

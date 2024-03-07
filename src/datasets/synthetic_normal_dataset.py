@@ -5,10 +5,11 @@ import pandas as pd
 from pandas import DataFrame
 from torch.utils.data import Dataset
 
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
-class SyntheticNormalDataset(Dataset):
+class SyntheticNormalDataset(DataDetectiveDataset):
     def __init__(self, num_cols: int = 1, dataset_size: int = 10000, loc: float = 0.):
         self.dataset_size = dataset_size
         self.columns = [f"feature_{j}" for j in range(num_cols)]
@@ -20,6 +21,8 @@ class SyntheticNormalDataset(Dataset):
         }, columns=self.columns)
 
         self.dataframe = dataframe
+
+        super().__init__(self, show_id=False, include_subject_id_in_data=False)
 
     def __getitem__(self, index: int):
         return self.dataframe.iloc[index].to_dict()
@@ -62,7 +65,7 @@ class SyntheticNormalDataset(Dataset):
             for column_name in self.columns
         }
 
-class SyntheticNormalDatasetContinuous(Dataset):
+class SyntheticNormalDatasetContinuous(DataDetectiveDataset):
     def __init__(self, num_cols: int = 1, dataset_size: int = 10000, loc: float = 0.):
         self.dataset_size = dataset_size
         self.columns = [f"feature_{j}" for j in range(num_cols)]
@@ -74,6 +77,8 @@ class SyntheticNormalDatasetContinuous(Dataset):
         }, columns=self.columns)
 
         self.dataframe = dataframe
+
+        super().__init__(self, show_id=False, include_subject_id_in_data=False)
 
     def __getitem__(self, index: int):
         return self.dataframe.iloc[index].to_dict()
@@ -116,7 +121,7 @@ class SyntheticNormalDatasetContinuous(Dataset):
             for column_name in self.columns
         }
 
-class SyntheticCategoricalDataset(SyntheticNormalDataset):
+class SyntheticCategoricalDataset(DataDetectiveDataset):
     def __init__(self, num_cols: int = 1, dataset_size: int = 10000, p: float = 0.25):
         self.dataset_size = dataset_size
         self.columns = [f"feature_{j}" for j in range(num_cols)]
@@ -127,6 +132,21 @@ class SyntheticCategoricalDataset(SyntheticNormalDataset):
         }, columns=self.columns)
 
         self.dataframe = dataframe
+
+        super().__init__(show_id=False, include_subject_id_in_data=False)
+    
+    def __getitem__(self, index: int):
+        return self.dataframe.iloc[index].to_dict()
+
+    def __len__(self) -> int:
+        return self.dataset_size
+
+    def __repr__(self):
+        return self.dataframe.__repr__()
+
+    @property
+    def num_columns(self):
+        return len(self.columns)
 
     def datatypes(self) -> Dict[str, DataType]:
         return {

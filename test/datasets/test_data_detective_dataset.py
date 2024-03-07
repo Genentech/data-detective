@@ -11,11 +11,13 @@ from src.datasets.synthetic_normal_dataset_for_ids import SyntheticNormalDataset
 
 from src.data_detective_engine import DataDetectiveEngine
 from src.enums.enums import DataType
-from test.integration.adbench_integration_test import TestADBenchIntegration
 
+SEED = 142
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.abspath(os.path.join(TEST_DIR, os.pardir))
+
 sys.path.insert(0, PROJECT_DIR)
+
 
 class TestDataDetectiveDataset:
     def test_data_detective_dataset_through_synth_normal(self):

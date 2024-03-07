@@ -73,12 +73,12 @@ class TestEmbeddingTransformer:
             }
         }
 
-        cifar_10, _ = torch.utils.data.random_split(cifar_10, [100, len(cifar_10) - 100])
+        cifar_10, _ = dd_random_split(cifar_10, [100, len(cifar_10) - 100])
 
         train_size: int = int(0.6 * len(cifar_10))
         val_size: int = int(0.2 * len(cifar_10))
         test_size: int = len(cifar_10) - train_size - val_size
-        train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(cifar_10, [train_size, val_size, test_size])
+        train_dataset, val_dataset, test_dataset = dd_random_split(cifar_10, [train_size, val_size, test_size])
 
         #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
