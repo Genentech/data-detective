@@ -13,12 +13,11 @@ from src.datasets.adbench_dataset import ADBenchDDDataset
 from src.enums.enums import DataType
 
 INFERENCE_SIZE = 20
+SEED = 142
 
 class TestADBenchIntegration:
-    SEED = 142
-
     def test_example(self):
-        seed = TestADBenchIntegration.SEED
+        seed = SEED
         finished = False
 
         np.random.seed(seed)
@@ -113,102 +112,102 @@ class TestADBenchIntegration:
             auc_dict = {}
 
             #############
-            anomaly_results_dict = results['unsupervised_anomaly_data_validator']
-            for validator_method in anomaly_results_dict.keys():
-                predicted_scores = anomaly_results_dict[validator_method]
-                result_key = list(predicted_scores.keys())[0]
-                predicted_scores = predicted_scores[result_key]
+        #     anomaly_results_dict = results['unsupervised_anomaly_data_validator']
+        #     for validator_method in anomaly_results_dict.keys():
+        #         predicted_scores = anomaly_results_dict[validator_method]
+        #         result_key = list(predicted_scores.keys())[0]
+        #         predicted_scores = predicted_scores[result_key]
 
-                true_scores = adbench_dataset.y
-                roc_auc_score = sklearn.metrics.roc_auc_score(true_scores, predicted_scores)
-                auc_dict[validator_method] = roc_auc_score
-                print(validator_method, roc_auc_score)
+        #         true_scores = adbench_dataset.y
+        #         roc_auc_score = sklearn.metrics.roc_auc_score(true_scores, predicted_scores)
+        #         auc_dict[validator_method] = roc_auc_score
+        #         print(validator_method, roc_auc_score)
 
-                results_for_table.append({
-                    "validator": "unsupervised anomaly datasets validator",
-                    "validator_method": validator_method,
-                    "dataset": npz_filename.split(".")[0].split("_")[1],
-                    "metric_value": roc_auc_score,
-                    "metric_unit": "aucroc"
-                })
+        #         results_for_table.append({
+        #             "validator": "unsupervised anomaly datasets validator",
+        #             "validator_method": validator_method,
+        #             "dataset": npz_filename.split(".")[0].split("_")[1],
+        #             "metric_value": roc_auc_score,
+        #             "metric_unit": "aucroc"
+        #         })
 
-            iforest_results = anomaly_results_dict['iforest_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
-            pca_results = anomaly_results_dict['pca_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
-            cblof_results = anomaly_results_dict['cblof_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
-            true_results = adbench_dataset.y
-            np.savez(f"anomaly_results_{npz_filename}", iforest_results=iforest_results, pca_results=pca_results, cblof_results=cblof_results, true_results=true_results)
+        #     iforest_results = anomaly_results_dict['iforest_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
+        #     pca_results = anomaly_results_dict['pca_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
+        #     cblof_results = anomaly_results_dict['cblof_anomaly_validator_method'][f'{adbench_dataset.input_data_name}_results']
+        #     true_results = adbench_dataset.y
+        #     np.savez(f"anomaly_results_{npz_filename}", iforest_results=iforest_results, pca_results=pca_results, cblof_results=cblof_results, true_results=true_results)
 
-            ood_inference_results_dict = results['ood_inference_data_validator']
-            iforest_results = ood_inference_results_dict['iforest_ood_inference_validator_method']['results']['ood_scores']
-            pca_results = ood_inference_results_dict['pca_ood_inference_validator_method']['results']['ood_scores']
-            cblof_results = ood_inference_results_dict['cblof_ood_inference_validator_method']['results']['ood_scores']
+        #     ood_inference_results_dict = results['ood_inference_data_validator']
+        #     iforest_results = ood_inference_results_dict['iforest_ood_inference_validator_method']['results']['ood_scores']
+        #     pca_results = ood_inference_results_dict['pca_ood_inference_validator_method']['results']['ood_scores']
+        #     cblof_results = ood_inference_results_dict['cblof_ood_inference_validator_method']['results']['ood_scores']
 
-            true_results = []
-            for idx in range(inference_dataset.__len__()):
-                sample = inference_dataset[idx]
-                true_results.append(sample['label'])
-            true_results = np.array(true_results)
+        #     true_results = []
+        #     for idx in range(inference_dataset.__len__()):
+        #         sample = inference_dataset[idx]
+        #         true_results.append(sample['label'])
+        #     true_results = np.array(true_results)
 
-            for validator_method in ood_inference_results_dict.keys():
-                predicted_results = ood_inference_results_dict[validator_method]['results']['ood_scores']
+        #     for validator_method in ood_inference_results_dict.keys():
+        #         predicted_results = ood_inference_results_dict[validator_method]['results']['ood_scores']
 
-                roc_auc_score = sklearn.metrics.roc_auc_score(true_results, predicted_results)
-                auc_dict[validator_method] = roc_auc_score
-                print(validator_method, roc_auc_score)
+        #         roc_auc_score = sklearn.metrics.roc_auc_score(true_results, predicted_results)
+        #         auc_dict[validator_method] = roc_auc_score
+        #         print(validator_method, roc_auc_score)
 
-                results_for_table.append({
-                    "validator": "ood inference datasets validator",
-                    "validator_method": validator_method,
-                    "dataset": npz_filename.split(".")[0].split("_")[1],
-                    "metric_value": roc_auc_score,
-                    "metric_unit": "aucroc"
-                })
+        #         results_for_table.append({
+        #             "validator": "ood inference datasets validator",
+        #             "validator_method": validator_method,
+        #             "dataset": npz_filename.split(".")[0].split("_")[1],
+        #             "metric_value": roc_auc_score,
+        #             "metric_unit": "aucroc"
+        #         })
 
-            np.savez(f"ood_inference_results_{npz_filename}", iforest_results=iforest_results, pca_results=pca_results, cblof_results=cblof_results, true_results=true_results)
+        #     np.savez(f"ood_inference_results_{npz_filename}", iforest_results=iforest_results, pca_results=pca_results, cblof_results=cblof_results, true_results=true_results)
 
-            split_results_dict = results['split_covariate_data_validator']
-            ks_results = split_results_dict['kolmogorov_smirnov_multidimensional_split_validator_method']
-            ks_results = {k: ([{"statistic": str(val.statistic), "pvalue": str(val.pvalue)} for val in v[0]], v[1]) for k, v in ks_results.items()}
-            kruskal_wallis_results = split_results_dict['kruskal_wallis_multidimensional_split_validator_method']
-            kruskal_wallis_results = {k: ([{"statistic": str(val.statistic), "pvalue": str(val.pvalue)} for val in v[0]], v[1]) for k, v in kruskal_wallis_results.items()}
-            mann_whitney_results = split_results_dict['mann_whitney_multidimensional_split_validator_method']
-            mann_whitney_results = {k: ([{"statistic": str(val.statistic), "pvalue": str(val.pvalue)} for val in v[0]], v[1]) for k, v in mann_whitney_results.items()}
+        #     split_results_dict = results['split_covariate_data_validator']
+        #     ks_results = split_results_dict['kolmogorov_smirnov_multidimensional_split_validator_method']
+        #     ks_results = {k: ([{"statistic": str(val.statistic), "pvalue": str(val.pvalue)} for val in v[0]], v[1]) for k, v in ks_results.items()}
+        #     kruskal_wallis_results = split_results_dict['kruskal_wallis_multidimensional_split_validator_method']
+        #     kruskal_wallis_results = {k: ([{"statistic": str(val.statistic), "pvalue": str(val.pvalue)} for val in v[0]], v[1]) for k, v in kruskal_wallis_results.items()}
+        #     mann_whitney_results = split_results_dict['mann_whitney_multidimensional_split_validator_method']
+        #     mann_whitney_results = {k: ([{"statistic": str(val.statistic), "pvalue": str(val.pvalue)} for val in v[0]], v[1]) for k, v in mann_whitney_results.items()}
 
-            results_dict = {
-                "kolmogorov_smirnov": ks_results,
-                "kruskal_wallis": kruskal_wallis_results,
-                "mann_whitney": mann_whitney_results,
-            }
+        #     results_dict = {
+        #         "kolmogorov_smirnov": ks_results,
+        #         "kruskal_wallis": kruskal_wallis_results,
+        #         "mann_whitney": mann_whitney_results,
+        #     }
 
-            for validator_method, res in results_dict.items():
-                min_pvalue = np.inf
-                has_significant_result = False
+        #     for validator_method, res in results_dict.items():
+        #         min_pvalue = np.inf
+        #         has_significant_result = False
 
-                for dataset_split_name, (pvals_and_stats_list_of_dicts, has_significant_result_dict) in res.items():
-                    min_pvalue = min(min_pvalue, float(min(pvals_and_stats_list_of_dicts, key=lambda d: d['pvalue'])['pvalue']))
-                    has_significant_result = has_significant_result or has_significant_result_dict['has_significant_result']
+        #         for dataset_split_name, (pvals_and_stats_list_of_dicts, has_significant_result_dict) in res.items():
+        #             min_pvalue = min(min_pvalue, float(min(pvals_and_stats_list_of_dicts, key=lambda d: d['pvalue'])['pvalue']))
+        #             has_significant_result = has_significant_result or has_significant_result_dict['has_significant_result']
 
-                results_for_table.append({
-                    "validator": "split distribution shift datasets validator",
-                    "validator_method": validator_method,
-                    "dataset": npz_filename.split(".")[0].split("_")[1],
-                    "metric_value": min_pvalue,
-                    "metric_unit": "p-value",
-                })
+        #         results_for_table.append({
+        #             "validator": "split distribution shift datasets validator",
+        #             "validator_method": validator_method,
+        #             "dataset": npz_filename.split(".")[0].split("_")[1],
+        #             "metric_value": min_pvalue,
+        #             "metric_unit": "p-value",
+        #         })
 
-                results_for_table.append({
-                    "validator": "split distribution shift datasets validator",
-                    "validator_method": validator_method,
-                    "dataset": npz_filename.split(".")[0].split("_")[1],
-                    "metric_value": has_significant_result,
-                    "metric_unit": "has significant result",
-                })
+        #         results_for_table.append({
+        #             "validator": "split distribution shift datasets validator",
+        #             "validator_method": validator_method,
+        #             "dataset": npz_filename.split(".")[0].split("_")[1],
+        #             "metric_value": has_significant_result,
+        #             "metric_unit": "has significant result",
+        #         })
 
 
 
-            with open(f"split_results_{npz_filename.split('.')[0]}.json", "w") as fp:
-                json.dump(results_dict, fp)
+        #     with open(f"split_results_{npz_filename.split('.')[0]}.json", "w") as fp:
+        #         json.dump(results_dict, fp)
 
-        df = pd.DataFrame.from_dict(results_for_table)
-        df.to_csv("results.csv")
-            ###############
+        # df = pd.DataFrame.from_dict(results_for_table)
+        # df.to_csv("results.csv")
+        #     ###############
