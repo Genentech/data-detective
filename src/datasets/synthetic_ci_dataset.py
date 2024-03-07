@@ -3,11 +3,13 @@ from typing import Dict
 
 from torch.utils.data import Dataset
 
+
 import src.utils
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
-class SyntheticCIDataset(Dataset):
+class SyntheticCIDataset(DataDetectiveDataset):
     def __init__(self, dataset_type: str, dataset_size: int = 10000) -> None:
         """
         Initializes the dataset and generaates the data.
@@ -20,11 +22,12 @@ class SyntheticCIDataset(Dataset):
         self.dataset_type = dataset_type
         self.columns = ['x', 'y', 'z']
 
-
         if self.dataset_type == "CI":
             self.x, self.y, self.z = src.utils.generate_ci_samples(dataset_size)
         elif self.dataset_type == "NI":
             self.x, self.y, self.z = src.utils.generate_ni_samples(dataset_size)
+
+        super().__init__(self)
 
     def __getitem__(self, index: int) -> Dict:
         """

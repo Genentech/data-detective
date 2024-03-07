@@ -166,7 +166,7 @@ class TestDataDetectiveDataset:
         c=3
 
     def test_backwards_compatibility(self):
-        seed = TestADBenchIntegration.SEED
+        seed = SEED
         finished = False
         INFERENCE_SIZE = 20
 
@@ -286,7 +286,7 @@ class TestDataDetectiveDataset:
         #todo: finish
 
     def test_result_identification(self):
-        seed = TestADBenchIntegration.SEED
+        seed = SEED
         finished = False
         INFERENCE_SIZE = 20
 
