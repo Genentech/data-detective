@@ -84,6 +84,7 @@ class ADBenchMultimodalValidatorMethodFactory:
                 kwargs_dict = {
                     f"results": {
                         "data_matrix": matrix,
+                        "id_list": [entire_dataset.get_sample_id(k) for k in range(len(entire_dataset))]
                     }
                 }
 
@@ -92,6 +93,7 @@ class ADBenchMultimodalValidatorMethodFactory:
             @staticmethod
             def validate(
                 data_matrix: Type[np.array] = None,  # n x d
+                id_list: list[str] = None
             ) -> object:
                 """
                 Runs anomaly detection.
@@ -103,6 +105,6 @@ class ADBenchMultimodalValidatorMethodFactory:
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
 
-                return anomaly_scores
+                return anomaly_scores, id_list
 
         return ADBenchAnomalyValidatorMethod

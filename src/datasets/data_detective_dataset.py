@@ -30,13 +30,19 @@ class DatatypesAndGetItemMeta(type):
             # Wrap the 'get_data' method with additional behavior
             original_getitem = dct['__getitem__']
             def wrapped_getitem(self, *args, **kwargs):
+                assert len(args) == 1, f"You must provide exactly one argument to __getitem__, you passed {args}."
                 try: 
-                    data_dict = original_getitem(self, *args, **kwargs)
-                except KeyError:
-                    if isinstance(args[0], int): 
-                        idx = self.index_df[self.index_df["data_idx"] == args[0]]['sample_id'][0]
+                    # handles the case of subsetting
+                    if hasattr(self, "index_df") and isinstance(args[0], int): 
+                        new_args = (self.index_df.iloc[args[0]]['data_idx'], )
                     else: 
-                        idx = self.index_df[self.index_df["sample_id"] == args[0]]['data_idx'][0]
+                        new_args = args
+                    data_dict = original_getitem(self, *new_args, **kwargs)
+                except (KeyError, IndexError, TypeError):
+                    if isinstance(args[0], int): 
+                        idx = list(self.index_df[self.index_df.index == args[0]]['sample_id'])[0]
+                    else: 
+                        idx = list(self.index_df[self.index_df["sample_id"] == args[0]].index)[0]
 
                     data_dict = original_getitem(self, *(idx,), **kwargs)
 
@@ -99,8 +105,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     example: 
     dd_test = dataset(indices=indices) # these indices are then used for the data. 
     """
-    def __init__(self, sample_ids: list = None, subject_ids: list = None, show_id: bool = False, include_subject_id_in_data=False ):
-    # def __init__(self, sample_id_key: str = None, subject_ids: list = None, show_id: bool = True):
+    def __init__(self, dataset = None, sample_ids: list = None, subject_ids: list = None, show_id: bool = False, include_subject_id_in_data=False ):
         self.include_subject_id_in_data = include_subject_id_in_data
         self.show_id = False # only for initialization
         
@@ -151,7 +156,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
             index_objects.append(index_object)
 
         self.index_df = pd.DataFrame(index_objects)
-        self.show_id = self.show_id
+        self.show_id = show_id
     
     def get_default_sample_id(self, data_idx, subject_id=None):
         saved_show_id = self.show_id
@@ -181,7 +186,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     def get_subject_id(self, data_idx_or_sample_id: int, subject_ids: list = None, sample_ids: list = None) -> str: 
         if isinstance(data_idx_or_sample_id, int): 
             data_idx = data_idx_or_sample_id
-            return self.index_df[self.index_df['data_idx'] == data_idx]['subject_id'][0]
+            return self.index_df[self.index_df.index == data_idx]['subject_id'].item()
         else: 
             sample_id = data_idx_or_sample_id
             return self.index_df[self.index_df['sample_id'] == sample_id]['subject_id'][0]
@@ -189,7 +194,10 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     # can be overridden
     # maps from data index 
     def get_sample_id(self, data_idx: int, sample_ids: list = None) -> str: 
-        return self.index_df[self.index_df['data_idx'] == data_idx]['sample_id'][0]
+        try: 
+            return self.index_df[self.index_df.index == data_idx]['sample_id'].item()
+        except Exception: 
+            c=3
 
     def get_id(self, sample_idx) -> Dict[int, Union[str, int]]: 
         id_dict = {
@@ -221,6 +229,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
             modified_dataset = self
 
         modified_dataset.index_df = modified_dataset.index_df[~modified_dataset.index_df['sample_id'].isin(sample_ids)]
+        modified_dataset.index_df.reset_index(inplace=True, drop=True)
 
         return modified_dataset
 
@@ -232,7 +241,6 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
 
         modified_dataset.index_df = modified_dataset.index_df[~modified_dataset.index_df['data_idx'].isin(data_idxs)]
         modified_dataset.index_df.reset_index(inplace=True, drop=True)
-        modified_dataset.index_df['data_idx'] = range(len(modified_dataset.index_df))
 
         return modified_dataset
 
@@ -244,7 +252,6 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
 
         modified_dataset.index_df = modified_dataset.index_df[modified_dataset.index_df['data_idx'].isin(data_idxs)]
         modified_dataset.index_df.reset_index(inplace=True, drop=True)
-        modified_dataset.index_df['data_idx'] = range(len(modified_dataset.index_df))
 
         return modified_dataset
 
@@ -300,10 +307,13 @@ def dd_random_split(dataset: DataDetectiveDataset, lengths: [Union[int, float]],
         raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
 
     indices = randperm(sum(lengths), generator=generator).tolist()  # type: ignore[arg-type, call-overload]
-    return [
+    split_datasets = [
         dataset.remove_all_indices_except(
             indices[offset - length : offset],
             in_place=False
         ) for offset, length in zip(_accumulate(lengths), lengths)
     ]
+
+    return split_datasets
+
 

@@ -5,17 +5,22 @@ from typing import List
 import torch
 from torch.utils.data import Dataset
 
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
-class ColumnFilteredDataset(Dataset):
+class ColumnFilteredDataset(DataDetectiveDataset):
     """
     Defines a dataset from another PyTorch dataset that filters on the matching regular expressions.
     """
     def __init__(self, unfiltered_dataset: Dataset = None, matching_regexes: List[str] = None, matching_datatypes: List[DataType] = None):
-        self.unfiltered_dataset = unfiltered_dataset
         self.matching_regexes = matching_regexes if matching_regexes else ['.*']
         self.matching_datatypes = matching_datatypes if matching_datatypes else [ e.value for e in DataType ]
+
+        self.unfiltered_dataset = unfiltered_dataset
+        self.include_subject_id_in_data = unfiltered_dataset.include_subject_id_in_data
+        self.show_id = unfiltered_dataset.show_id
+        self.index_df = unfiltered_dataset.index_df
 
     def __getitem__(self, index: int) -> typing.Dict:
         """

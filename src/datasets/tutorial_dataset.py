@@ -37,7 +37,6 @@ class TutorialDataset(DataDetectiveDataset):
             "label": sample[1],
         }
 
-    # TODO: remove
     def __len__(self) -> int:
         return DATASET_SIZE
 

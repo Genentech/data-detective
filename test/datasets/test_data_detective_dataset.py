@@ -34,6 +34,21 @@ class TestDataDetectiveDataset:
         data_dict = sample['data']
         assert("feature_0" in data_dict.keys())
 
+        synth_normal = SyntheticNormalDatasetForIds()
+        test_dd_idx = synth_normal.get_sample_id(0)
+
+        sample = synth_normal[test_dd_idx]
+        assert("id" in sample.keys())
+        assert("data" in sample.keys())
+
+        id_dict = sample['id']
+        assert("subject_id" in id_dict.keys())
+        assert("sample_id" in id_dict.keys())
+        assert(id_dict['subject_id'] == id_dict['sample_id'])
+
+        data_dict = sample['data']
+        assert("feature_0" in data_dict.keys())
+
     def test_data_detective_dataset_through_synth_normal_sample(self):
         synth_normal = SyntheticNormalDatasetForIdsWithSampleIds()
         test_sample_id = synth_normal.get_sample_id(0)
@@ -141,8 +156,11 @@ class TestDataDetectiveDataset:
     def test_data_detective_dataset_metaclass_behavior(self):
         synth_normal_subject = SyntheticNormalDatasetForIds(include_subject_id_in_data=True)
         synth_normal_no_subject = SyntheticNormalDatasetForIds(include_subject_id_in_data=False)
-        synth_normal_subject.datatypes()
-        synth_normal_no_subject.datatypes()
+        subject_datatypes = synth_normal_subject.datatypes()
+        no_subject_datatypes = synth_normal_no_subject.datatypes()
+
+        assert("subject_id" in subject_datatypes.keys())
+        assert("subject_id" not in no_subject_datatypes.keys())
         c=3
 
     def test_backwards_compatibility(self):
@@ -154,15 +172,15 @@ class TestDataDetectiveDataset:
         torch.manual_seed(seed)
 
         npz_files = [
-            "4_breastw.npz",
+            # "4_breastw.npz",
             "6_cardio.npz",
-            # "16_http.npz",
-            "21_Lymphography.npz",
-            "25_musk.npz",
-            # "31_satimage-2.npz",
-            "38_thyroid.npz",
-            "42_WBC.npz",
-            "43_WDBC.npz",
+            # # "16_http.npz",
+            # "21_Lymphography.npz",
+            # "25_musk.npz",
+            # # "31_satimage-2.npz",
+            # "38_thyroid.npz",
+            # "42_WBC.npz",
+            # "43_WDBC.npz",
         ]
 
         results_for_table = []
@@ -222,7 +240,7 @@ class TestDataDetectiveDataset:
             train_size: int = int(0.6 * len(everything_but_inference_dataset))
             val_size: int = int(0.2 * len(everything_but_inference_dataset))
             test_size: int = len(everything_but_inference_dataset) - train_size - val_size
-            train_dataset, val_dataset, test_dataset = torch.utils.data.random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
+            train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
             #TODO: lists for validation sets and test sets.
             data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
@@ -263,6 +281,103 @@ class TestDataDetectiveDataset:
                 "test_set": test_dataset_1,
             },
         }
+        #todo: finish
+
+    def test_result_identification(self):
+        seed = TestADBenchIntegration.SEED
+        finished = False
+        INFERENCE_SIZE = 20
+
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+
+        npz_files = [
+            # "4_breastw.npz",
+            "6_cardio.npz",
+            # # "16_http.npz",
+            # "21_Lymphography.npz",
+            # "25_musk.npz",
+            # # "31_satimage-2.npz",
+            # "38_thyroid.npz",
+            # "42_WBC.npz",
+            # "43_WDBC.npz",
+        ]
+
+        results_for_table = []
+
+        for npz_filename in npz_files:
+            print(npz_filename)
+            # TODO: add proper datasets augmentation strategy
+            adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
+                # npz_filename="16_http.npz",
+                npz_filename=npz_filename,
+                input_data_type=DataType.MULTIDIMENSIONAL,
+                output_data_type=DataType.CATEGORICAL,
+            )
+
+            test_validation_schema : dict = {
+                "default_inclusion": False,
+                "validators": {
+                    "unsupervised_anomaly_data_validator": {
+                        # "include": [
+                        #     adbench_dataset.input_data_name,
+                        #     "label",
+                        # ],
+                    },
+                    # "split_covariate_data_validator": {
+                    #     # "include": [
+                    #     #     adbench_dataset.input_data_name,
+                    #     #     "label"
+                    #     # ]
+                    # },
+                    # "ood_inference_data_validator": {
+                    #     # "include": [
+                    #     #     adbench_dataset.input_data_name,
+                    #     #     "label"
+                    #     # ]
+                    # }
+                }
+            }
+
+
+            inference_dataset, everything_but_inference_dataset = dd_random_split( adbench_dataset, [INFERENCE_SIZE, adbench_dataset.__len__() - INFERENCE_SIZE])
+            true_results = []
+            for idx in range(inference_dataset.__len__()):
+                sample = inference_dataset[idx]
+                true_results.append(sample['label'])
+            true_results = np.array(true_results)
+
+            while len(np.unique(true_results)) < 2:
+                inference_dataset, everything_but_inference_dataset = dd_random_split(adbench_dataset,
+                                                                                                    [INFERENCE_SIZE,
+                                                                                                     adbench_dataset.__len__() - INFERENCE_SIZE])
+                true_results = []
+                for idx in range(inference_dataset.__len__()):
+                    sample = inference_dataset[idx]
+                    true_results.append(sample['label'])
+                true_results = np.array(true_results)
+
+            train_size: int = int(0.6 * len(everything_but_inference_dataset))
+            val_size: int = int(0.2 * len(everything_but_inference_dataset))
+            test_size: int = len(everything_but_inference_dataset) - train_size - val_size
+            train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
+
+            #TODO: lists for validation sets and test sets.
+            data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
+                "standard_split": {
+                    "training_set": train_dataset,
+                    "validation_set": val_dataset,
+                    "test_set": test_dataset,
+                },
+                "entire_set": adbench_dataset,
+                "everything_but_inference_set": everything_but_inference_dataset,
+                "inference_set": inference_dataset
+            }
+            
+            results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
+            assert(len(results.items()) > 0)
+            c=3
+            # print(results)
 
         
 

@@ -1,7 +1,10 @@
 from abc import abstractmethod
+import copy
 from typing import Dict, Union
 import pandas as pd
 import torch
+
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 
 
 class Action: 
@@ -33,22 +36,57 @@ class RemoveTopKAnomalousSamplesAction(Action):
         self.remove_all_duplicates = remove_all_duplicates
 
     def get_new_data_object(
-        data_object: Dict[str, Union[torch.utils.data.Dataset, Dict[str, torch.utils.data.Dataset]]],
+        self,
+        data_object: Dict[str, Union[DataDetectiveDataset, Dict[str, DataDetectiveDataset]]],
         aggregated_results: pd.DataFrame, 
         aggregated_results_key: str = None,
     ): 
+        """
+        Removes top k anomalous samples from the entire set, propagating results to all datasets and splits.
+        If there are duplicates, it will continue removing samples from worst to best until at least K samples are removed.
+
+        Aggregated results is a results dataframe indexed on samples. This means that each sample id can correspond to more
+        than one sample in the dataset, if there are duplicates. 
+        """
+        entire_set = data_object['entire_set']
+
         if aggregated_results_key is not None: 
             assert(aggregated_results_key in aggregated_results.keys())
         else: 
             aggregated_results_key = min(aggregated_results.keys(), key=len)
 
-        items_most_to_least_anomalous = list(aggregated_results.sort_values(aggregated_results_key).index)
-        indices = [int(item_name.split(" ")[1]) for item_name in items_most_to_least_anomalous]
+        sample_ids_to_remove = set() 
+        num_datapoints_removed = 0
+
+        while num_datapoints_removed < self.k: 
+            worst_sample_id = aggregated_results[aggregated_results_key].idxmin()
+            frequency_of_worst_sample = entire_set.index_df['sample_id'].value_counts()[worst_sample_id]
+
+            sample_ids_to_remove.add(worst_sample_id)
+            num_datapoints_removed += frequency_of_worst_sample
+            aggregated_results = aggregated_results.drop(worst_sample_id)
+
+        data_object = copy.copy(data_object)
+        for key, dataset_or_split_group_dict in data_object.items(): 
+            if isinstance(dataset_or_split_group_dict, dict):
+                split_group_dict = dataset_or_split_group_dict
+                for key, dataset in split_group_dict.items():
+                    split_group_dict[key] = dataset.remove_samples(sample_ids_to_remove)
+            else: 
+                dataset = dataset_or_split_group_dict
+                data_object[key] = dataset.remove_samples(sample_ids_to_remove)
+
+        print(f"{len(sample_ids_to_remove)} samples removed and {num_datapoints_removed} datapoints removed.")
+        print(f"removed samples {sample_ids_to_remove}")
+
+        return data_object
 
 class ResplitDataAction(Action):
     def get_new_data_object(
         data_object: Dict[str, Union[torch.utils.data.Dataset, Dict[str, torch.utils.data.Dataset]]],
         aggregated_results: pd.DataFrame, 
     ): 
-
+        """
+        todo: implement
+        """
         return data_object

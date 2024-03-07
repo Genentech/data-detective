@@ -63,7 +63,6 @@ class DataDetectiveEngine:
                     # TODO: implement filtering correctly on the torch datasets.
                     dataset = dataset_or_data_object
                     filtered_data_object[key] = filter_dataset(dataset, include_lst)
-                    filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
 
             return filtered_data_object
 
@@ -84,29 +83,16 @@ class DataDetectiveEngine:
                 else: 
                     dataset = dataset_or_data_object
                     filtered_transformed_data_object[key] = TransformedDataset(dataset, transforms_dict) 
+                    
+                    has_categorical_data = DataType.CATEGORICAL in filtered_transformed_data_object[key].datatypes()
+                    if has_categorical_data: 
+                        filtered_transformed_data_object[key] = OneHotEncodedDataset(filtered_transformed_data_object[key])
 
             return filtered_transformed_data_object
 
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
             
-        
-        # filtered_data_object = {}
-
-        # for key, dataset in data_object.items():
-        #     # TODO: implement filtering correctly on the torch datasets.
-        #     filtered_data_object[key] = filter_dataset(dataset, include_lst)
-        #     filtered_data_object[key] = OneHotEncodedDataset(filtered_data_object[key])
-
-        # if 'transforms' in config_dict.keys():
-        #     transforms_dict = config_dict['transforms']
-        #     transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
-        #     filtered_transformed_data_object = {
-        #         data_object_name: TransformedDataset(data_object_part, transforms_dict) for
-        #         data_object_name, data_object_part in filtered_data_object.items()}
-        # else:
-        #     filtered_transformed_data_object = filtered_data_object
-
         filtered_transformed_data_object['entire_set'].__getitem__(0)
         filtered_transformed_data_object['entire_set'].datatypes()
         return filtered_transformed_data_object, validator_class_object.get_task_list(

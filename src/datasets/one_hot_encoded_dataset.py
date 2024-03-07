@@ -8,11 +8,15 @@ from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
-class OneHotEncodedDataset:
+class OneHotEncodedDataset(DataDetectiveDataset):
     def __init__(self,
         dataset: DataDetectiveDataset,
     ):
         self.dataset = dataset
+        self.include_subject_id_in_data = dataset.include_subject_id_in_data
+        self.show_id = dataset.show_id
+        self.index_df = dataset.index_df
+
         self.prepare_one_hot_encodings()
 
     def datatypes(self):

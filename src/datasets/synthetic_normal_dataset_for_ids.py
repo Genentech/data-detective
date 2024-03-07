@@ -24,7 +24,12 @@ class SyntheticNormalDatasetForIds(DataDetectiveDataset):
 
         self.dataframe = dataframe
 
-        super().__init__(**kwargs, show_id=True, include_subject_id_in_data=True)
+        show_id = kwargs.get("show_id", True)
+        kwargs["show_id"] = show_id
+        include_subject_id_in_data = kwargs.get("include_subject_id_in_data", True)
+        kwargs["include_subject_id_in_data"] = include_subject_id_in_data 
+
+        super().__init__(**kwargs)
 
     # idx represents samddple index if exists
     # otherwise represents internal idx. 

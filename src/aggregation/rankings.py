@@ -1,5 +1,6 @@
 import typing
 from enum import Enum
+import numpy as np
 
 import pandas as pd
 import scipy
@@ -20,12 +21,13 @@ class RankingAggregationMethod(Enum):
     ROUND_ROBIN = "round_robin"
 
 class ScoreAggregationMethod(Enum):
-    NORMALIZED_Z_SCORE = "normalized_z_score"
+    NORMALIZED_AVERAGE = "normalized_average"
 
 class ScoreAggregator(): 
     #TODO: what is the score list in this function?
-    def normalized_z_score(self, score_list): 
-        pass
+    def normalized_average(self, score_df): 
+        norm_score_df = (score_df - score_df.min()) / (score_df.max() - score_df.min())
+        return norm_score_df.mean(axis=1)
 
 class ResultAggregator:
     FLRA = FullListRankAggregator()
@@ -77,7 +79,7 @@ class ResultAggregator:
         @param list: a list of the scores to be converted to rankings.
         @return a dict keying from item number to the rankings, where high score is better and higher ranking is better.
         """
-        return {f"item {k}": v for k, v in ResultAggregator.FLRA.convert_to_ranks(dict(enumerate(scores))).items()}
+        return ResultAggregator.FLRA.convert_to_ranks(scores)
 
     def construct_rankings_df(self, validator_name, given_validator_method: str = None,
                               given_data_modality: str = None) -> pd.DataFrame:
@@ -110,8 +112,20 @@ class ResultAggregator:
 
     def construct_score_df(self, validator_name, given_validator_method: str = None,
                               given_data_modality: str = None) -> pd.DataFrame:
-        #TODO: implement
-        pass
+        validator_results = self.results_object[validator_name]
+        results_obj = {}
+
+        for validator_method, results_dict in validator_results.items():
+            if given_validator_method and (validator_method != given_validator_method):
+                continue
+            for data_modality, scores in results_dict.items():
+                #TODO: do we make sure that this is true for all of the methods?
+                if given_data_modality and (data_modality.replace("_results", "") != given_data_modality):
+                    continue
+                results_obj[f"{data_modality}_{validator_method}_score"] = scores
+
+        score_df = pd.DataFrame(results_obj)
+        return score_df.sort_index()
 
     def aggregate_results_modally(self, validator_name: str, aggregation_methods: List[Union[RankingAggregationMethod, ScoreAggregationMethod]],
                                  given_data_modality: str = None) -> pd.DataFrame:
@@ -126,16 +140,27 @@ class ResultAggregator:
         @return: the dataframe with the original ranks as well as the aggregated ranks
         """
         rankings_df = self.construct_rankings_df(validator_name, given_data_modality=given_data_modality)
-        output_df = rankings_df.copy()
+        rankings_output_df = rankings_df.copy()
 
+        score_df = self.construct_score_df(validator_name, given_data_modality=given_data_modality)
+        score_output_df = score_df.copy()
+        
         for aggregation_method in aggregation_methods:
-            aggregation_method_name = aggregation_method.value
-            scorelist = self.convert_to_scorelist(rankings_df)
-            agg_method = getattr(ResultAggregator.FLRA, aggregation_method_name)
-            agg_rankings = agg_method(scorelist)[1]
-            output_df[f"{aggregation_method_name}_agg_rank"] = list(agg_rankings.values())
+            if aggregation_method in RankingAggregationMethod.__members__.values():
+                aggregation_method_name = aggregation_method.value
+                scorelist = self.convert_to_scorelist(rankings_df)
+                agg_method = getattr(ResultAggregator.FLRA, aggregation_method_name)
+                agg_rankings = agg_method(scorelist)[1]
 
-        return output_df
+                rankings_output_df[f"{aggregation_method_name}_agg_rank"] = list(agg_rankings.values())
+            elif aggregation_method in ScoreAggregationMethod.__members__.values():
+                aggregation_method_name = aggregation_method.value
+                agg_method = getattr(ResultAggregator.SCORE_AGGREGATOR, aggregation_method_name)
+                agg_scores = agg_method(score_df)
+                score_output_df[f"{aggregation_method_name}_agg_score"] = agg_scores
+            else:
+                raise Exception(f"aggregation method {aggregation_method.value} not found in score or ranking aggregation methods. Please check in src/aggregation/rankings.py to make sure that it exists.")
+
 
     def aggregate_results_multimodally(self, validator_name: str, aggregation_methods: List[RankingAggregationMethod]) -> pd.DataFrame:
         """
@@ -148,9 +173,9 @@ class ResultAggregator:
         rankings_df = self.construct_rankings_df(validator_name)
         rankings_output_df = rankings_df.copy()
 
-        # score_df = self.construct_score_df(validator_name)
-        # score_output_df = score_df.copy()
-
+        score_df = self.construct_score_df(validator_name)
+        score_output_df = score_df.copy()
+        
         for aggregation_method in aggregation_methods:
             if aggregation_method in RankingAggregationMethod.__members__.values():
                 aggregation_method_name = aggregation_method.value
@@ -160,10 +185,12 @@ class ResultAggregator:
 
                 rankings_output_df[f"{aggregation_method_name}_agg_rank"] = list(agg_rankings.values())
             elif aggregation_method in ScoreAggregationMethod.__members__.values():
-                #TODO: implement
-                pass
+                aggregation_method_name = aggregation_method.value
+                agg_method = getattr(ResultAggregator.SCORE_AGGREGATOR, aggregation_method_name)
+                agg_scores = agg_method(score_df)
+                score_output_df[f"{aggregation_method_name}_agg_score"] = agg_scores
             else:
                 raise Exception(f"aggregation method {aggregation_method.value} not found in score or ranking aggregation methods. Please check in src/aggregation/rankings.py to make sure that it exists.")
 
         #TODO: find a more sensible way of returning? maybe just a concat is needed... TBD.
-        return rankings_output_df
+        return pd.concat([rankings_output_df, score_output_df], axis=1)
