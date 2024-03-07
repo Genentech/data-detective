@@ -84,6 +84,8 @@ class DataDetectiveEngine:
                     dataset = dataset_or_data_object
                     filtered_transformed_data_object[key] = TransformedDataset(dataset, transforms_dict) 
 
+            return filtered_transformed_data_object
+
         def get_one_hot_encoded_data_object(data_object):
             one_hot_encoded_data_object = {}
 

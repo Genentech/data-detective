@@ -31,12 +31,16 @@ class Transform(torch.nn.Module):
         return self.transform(obj)
 
 
-class TransformedDataset:
+class TransformedDataset(DataDetectiveDataset):
     def __init__(self,
         dataset: DataDetectiveDataset,
         transforms: typing.Dict[str, typing.List[Transform]]
     ):
         self.dataset = dataset
+        self.include_subject_id_in_data = self.dataset.include_subject_id_in_data
+        self.show_id = self.dataset.show_id
+        self.index_df = self.dataset.index_df
+        
         self.transforms = transforms
         self.cache_statistics_dict = {
             'cache_misses': 0,
