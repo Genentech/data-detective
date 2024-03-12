@@ -108,7 +108,8 @@ class ADBenchValidatorMethodFactory:
                     id: anomaly_score 
                     for (id, anomaly_score) 
                     in zip(id_list, anomaly_scores)
-                }
+                }, model_instance
+                #todo: may need to return model instance for further processing
 
         return ADBenchAnomalyValidatorMethod
 

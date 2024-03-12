@@ -18,13 +18,12 @@ def get_resnet50(**kwargs):
         if len(x.shape) == 2:
             # add channel dimension
             x = torch.unsqueeze(x, 0)
-        if x.shape[0] == 1:
-            # if 1ch need from 1ch to 3ch RGB
-            x = x.expand(3, *x.shape[1:])
         if len(x.shape) == 3:
             # need a 4th dimension
             x = torch.unsqueeze(x, 0)
-
+        if x.shape[0] == 1:
+            # if 1ch need from 1ch to 3ch RGB
+            x = x.expand(3, *x.shape[1:])
         x = backbone(x)
         x = x.squeeze()
         x = x.reshape((-1, 2048))
