@@ -41,7 +41,7 @@ class TestMyFashionMNIST:
         )
 
         sample = fashion_mnist[0]
-        assert(isinstance(sample['image'], FloatTensor))
+        assert(isinstance(sample['fashion_mnist_image'], FloatTensor))
         assert(isinstance(sample['label'], int))
 
     def test_datatypes(self):
@@ -56,7 +56,7 @@ class TestMyFashionMNIST:
         )
 
         datatypes = fashion_mnist.datatypes()
-        assert(datatypes['image'] == DataType.IMAGE)
+        assert(datatypes['fashion_mnist_image'] == DataType.IMAGE)
         assert(datatypes['label'] == DataType.CATEGORICAL)
 
 

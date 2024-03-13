@@ -7,6 +7,7 @@ from typing import Dict
 
 from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.csv_dataset import CSVDataset
+from src.datasets.data_detective_dataset import dd_random_split
 from src.enums.enums import DataType
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))

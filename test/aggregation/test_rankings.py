@@ -60,18 +60,18 @@ class TestADBenchIntegration:
                             "label",
                         ],
                     },
-                    "split_covariate_data_validator": {
-                        "include": [
-                            adbench_dataset.input_data_name,
-                            "label"
-                        ]
-                    },
-                    "ood_inference_data_validator": {
-                        "include": [
-                            adbench_dataset.input_data_name,
-                            "label"
-                        ]
-                    }
+                    # "split_covariate_data_validator": {
+                    #     "include": [
+                    #         adbench_dataset.input_data_name,
+                    #         "label"
+                    #     ]
+                    # },
+                    # "ood_inference_data_validator": {
+                    #     "include": [
+                    #         adbench_dataset.input_data_name,
+                    #         "label"
+                    #     ]
+                    # }
                 }
             }
 

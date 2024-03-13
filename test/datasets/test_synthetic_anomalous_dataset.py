@@ -36,7 +36,7 @@ class TestSyntheticAnomalousDataset:
 
     def test_in_bounds_access(self, synthetic_anomalous_dataset):
         assert 0 <= synthetic_anomalous_dataset[57000]['label'] <= 9
-        assert isinstance(synthetic_anomalous_dataset[57000]['image'], torch.FloatTensor)
+        assert isinstance(synthetic_anomalous_dataset[57000]['fashion_mnist_image'], torch.FloatTensor)
 
     def test_class_counts(self, synthetic_anomalous_dataset):
         manual_class_counts = {ind: 6000 for ind in range(10)}
