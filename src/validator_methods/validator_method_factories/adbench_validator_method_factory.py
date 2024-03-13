@@ -66,6 +66,7 @@ class ADBenchValidatorMethodFactory:
                 @param validator_kwargs: the kwargs from the validation schema.
                 @return: a dict mapping from the key the result from calling .validate() on the kwargs values.
                 """
+                should_return_model_instance = validator_kwargs.get("should_return_model_instance", False)
                 entire_dataset: Dataset = data_object["entire_set"]
 
                 matrix_dict = {
@@ -83,7 +84,8 @@ class ADBenchValidatorMethodFactory:
                 kwargs_dict = {
                     f"{column}_results": {
                         "data_matrix": column_data,
-                        "id_list": [entire_dataset.get_sample_id(k) for k in range(len(entire_dataset))]
+                        "id_list": [entire_dataset.get_sample_id(k) for k in range(len(entire_dataset))],
+                        "should_return_model_instance": should_return_model_instance,
                     } for column, column_data in matrix_dict.items()
                 }
 
@@ -92,7 +94,8 @@ class ADBenchValidatorMethodFactory:
             @staticmethod
             def validate(
                 data_matrix: Type[np.array] = None,  # n x d
-                id_list: list[str] = None
+                id_list: list[str] = None,
+                should_return_model_instance: bool = False
             ) -> object:
                 """
                 Runs anomaly detection.
@@ -104,11 +107,18 @@ class ADBenchValidatorMethodFactory:
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
 
+                if should_return_model_instance: 
+                    return {
+                        id: anomaly_score 
+                        for (id, anomaly_score) 
+                        in zip(id_list, anomaly_scores)
+                    }, model_instance
+                
                 return {
                     id: anomaly_score 
                     for (id, anomaly_score) 
                     in zip(id_list, anomaly_scores)
-                }, model_instance
+                }
                 #todo: may need to return model instance for further processing
 
         return ADBenchAnomalyValidatorMethod

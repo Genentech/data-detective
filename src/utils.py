@@ -1,14 +1,17 @@
+import copy
 import os
 from collections import defaultdict
 from random import randint
 from typing import Dict, List, Optional, Sequence, Union, Any
 
 import joblib
+from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import torch.utils.data
 from joblib import delayed, Parallel
 from torch.utils.data import DataLoader, Dataset
+from tqdm import tqdm
 from src.datasets.data_detective_dataset import DataDetectiveDataset
 
 from src.datasets.column_filtered_dataset import ColumnFilteredDataset
@@ -420,34 +423,147 @@ def get_split_group_keys(data_object):
 
     return split_group_keys
 
-# def random_split(dataset: DataDetectiveDataset, lengths: Sequence[Union[int, float]],
-#                  generator: Optional[torch.Generator] = torch.default_generator) -> List[DataDetectiveSubset]:
-#     r"""
-#     Randomly split a dataset into non-overlapping new datasets of given lengths.
-#     """
-#     if math.isclose(sum(lengths), 1) and sum(lengths) <= 1:
-#         subset_lengths: List[int] = []
-#         for i, frac in enumerate(lengths):
-#             if frac < 0 or frac > 1:
-#                 raise ValueError(f"Fraction at index {i} is not between 0 and 1")
-#             n_items_in_split = int(
-#                 math.floor(len(dataset) * frac)  # type: ignore[arg-type]
-#             )
-#             subset_lengths.append(n_items_in_split)
-#         remainder = len(dataset) - sum(subset_lengths)  # type: ignore[arg-type]
-#         # add 1 to all the lengths in round-robin fashion until the remainder is 0
-#         for i in range(remainder):
-#             idx_to_add_at = i % len(subset_lengths)
-#             subset_lengths[idx_to_add_at] += 1
-#         lengths = subset_lengths
-#         for i, length in enumerate(lengths):
-#             if length == 0:
-#                 warnings.warn(f"Length of split at index {i} is 0. "
-#                               f"This might result in an empty dataset.")
+#########################3
+#
+#
+# OCCLUSION UTILITIES
+#
+#
+##########################
 
-#     # Cannot verify that dataset is Sized
-#     if sum(lengths) != len(dataset):    # type: ignore[arg-type]
-#         raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
+class OcclusionTransform(torch.nn.Module):
+    def __init__(self, width=5):
+        super().__init__()
+        self.width = width
+        
+        if width % 2 != 1: 
+            raise Exception("Width must be an odd number")
+        
+    def forward(self, tensor, loc): 
+        tensor = copy.deepcopy(tensor)
+        width = self.width
+        
+        diff = (width - 1) / 2
+        first_dim, second_dim = loc[0], loc[1]
+        
+        min_val_first = np.round(max(0, first_dim - diff)).astype(int)
+        min_val_second = np.round(max(0, second_dim - diff)).astype(int)
+        
+        max_val_first = np.round(min(tensor.shape[1], first_dim + diff + 1)).astype(int)
+        max_val_second = np.round(min(tensor.shape[1], second_dim + diff + 1)).astype(int)
+        
+        tensor[:, min_val_first:max_val_first, min_val_second:max_val_second].fill_(0)
+        
+        return tensor
 
-#     indices = randperm(sum(lengths), generator=generator).tolist()  # type: ignore[arg-type, call-overload]
-#     return [Subset(dataset, indices[offset - length : offset]) for offset, length in zip(_accumulate(lengths), lengths)]
+def plot_occ_results(img, localized_anomaly_score, width, color_bounds):
+    if color_bounds != "auto":
+        vmin, vmax = color_bounds
+    else: 
+        vmin, vmax = None, None
+    
+    im = box_blur(localized_anomaly_score, width)
+    im = im.reshape(im.shape[-2:])
+    
+    plt.imshow(img.reshape(img.shape[-2:]), cmap='Greys_r')
+    plt.colorbar()
+    plt.suptitle("Original Image")
+    plt.show()
+
+    plt.imshow(im, vmin=vmin, vmax=vmax, cmap='plasma')
+    plt.colorbar()
+    plt.suptitle(f"Blurred anomaly occlusion heatmap (width {width})")
+    plt.show()
+
+    plt.imshow(localized_anomaly_score, vmin=vmin, vmax=vmax, cmap='plasma')
+    plt.colorbar()
+    plt.suptitle(f"Unblurred anomaly occlusion heatmap (width {width})")
+    plt.show()
+
+    
+def box_blur(tensor, width):
+    def get_sum(sum_table,
+            min_val_first, 
+            min_val_second, 
+            max_val_first, 
+            max_val_second
+    ):
+        x = 0
+        x += sum_table[max_val_first][max_val_second] 
+
+        if min_val_second != 0: 
+            x -= sum_table[max_val_first][min_val_second - 1]
+
+        if min_val_first != 0:
+            x -= sum_table[min_val_first - 1][max_val_second] 
+
+        if not (min_val_first == 0 or min_val_second == 0):
+            x += sum_table[min_val_first - 1][min_val_second - 1]
+
+        return x
+
+    def compute_overlaps(tensor, patch_size=(3, 3), patch_stride=(1, 1)):
+        width = (patch_size[0] - 1) // 2
+        tensor = torch.FloatTensor(tensor)
+        tensor = np.pad(tensor, (width, width, width, width), "constant", 0)
+        while len(tensor.shape) < 4:
+            tensor = tensor.reshape((-1, *tensor.shape))
+
+        n, c, h, w = tensor.size()
+        px, py = patch_size
+        sx, sy = patch_stride
+        nx = ((w-px)//sx)+1
+        ny = ((h-py)//sy)+1
+
+        overlaps = torch.zeros(tensor.size()).type_as(tensor.data)
+        for i in range(ny):
+            for j in range(nx):
+                overlaps[:, :, i*sy:i*sy+py, j*sx:j*sx+px] += 1
+        overlaps = torch.autograd.Variable(overlaps)
+        return overlaps[:,:,width:-width,width:-width]
+
+    sum_table = tensor.cumsum(axis=0).cumsum(axis=1)
+
+    res = np.zeros(tensor.shape)
+    first_dim_size = tensor.shape[-2]
+    second_dim_size = tensor.shape[-1]
+    diff = np.round((width - 1) // 2).astype(int)
+
+
+    for first_dim in range(first_dim_size): 
+        for second_dim in range(second_dim_size): 
+
+            min_val_first = np.round(max(0, first_dim - diff)).astype(int)
+            min_val_second = np.round(max(0, second_dim - diff)).astype(int)
+
+            max_val_first = np.round(min(tensor.shape[1] - 1, first_dim + diff)).astype(int)
+            max_val_second = np.round(min(tensor.shape[1] - 1, second_dim + diff)).astype(int)
+
+            res[first_dim][second_dim] = get_sum(sum_table,
+                min_val_first, 
+                min_val_second, 
+                max_val_first, 
+                max_val_second
+            )
+
+    overlap = compute_overlaps(tensor, patch_size=(width, width))
+        
+    return res / overlap
+    
+    
+def occlusion_interpretability(img, model, occ, color_bounds="auto"):    
+    occluded_image_dict = {}
+    for first_dim in tqdm(range(img.shape[1])):
+        for second_dim in range(img.shape[2]):
+            occluded = occ(img, (first_dim, second_dim))
+            occluded_image_dict[tuple((first_dim, second_dim))] = occluded
+
+            
+    resnet = TRANSFORM_LIBRARY['resnet50']
+    resnet.initialize_transform({})
+    embeddings = np.concatenate([resnet(img) for img in tqdm(occluded_image_dict.values())], axis=0)
+#     embeddings = np.concatenate(Parallel(n_jobs=6)(delayed(resnet)(img) for img in tqdm(occluded_image_dict.values())), axis=0)
+    localized_anomaly_scores = model.decision_function(embeddings)
+    reshaped_localized_anomaly_score = torch.FloatTensor(list(localized_anomaly_scores)).reshape(img.shape[-2:])
+    plot_occ_results(img, reshaped_localized_anomaly_score, occ.width, color_bounds)
+    return reshaped_localized_anomaly_score

@@ -239,7 +239,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
         else: 
             modified_dataset = self
 
-        modified_dataset.index_df = modified_dataset.index_df[~modified_dataset.index_df['data_idx'].isin(data_idxs)]
+        modified_dataset.index_df = modified_dataset.index_df[~modified_dataset.index_df['data_idx'].index.isin(data_idxs)]
         modified_dataset.index_df.reset_index(inplace=True, drop=True)
 
         return modified_dataset
@@ -250,7 +250,7 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
         else: 
             modified_dataset = self
 
-        modified_dataset.index_df = modified_dataset.index_df[modified_dataset.index_df['data_idx'].isin(data_idxs)]
+        modified_dataset.index_df = modified_dataset.index_df[modified_dataset.index_df['data_idx'].index.isin(data_idxs)]
         modified_dataset.index_df.reset_index(inplace=True, drop=True)
 
         return modified_dataset
@@ -307,12 +307,15 @@ def dd_random_split(dataset: DataDetectiveDataset, lengths: [Union[int, float]],
         raise ValueError("Sum of input lengths does not equal the length of the input dataset!")
 
     indices = randperm(sum(lengths), generator=generator).tolist()  # type: ignore[arg-type, call-overload]
+
     split_datasets = [
         dataset.remove_all_indices_except(
             indices[offset - length : offset],
             in_place=False
         ) for offset, length in zip(_accumulate(lengths), lengths)
     ]
+
+    assert sum([dataset.__len__() for dataset in split_datasets]) == dataset.__len__()
 
     return split_datasets
 
