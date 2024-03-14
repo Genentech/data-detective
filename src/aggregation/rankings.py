@@ -94,17 +94,26 @@ class ResultAggregator:
         rankings for that data modality
         @return: a rankings dataframe where the rows are items and the columns are the methods / modalitiese
         """
-        validator_results = self.results_object[validator_name]
+        validator_results = self.results_object[validator_name].copy()
         results_obj = {}
 
         for validator_method, results_dict in validator_results.items():
             if given_validator_method and (validator_method != given_validator_method):
                 continue
-            for data_modality, scores in results_dict.items():
+            for data_modality, scores_or_tuple in results_dict.items():
                 #TODO: do we make sure that this is true for all of the methods?
                 if given_data_modality and (data_modality.replace("_results", "") != given_data_modality):
                     continue
+
+                # handles case where model is returned first.
+                if isinstance(scores_or_tuple, tuple): 
+                    scores = scores_or_tuple[0]
+                else: 
+                    scores = scores_or_tuple
+
                 rankings = ResultAggregator.get_rankings(scores)
+                # rankings = ResultAggregator.get_rankings(scores_or_tuple)
+
                 results_obj[f"{data_modality}_{validator_method}_rank"] = rankings
 
         rankings_df = pd.DataFrame(results_obj)
@@ -115,13 +124,21 @@ class ResultAggregator:
         validator_results = self.results_object[validator_name]
         results_obj = {}
 
-        for validator_method, results_dict in validator_results.items():
+        for validator_method, tuple_or_results_dict in validator_results.items():
+            results_dict = tuple_or_results_dict if isinstance(tuple_or_results_dict, dict) else tuple_or_results_dict[0]
             if given_validator_method and (validator_method != given_validator_method):
                 continue
-            for data_modality, scores in results_dict.items():
+            for data_modality, scores_or_tuple in results_dict.items():
                 #TODO: do we make sure that this is true for all of the methods?
                 if given_data_modality and (data_modality.replace("_results", "") != given_data_modality):
                     continue
+
+                # handles case where model is returned first.
+                if isinstance(scores_or_tuple, tuple): 
+                    scores = scores_or_tuple[0]
+                else: 
+                    scores = scores_or_tuple
+
                 results_obj[f"{data_modality}_{validator_method}_score"] = scores
 
         score_df = pd.DataFrame(results_obj)
@@ -161,6 +178,7 @@ class ResultAggregator:
             else:
                 raise Exception(f"aggregation method {aggregation_method.value} not found in score or ranking aggregation methods. Please check in src/aggregation/rankings.py to make sure that it exists.")
 
+        return pd.concat([rankings_output_df, score_output_df], axis=1)
 
     def aggregate_results_multimodally(self, validator_name: str, aggregation_methods: List[RankingAggregationMethod]) -> pd.DataFrame:
         """

@@ -8,7 +8,7 @@ from constants import FloatTensor
 from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
-DATASET_SIZE = 50
+DATASET_SIZE = 500
 
 class TutorialDataset(DataDetectiveDataset):
     def __init__(self, **kwargs):
@@ -30,8 +30,12 @@ class TutorialDataset(DataDetectiveDataset):
         Returns a dictionary of the image, vector, and label.
         """
         sample = self.mnist.__getitem__(idx)
+        mnist_image = sample[0]
+        if idx == 10: 
+            mnist_image = 1 - mnist_image
+
         return {
-            "mnist_image": sample[0],
+            "mnist_image": mnist_image,
             "normal_vector": self.normal_column[idx][:],
             "normal_vector_2": self.normal_column_2[idx],
             "label": sample[1],
@@ -55,6 +59,7 @@ class TutorialDataset(DataDetectiveDataset):
         # src: https://stackoverflow.com/questions/31556446/how-to-draw-axis-in-the-middle-of-the-figure
         sample = self[idx]
         print(sample["label"])
+        print(sample["mnist_image"].min(), sample['mnist_image'].max())
         plt.imshow(sample["mnist_image"].squeeze())
         plt.show()
 
