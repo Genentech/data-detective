@@ -17,7 +17,7 @@ class DuplicateSampleValidatorMethod(DataValidatorMethod):
         """
         @return: the datatype the validators method operates on
         """
-        return { DataType.MULTIDIMENSIONAL, DataType.IMAGE, DataType.TEXT, DataType.SEQUENTIAL }
+        return { DataType.MULTIDIMENSIONAL, DataType.IMAGE, DataType.TEXT, DataType.SEQUENTIAL, DataType.CATEGORICAL, DataType.CONTINUOUS }
 
     @staticmethod
     def param_keys() -> Set[ValidatorMethodParameter]:
