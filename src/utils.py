@@ -10,9 +10,12 @@ import numpy as np
 import torch
 import torch.utils.data
 from joblib import delayed, Parallel
+from torch.nn.functional import pad
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
+from constants import FloatTensor
 from src.datasets.data_detective_dataset import DataDetectiveDataset
+
 
 from src.datasets.column_filtered_dataset import ColumnFilteredDataset
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
@@ -452,6 +455,8 @@ class OcclusionTransform(torch.nn.Module):
         max_val_first = np.round(min(tensor.shape[1], first_dim + diff + 1)).astype(int)
         max_val_second = np.round(min(tensor.shape[1], second_dim + diff + 1)).astype(int)
         
+        if len(tensor.shape) < 3:
+            tensor = tensor.reshape((-1, *tensor.shape))
         tensor[:, min_val_first:max_val_first, min_val_second:max_val_second].fill_(0)
         
         return tensor
@@ -504,8 +509,8 @@ def box_blur(tensor, width):
 
     def compute_overlaps(tensor, patch_size=(3, 3), patch_stride=(1, 1)):
         width = (patch_size[0] - 1) // 2
-        tensor = torch.FloatTensor(tensor)
-        tensor = np.pad(tensor, (width, width, width, width), "constant", 0)
+        tensor = FloatTensor(tensor)
+        tensor = pad(tensor, (width, width, width, width), "constant", 0)
         while len(tensor.shape) < 4:
             tensor = tensor.reshape((-1, *tensor.shape))
 

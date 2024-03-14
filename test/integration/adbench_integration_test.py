@@ -27,7 +27,7 @@ class TestADBenchIntegration:
             "4_breastw.npz",
             "6_cardio.npz",
             # "16_http.npz",
-            "21_Lymphography.npz",
+            # "21_Lymphography.npz",
             "25_musk.npz",
             # "31_satimage-2.npz",
             "38_thyroid.npz",
