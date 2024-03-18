@@ -16,7 +16,6 @@ setup(
         "ptyprocess",
         "pyod==1.0.7",
         "pytest==7.1.2",
-        "pytypes==1.0b10",
         "pyyaml==6.0",
         "regex==2022.10.31",
         "scikit-learn==1.2",
