@@ -3,11 +3,11 @@ import sys
 import time
 import torch
 
-from typing import Dict
+from typing import Dict, Union
 
 from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.csv_dataset import CSVDataset
-from src.datasets.data_detective_dataset import dd_random_split
+from src.datasets.data_detective_dataset import dd_random_split, DataDetectiveDataset
 from src.enums.enums import DataType
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +36,7 @@ class TestCSVDataset:
         train_dataset, val_dataset, test_dataset = dd_random_split(everything_but_inference_dataset,
                                                                                  [train_size, val_size, test_size])
 
-        data_object: Dict[str, torch.utils.data.Dataset] = {
+        data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
             "standard_split":  {
                 "training_set": train_dataset,
                 "validation_set": val_dataset,
