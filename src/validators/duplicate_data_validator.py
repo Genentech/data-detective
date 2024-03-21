@@ -8,6 +8,7 @@ from src.validators.data_validator import DataValidator
 from src.validator_methods.duplicate_high_dimensional_validator_method import DuplicateHighDimensionalValidatorMethod
 from src.validator_methods.duplicate_sample_validator_method import DuplicateSampleValidatorMethod
 from src.validator_methods.near_duplicate_multidimensional_validator_method import NearDuplicateMultidimensionalValidatorMethod
+from src.validator_methods.near_duplicate_sample_validator_method import NearDuplicateSampleValidatorMethod
 
 class DuplicateDataValidator(DataValidator):
     """
@@ -19,5 +20,6 @@ class DuplicateDataValidator(DataValidator):
         return {
             DuplicateHighDimensionalValidatorMethod,
             DuplicateSampleValidatorMethod,
-            NearDuplicateMultidimensionalValidatorMethod
+            NearDuplicateMultidimensionalValidatorMethod,
+            NearDuplicateSampleValidatorMethod,
         }

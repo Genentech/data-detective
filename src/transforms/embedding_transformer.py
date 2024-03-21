@@ -26,7 +26,7 @@ class Transform(torch.nn.Module):
 
     def hash_transform_value(self, val):
         if hasattr(val, "numpy"):
-            val = val.numpy()
+            val = val.cpu().numpy()
 
         #todo: add assertion that no two transforms have the same name
         transform_name = self.new_column_name_fn("")
