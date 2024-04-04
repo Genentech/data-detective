@@ -98,6 +98,34 @@ def histogram_name(original_name):
     return f"histogram_{original_name}"
 
 
+def get_unit_norm(**kwargs):
+    data_object = kwargs.get("data_object", None)
+    if data_object is None: 
+        raise Exception("Data object cannot be none in unit norm transform.")
+    
+    dataset_to_use = kwargs.get("dataset_to_use", "entire_set") 
+    dataset_to_use = data_object[dataset_to_use]
+    column = kwargs.get("column")
+
+    if column is None: 
+        raise Exception("column cannot be none")
+
+    min_val, max_val = np.inf, -np.inf
+    for i in range(len(dataset_to_use)): 
+        datapoint = dataset_to_use[i][column]
+        min_val = min(datapoint, min_val)
+        max_val = max(datapoint, max_val)
+    
+    def full_impl(x): 
+        x = (x - min_val) / (max_val - min_val)
+        return x
+
+    return full_impl
+
+def unit_norm_name(original_name):
+    return f"{original_name}_unit_normed"
+
+
 TRANSFORM_LIBRARY = {
     "histogram": Transform(
         transform_class=get_histogram,
@@ -119,4 +147,9 @@ TRANSFORM_LIBRARY = {
         new_column_name_fn=bert_backbone_name,
         new_column_datatype=DataType.MULTIDIMENSIONAL,
     ),
+    "unit_norm": Transform(
+        transform_class=get_unit_norm, 
+        new_column_name_fn=unit_norm_name,
+        new_column_datatype=DataType.CONTINUOUS,
+    )
 }

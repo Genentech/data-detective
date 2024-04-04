@@ -1,3 +1,4 @@
+import copy
 import multiprocessing.pool
 import queue
 import torch
@@ -73,13 +74,14 @@ class DataDetectiveEngine:
             if transforms_dict is None:
                 transforms_dict = config_dict['transforms']
                 transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
+                # transforms_dict = self.train_transforms(transforms_dict, filtered_data_object)
 
             filtered_transformed_data_object = {}
 
             for key, dataset_or_data_object in filtered_data_object.items():
                 if isinstance(dataset_or_data_object, dict): 
                     sub_data_object = dataset_or_data_object
-                    filtered_transformed_data_object[key] = get_filtered_transformed_data_object(sub_data_object)
+                    filtered_transformed_data_object[key] = get_filtered_transformed_data_object(sub_data_object, transforms_dict=transforms_dict)
                 else: 
                     dataset = dataset_or_data_object
                     filtered_transformed_data_object[key] = TransformedDataset(dataset, transforms_dict) 
@@ -104,6 +106,7 @@ class DataDetectiveEngine:
 
             return one_hot_encoded_data_object
 
+        # import pdb; pdb.set_trace()
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
         filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
@@ -202,10 +205,10 @@ class DataDetectiveEngine:
 
         return result_dict
 
-    def parse_transforms(self, transform_dict: Dict[str, Any], data_object):
+    def parse_transforms(self, transform_dict: Dict[str, Any], root_data_object):
         output_dict = defaultdict(lambda: [])
 
-        sample_dataset = list(data_object.items())[0][1]
+        sample_dataset = list(root_data_object.items())[0][1]
         while isinstance(sample_dataset, dict):
             sample_dataset = list(sample_dataset.values())[0]
         while isinstance(sample_dataset, torch.utils.data.Subset):
@@ -236,19 +239,21 @@ class DataDetectiveEngine:
                 in_place = transform_specification['in_place'].lower() == 'true'
                 options = transform_specification['options']
 
-                ### getting transform from self object
-                transform = TRANSFORM_LIBRARY.get(name, self.transform_dict.get(name))
-                if not transform:
-                    raise Exception(f"Transform {name} not found in transform library or registered to Data Detective Engine.")
-                ###
-
-                transform.initialize_transform(options)
-                transform.in_place = in_place
-
                 for column_name in relevant_columns:
+                    ### getting transform from self object
+                    transform = copy.deepcopy(TRANSFORM_LIBRARY.get(name, self.transform_dict.get(name)))
+                    if not transform:
+                        raise Exception(f"Transform {name} not found in transform library or registered to Data Detective Engine.")
+                    ###
+
+                    transform.initialize_transform( options | {"data_object": root_data_object, "column": column_name })
+                    transform.in_place = in_place
                     output_dict[column_name].append(transform)
 
         return dict(output_dict)
+
+    def train_transforms(self, transform_dict: Dict[str, Any], data_object):
+        return transform_dict
 
     def validator_name_to_object(self, validator_class_name: str) -> DataValidator:
         """

@@ -8,7 +8,7 @@ from constants import FloatTensor
 from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
-DATASET_SIZE = 500
+DATASET_SIZE = 100
 
 class TutorialDataset(DataDetectiveDataset):
     def __init__(self, **kwargs):
@@ -29,6 +29,7 @@ class TutorialDataset(DataDetectiveDataset):
         """
         Returns a dictionary of the image, vector, and label.
         """
+        print(f"getting item {idx}")
         sample = self.mnist.__getitem__(idx)
         mnist_image = sample[0]
         if idx == 10: 

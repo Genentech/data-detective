@@ -17,13 +17,13 @@ sys.path.insert(0, PROJECT_DIR)
 class TestCSVDataset:
     def test_csv_dataset_openbhb(self):
         dataset = CSVDataset(
-            filepath="openbhb_image_paths.csv",
+            filepath="openbhb_image_paths_tiny.csv",
             datatype_dict={ "openbhb_image": DataType.IMAGE, },
         )
 
         # hack for setting length to 100 for testing
-        desired_length = 50
-        dataset, _ = dd_random_split(dataset, [desired_length, dataset.__len__() - desired_length])
+        # desired_length = 100
+        # dataset, _ = dd_random_split(dataset, [desired_length, dataset.__len__() - desired_length])
 
         inference_size: int = 20
         everything_but_inference_size: int = dataset.__len__() - inference_size
