@@ -8,6 +8,9 @@ from src.transforms.embedding_transformer import Transform
 def get_resnet50(**kwargs):
     import torchvision.models
 
+    kwargs.pop("data_object")
+    kwargs.pop("column")
+
     resnet = torchvision.models.resnet50(
         weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2, **kwargs
     )
@@ -41,6 +44,9 @@ def resnet50_backbone_name(original_name):
 def get_vit(**kwargs):
     from transformers import AutoImageProcessor, ViTModel
 
+    kwargs.pop("data_object")
+    kwargs.pop("column")
+
     image_processor = AutoImageProcessor.from_pretrained(
         "google/vit-base-patch16-224-in21k"
     )
@@ -68,6 +74,9 @@ def vit_backbone_name(original_name):
 
 def get_bert(**kwargs):
     from transformers import AutoTokenizer, BertModel
+
+    kwargs.pop("data_object")
+    kwargs.pop("column")
 
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
     model = BertModel.from_pretrained("bert-base-uncased")

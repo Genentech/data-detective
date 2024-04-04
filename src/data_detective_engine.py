@@ -106,7 +106,6 @@ class DataDetectiveEngine:
 
             return one_hot_encoded_data_object
 
-        # import pdb; pdb.set_trace()
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
         filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
@@ -207,6 +206,7 @@ class DataDetectiveEngine:
 
     def parse_transforms(self, transform_dict: Dict[str, Any], root_data_object):
         output_dict = defaultdict(lambda: [])
+        # serialization_dict = defaultdict(lambda: [])
 
         sample_dataset = list(root_data_object.items())[0][1]
         while isinstance(sample_dataset, dict):
@@ -249,6 +249,11 @@ class DataDetectiveEngine:
                     transform.initialize_transform( options | {"data_object": root_data_object, "column": column_name })
                     transform.in_place = in_place
                     output_dict[column_name].append(transform)
+                    # serialization_dict[column_name].append({
+                    #     "name": name, 
+                    #     "in_place": in_place,
+                    #     "options": options,
+                    # })
 
         return dict(output_dict)
 

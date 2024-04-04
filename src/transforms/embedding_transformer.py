@@ -1,6 +1,8 @@
 import os
 import pickle
 from collections import defaultdict
+from cachetools import LRUCache
+import time
 
 import joblib
 import numpy as np
@@ -12,6 +14,8 @@ from src.enums.enums import DataType
 
 
 class Transform(torch.nn.Module):
+    cache = LRUCache(maxsize=10000)
+
     def __init__(self, transform_class, new_column_name_fn: typing.Callable[[str], str], new_column_datatype: DataType,
                  in_place: bool = False, cache_values: bool = True):
         super().__init__()
@@ -24,17 +28,18 @@ class Transform(torch.nn.Module):
         if self.cache_values:
             self.cache_statistics_dict = defaultdict(lambda: 0)
 
-    def hash_transform_value(self, val):
-        if hasattr(val, "numpy"):
-            val = val.numpy()
+    def hash_transform_value(self, id=None, col_name=None):
+        # if hasattr(val, "numpy"):
+        #     val = val.numpy()
 
         #todo: add assertion that no two transforms have the same name
         transform_name = self.new_column_name_fn("")
-
+        
         return joblib.hash((
-            val,
+            id, 
+            col_name,
             transform_name,
-            self.options,
+            {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
         ))
 
     def initialize_transform(self, transform_kwargs):
@@ -43,11 +48,26 @@ class Transform(torch.nn.Module):
 
     #TODO: add a "fit" method to accommodate transforms that need to be fit.
 
-    def forward(self, obj):
+    def forward(self, dataset, item, col_name):
+        ### this takes most of the time
         if not hasattr(self, "transform"):
             raise Exception("Transform not initialized before use.")
 
-        hash_value = self.hash_transform_value(obj)
+        hash_value = self.hash_transform_value(id=dataset.get_sample_id(item), col_name=col_name)
+
+        # start = time.time() 
+        # if hash_value in self.cache: 
+        #     transformed_value = self.cache.get(hash_value)
+        #     print("cache hit")
+        #     self.cache_statistics_dict['cache_hits'] += 1
+        # else: 
+        #     obj = dataset[item][col_name]
+        #     transformed_value = self.transform(obj)
+        #     self.cache[hash_value] = transformed_value
+        #     print("cache miss")
+        #     self.cache_statistics_dict['cache_miss'] += 1
+        # end = time.time() 
+        # print(f"transforming took {1000 * (end - start)} ms")
 
         filepath = f"data/tmp/{hash_value}.pkl"
         if os.path.isfile(filepath):
@@ -59,6 +79,7 @@ class Transform(torch.nn.Module):
             if not os.path.isdir("data/tmp"):
                 os.makedirs("data/tmp")
 
+            obj = dataset[item][col_name]
             transformed_value = self.transform(obj)
             with open(filepath, "wb") as f:
                 self.cache_statistics_dict['cache_misses'] += 1
@@ -69,7 +90,7 @@ class Transform(torch.nn.Module):
 class TransformedDataset(DataDetectiveDataset):
     def __init__(self,
         dataset: DataDetectiveDataset,
-        transforms: typing.Dict[str, typing.List[Transform]]
+        transforms: typing.Dict[str, typing.List[Transform]],
     ):
         self.dataset = dataset
         self.include_subject_id_in_data = self.dataset.include_subject_id_in_data
@@ -77,6 +98,7 @@ class TransformedDataset(DataDetectiveDataset):
         self.index_df = self.dataset.index_df
         
         self.transforms = transforms
+
 
     def datatypes(self):
         dataset = self.dataset
@@ -97,17 +119,26 @@ class TransformedDataset(DataDetectiveDataset):
         return new_datatypes
 
     def __getitem__(self, item):
+        start_time = time.time()
+
         new_item = self.dataset[item]
 
         for col_name, transform_list in self.transforms.items():
             for transform in transform_list:
                 new_column_name_fn = transform.new_column_name_fn
                 new_column_name = new_column_name_fn(col_name)
-                new_item[new_column_name] = transform(new_item[col_name])
+                # new_item[new_column_name] = transform(new_item[col_name])
+                new_item[new_column_name] = transform(self.dataset, item, col_name)
 
             if all([transform.in_place for transform in transform_list]):
                 new_item.pop(col_name)
 
+        end_time = time.time()
+        # Calculate the duration
+        duration_seconds = end_time - start_time
+        duration_milliseconds = duration_seconds * 1000
+
+        print(f"Execution time for transformed idx {item}:", duration_milliseconds, "milliseconds")
         return new_item
 
     def __len__(self):
