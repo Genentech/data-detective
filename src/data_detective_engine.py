@@ -241,19 +241,16 @@ class DataDetectiveEngine:
 
                 for column_name in relevant_columns:
                     ### getting transform from self object
-                    transform = copy.deepcopy(TRANSFORM_LIBRARY.get(name, self.transform_dict.get(name)))
-                    if not transform:
+                    transform_class = TRANSFORM_LIBRARY.get(name, self.transform_dict.get(name))
+
+                    if not transform_class:
                         raise Exception(f"Transform {name} not found in transform library or registered to Data Detective Engine.")
+            
+                    transform = transform_class(in_place=in_place)
                     ###
 
                     transform.initialize_transform( options | {"data_object": root_data_object, "column": column_name })
-                    transform.in_place = in_place
                     output_dict[column_name].append(transform)
-                    # serialization_dict[column_name].append({
-                    #     "name": name, 
-                    #     "in_place": in_place,
-                    #     "options": options,
-                    # })
 
         return dict(output_dict)
 
