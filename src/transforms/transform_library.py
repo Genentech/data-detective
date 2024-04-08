@@ -113,20 +113,27 @@ def get_unit_norm(**kwargs):
         raise Exception("Data object cannot be none in unit norm transform.")
     
     dataset_to_use = kwargs.get("dataset_to_use", "entire_set") 
+    use_dataset_statistics = kwargs.get("use_dataset_statistics", True)
+
     dataset_to_use = data_object[dataset_to_use]
     column = kwargs.get("column")
 
     if column is None: 
         raise Exception("column cannot be none")
 
-    min_val, max_val = np.inf, -np.inf
-    for i in range(len(dataset_to_use)): 
-        datapoint = dataset_to_use[i][column]
-        min_val = min(datapoint, min_val)
-        max_val = max(datapoint, max_val)
+    if use_dataset_statistics:
+        min_val, max_val = np.inf, -np.inf
+        for i in range(len(dataset_to_use)): 
+            datapoint = dataset_to_use[i][column]
+            min_val = min(datapoint, min_val)
+            max_val = max(datapoint, max_val)
     
     def full_impl(x): 
-        x = (x - min_val) / (max_val - min_val)
+        if use_dataset_statistics:
+            x = (x - min_val) / (max_val - min_val)
+        else: 
+            x = (x - x.min()) / (x.max() - x.min())
+
         return x
 
     return full_impl

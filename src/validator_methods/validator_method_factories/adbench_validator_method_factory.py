@@ -3,7 +3,8 @@ from typing import Set, Dict, Type
 import numpy as np
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
 from pytypes import override
-from torch.utils.data import Dataset
+import torch
+from torch.utils.data import Dataset, DataLoader
 
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
@@ -73,14 +74,21 @@ class ADBenchValidatorMethodFactory:
                     column: [] for column in entire_dataset.datatypes().keys()
                 }
 
-                for idx in range(entire_dataset.__len__()):
-                    sample = entire_dataset[idx]
-                    for column, column_data in sample.items():
+                loader = DataLoader(entire_dataset, batch_size=1000, shuffle=False, num_workers=4)
+                for batch in loader:
+                    for column, column_data in batch.items():
+                        # print(f"col {column}")
+                        # print(column_data.shape)
                         matrix_dict[column].append(column_data)
 
                 for column in entire_dataset.datatypes().keys():
-                    matrix_dict[column] = np.vstack(matrix_dict[column])
+                    is_3d = len(matrix_dict[column][0].shape) == 3
+                    concatenated = torch.cat(matrix_dict[column], dim=1 if is_3d else 0)
+                    concatenated = concatenated.reshape((-1, concatenated.shape[-1]))
+                    matrix_dict[column] = concatenated
 
+                print(matrix_dict['resnet50_backbone_mnist_image'].shape)
+                
                 kwargs_dict = {
                     f"{column}_results": {
                         "data_matrix": column_data,

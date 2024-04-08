@@ -1,4 +1,6 @@
+import time
 from typing import Union, Dict
+import torch
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -8,7 +10,7 @@ from constants import FloatTensor
 from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
-DATASET_SIZE = 100
+DATASET_SIZE = 1000
 
 class TutorialDataset(DataDetectiveDataset):
     def __init__(self, **kwargs):
@@ -29,14 +31,20 @@ class TutorialDataset(DataDetectiveDataset):
         """
         Returns a dictionary of the image, vector, and label.
         """
-        print(f"getting item {idx}")
+        start = time.time() 
         sample = self.mnist.__getitem__(idx)
         mnist_image = sample[0]
+        output_size = (mnist_image.size(1) * 55, mnist_image.size(2) * 55)
+        upsampled_tensor = torch.nn.functional.interpolate(mnist_image.unsqueeze(0), size=output_size, mode='bilinear', align_corners=False)
+
         if idx == 10: 
             mnist_image = 1 - mnist_image
+        end = time.time() 
+        # print(f"Getting untransformed object {idx}: {1000 * (end - start)} ms")
 
         return {
-            "mnist_image": mnist_image,
+            # "mnist_image": mnist_image,
+            "mnist_image": upsampled_tensor,
             "normal_vector": self.normal_column[idx][:],
             "normal_vector_2": self.normal_column_2[idx],
             "label": sample[1],
