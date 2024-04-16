@@ -1,14 +1,17 @@
+import time
 from typing import Union, Dict
+import torch
 
 import numpy as np
+from litdata import StreamingDataset
 from matplotlib import pyplot as plt
 from torchvision.datasets import MNIST
 
 from constants import FloatTensor
-from src.datasets.data_detective_dataset import DataDetectiveDataset
+from src.datasets.data_detective_dataset import DataDetectiveDataset, LambdaDictWrapper
 from src.enums.enums import DataType
 
-DATASET_SIZE = 500
+DATASET_SIZE = 1000
 
 class TutorialDataset(DataDetectiveDataset):
     def __init__(self, normal_vec_size=2, **kwargs):
@@ -29,17 +32,39 @@ class TutorialDataset(DataDetectiveDataset):
         """
         Returns a dictionary of the image, vector, and label.
         """
-        sample = self.mnist.__getitem__(idx)
-        mnist_image = sample[0]
-        if idx == 10: 
-            mnist_image = 1 - mnist_image
+        start = time.time() 
+        # sample = self.mnist.__getitem__(idx)
+        # mnist_image = sample[0]
+        # output_size = (mnist_image.size(1) * 55, mnist_image.size(2) * 55)
+        # upsampled_tensor = torch.nn.functional.interpolate(mnist_image.unsqueeze(0), size=output_size, mode='bilinear', align_corners=False)
 
-        return {
-            "mnist_image": mnist_image,
+        def get_img():
+            # print("unwrapping image")
+            sample = self.mnist.__getitem__(idx)
+            mnist_image = sample[0]
+            output_size = (mnist_image.size(1) * 55, mnist_image.size(2) * 55)
+            upsampled_tensor = torch.nn.functional.interpolate(mnist_image.unsqueeze(0), size=output_size, mode='bilinear', align_corners=False)
+
+            if idx == 10: 
+                upsampled_tensor = 1 - upsampled_tensor
+
+            return upsampled_tensor
+
+        def get_label(): 
+            # print("unwrapping label")
+            sample = self.mnist.__getitem__(idx)
+            return sample[1]
+
+        end = time.time() 
+        # print(f"Getting untransformed object {idx}: {1000 * (end - start)} ms")
+
+        return LambdaDictWrapper({
+            # "mnist_image": mnist_image,
+            "mnist_image": get_img,
             "normal_vector": self.normal_column[idx][:],
             "normal_vector_2": self.normal_column_2[idx],
-            "label": sample[1],
-        }
+            "label": get_label,
+        })
 
     def __len__(self) -> int:
         return DATASET_SIZE
@@ -100,4 +125,3 @@ class TutorialDataset(DataDetectiveDataset):
 
         plt.scatter(sample["normal_vector_2"][:2], 0)
         plt.show()
-

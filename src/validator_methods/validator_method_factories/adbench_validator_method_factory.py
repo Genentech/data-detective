@@ -1,9 +1,11 @@
+import time
 from typing import Set, Dict, Type
 
 import numpy as np
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
 from pytypes import override
-from torch.utils.data import Dataset
+import torch
+from torch.utils.data import Dataset, DataLoader
 
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
@@ -73,14 +75,29 @@ class ADBenchValidatorMethodFactory:
                     column: [] for column in entire_dataset.datatypes().keys()
                 }
 
-                for idx in range(entire_dataset.__len__()):
-                    sample = entire_dataset[idx]
-                    for column, column_data in sample.items():
+                start = time.time() 
+                loader = DataLoader(entire_dataset, batch_size=min(len(entire_dataset), 1000),
+                                #     sampler=torch.utils.data.BatchSampler(
+                                #         torch.utils.data.SequentialSampler(entire_dataset), 
+                                #         batch_size=1000, 
+                                #         drop_last=False
+                                #    ),
+                                    shuffle=False)
+
+                for batch in loader:
+                    for column, column_data in batch.items():
+                        # print(f"col {column}")
+                        # print(column_data.shape)
                         matrix_dict[column].append(column_data)
+                end = time.time() 
+                print(f"time needed: {(end - start)*1000} ms")
 
                 for column in entire_dataset.datatypes().keys():
-                    matrix_dict[column] = np.vstack(matrix_dict[column])
-
+                    is_3d = len(matrix_dict[column][0].shape) == 3
+                    concatenated = torch.cat(matrix_dict[column], dim=1 if is_3d else 0)
+                    concatenated = concatenated.reshape((len(entire_dataset), -1))
+                    matrix_dict[column] = concatenated
+                
                 kwargs_dict = {
                     f"{column}_results": {
                         "data_matrix": column_data,
@@ -104,13 +121,6 @@ class ADBenchValidatorMethodFactory:
                 @return:
                 """
                 model_instance = model()
-                # data_matrix = (data_matrix - data_matrix.min()) / (data_matrix.max() - data_matrix.min())
-                min_vec, max_vec = data_matrix.min(axis=0), data_matrix.max(axis=0)
-                def normalize(data): 
-                    return (data - min_vec) / (max_vec - min_vec)
-                model_instance.normalize = normalize
-
-                data_matrix = model_instance.normalize(data_matrix)
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
 

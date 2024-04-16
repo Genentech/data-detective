@@ -13,6 +13,7 @@ from src.datasets.my_cifar_10 import MyCIFAR10
 from src.enums.enums import DataType
 from src.transforms.embedding_transformer import Transform, TransformedDataset
 from src.data_detective_engine import DataDetectiveEngine
+from src.transforms.transform_library import GaussianBlurTransform
 
 
 @pytest.fixture
@@ -31,7 +32,7 @@ def cifar_10():
 
 class TestEmbeddingTransformer:
     def test_embedding_transformer(self, cifar_10):
-        gaussian_blur = Transform(GaussianBlur, lambda name: f"blurred_{name}", DataType.IMAGE, in_place=False)
+        gaussian_blur = GaussianBlurTransform()
         gaussian_blur.initialize_transform({"kernel_size": 9})
         resnet = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
         modules = list(resnet.children())[:-1]

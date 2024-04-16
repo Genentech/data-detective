@@ -1,3 +1,4 @@
+import copy
 import multiprocessing.pool
 import queue
 import torch
@@ -9,7 +10,7 @@ from typing import Dict, List, Any, Tuple
 
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
 from src.enums.enums import DataType
-from src.transforms.embedding_transformer import TransformedDataset
+from src.transforms.embedding_transformer import Transform, TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
 from src.utils import snake_to_camel, filter_dataset
 from src.validators.data_validator import DataValidator
@@ -73,13 +74,14 @@ class DataDetectiveEngine:
             if transforms_dict is None:
                 transforms_dict = config_dict['transforms']
                 transforms_dict = self.parse_transforms(transforms_dict, filtered_data_object)
+                # transforms_dict = self.train_transforms(transforms_dict, filtered_data_object)
 
             filtered_transformed_data_object = {}
 
             for key, dataset_or_data_object in filtered_data_object.items():
                 if isinstance(dataset_or_data_object, dict): 
                     sub_data_object = dataset_or_data_object
-                    filtered_transformed_data_object[key] = get_filtered_transformed_data_object(sub_data_object)
+                    filtered_transformed_data_object[key] = get_filtered_transformed_data_object(sub_data_object, transforms_dict=transforms_dict)
                 else: 
                     dataset = dataset_or_data_object
                     filtered_transformed_data_object[key] = TransformedDataset(dataset, transforms_dict) 
@@ -107,6 +109,7 @@ class DataDetectiveEngine:
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
         filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
+        # filtered_transformed_onehot_encoded_data_object = filtered_transformed_data_object
 
             
         return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
@@ -161,8 +164,9 @@ class DataDetectiveEngine:
         specified in the docstring; best practice constitutes including the minimal amount of rows or columns necessary to 
         do the validation. 
         """
-        validators = config_dict["validators"]
+        Transform.load_cache_from_disk()
 
+        validators = config_dict["validators"]
         data_objects = []
 
         for validator_class_name, validator_params in validators.items():
@@ -198,12 +202,15 @@ class DataDetectiveEngine:
 
             result_dict[validator][validator_method] = results
 
+        Transform.dump_cache_to_disk()
+
         return result_dict
 
-    def parse_transforms(self, transform_dict: Dict[str, Any], data_object):
+    def parse_transforms(self, transform_dict: Dict[str, Any], root_data_object):
         output_dict = defaultdict(lambda: [])
+        # serialization_dict = defaultdict(lambda: [])
 
-        sample_dataset = list(data_object.items())[0][1]
+        sample_dataset = list(root_data_object.items())[0][1]
         while isinstance(sample_dataset, dict):
             sample_dataset = list(sample_dataset.values())[0]
         while isinstance(sample_dataset, torch.utils.data.Subset):
@@ -234,19 +241,23 @@ class DataDetectiveEngine:
                 in_place = transform_specification['in_place'].lower() == 'true'
                 options = transform_specification['options']
 
-                ### getting transform from self object
-                transform = TRANSFORM_LIBRARY.get(name, self.transform_dict.get(name))
-                if not transform:
-                    raise Exception(f"Transform {name} not found in transform library or registered to Data Detective Engine.")
-                ###
-
-                transform.initialize_transform(options)
-                transform.in_place = in_place
-
                 for column_name in relevant_columns:
+                    ### getting transform from self object
+                    transform_class = TRANSFORM_LIBRARY.get(name, self.transform_dict.get(name))
+
+                    if not transform_class:
+                        raise Exception(f"Transform {name} not found in transform library or registered to Data Detective Engine.")
+            
+                    transform = transform_class(in_place=in_place)
+                    ###
+
+                    transform.initialize_transform( options | {"data_object": root_data_object, "column": column_name })
                     output_dict[column_name].append(transform)
 
         return dict(output_dict)
+
+    def train_transforms(self, transform_dict: Dict[str, Any], data_object):
+        return transform_dict
 
     def validator_name_to_object(self, validator_class_name: str) -> DataValidator:
         """

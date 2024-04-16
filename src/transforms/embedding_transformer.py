@@ -1,6 +1,8 @@
 import os
 import pickle
 from collections import defaultdict
+from cachetools import LRUCache
+import time
 
 import joblib
 import numpy as np
@@ -12,70 +14,115 @@ from src.enums.enums import DataType
 
 
 class Transform(torch.nn.Module):
-    def __init__(self, transform_class, new_column_name_fn: typing.Callable[[str], str], new_column_datatype: DataType,
-                 in_place: bool = False, cache_values: bool = True):
+    cache = LRUCache(maxsize=50000)
+
+    def dump_cache_to_disk():
+        filepath = 'data/tmp/cache.pkl'
+        with open(filepath, 'wb') as f:
+            pickle.dump(Transform.cache, f)
+        print(f"Cache written to {filepath}")
+
+    def load_cache_from_disk():
+        filepath = 'data/tmp/cache.pkl'
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as f:
+                Transform.cache = pickle.load(f)
+            print(f"Cache loaded from {filepath}")
+        else:
+            print(f"File {filepath} does not exist. Cache not loaded.")
+
+    def __init__(self, new_column_datatype: DataType, in_place: bool = False, cache_values: bool = True):
         super().__init__()
-        self.transform_class = transform_class
-        self.new_column_name_fn = new_column_name_fn
         self.new_column_datatype = new_column_datatype
         self.in_place = in_place
         self.cache_values = cache_values
 
-        if self.cache_values:
-            self.cache_statistics_dict = defaultdict(lambda: 0)
+    def hash_transform_value(self, id=None, col_name=None):
+        #todo: add assertion that no two transforms have the same name
+        transform_name = self.new_column_name("")
+        
+        return joblib.hash((
+            id, 
+            col_name,
+            transform_name,
+            {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
+        ))
 
-    def hash_transform_value(self, val):
-        if hasattr(val, "numpy"):
-            val = val.cpu().numpy()
+    def hash_object(self, obj):
+        if hasattr(obj, "numpy"):
+            obj = obj.numpy()
 
         #todo: add assertion that no two transforms have the same name
-        transform_name = self.new_column_name_fn("")
-
+        transform_name = self.new_column_name("")
+        
         return joblib.hash((
-            val,
+            obj,
             transform_name,
-            self.options,
+            {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
         ))
 
     def initialize_transform(self, transform_kwargs):
         self.options = transform_kwargs
-        self.transform = self.transform_class(**transform_kwargs)
 
-    #TODO: add a "fit" method to accommodate transforms that need to be fit.
-
-    def forward(self, obj):
+    def forward_item(self, obj):
+        ### this takes most of the time
         if not hasattr(self, "transform"):
             raise Exception("Transform not initialized before use.")
 
-        hash_value = self.hash_transform_value(obj)
+        hash_value = self.hash_object(obj)
 
-        filepath = f"data/tmp/{hash_value}.pkl"
-        if os.path.isfile(filepath):
-            try: 
-                with open(filepath, "rb") as f:
-                    transformed_value = pickle.load(f)
-                    self.cache_statistics_dict['cache_hits'] += 1
-            except Exception: 
-                transformed_value = self.transform(obj)
-                with open(filepath, "wb") as f:
-                    pickle.dump(transformed_value, f)
-                    self.cache_statistics_dict['cache_misses'] += 1
-        else:
-            # import pdb; pdb.set_trace()
-            if not os.path.isdir("data/tmp"):
-                os.makedirs("data/tmp")
-
+        # start = time.time() 
+        # print(item)
+        if hash_value in self.cache: 
+            transformed_value = self.cache.get(hash_value)
+        else: 
             transformed_value = self.transform(obj)
-            with open(filepath, "wb") as f:
-                pickle.dump(transformed_value, f)
-                self.cache_statistics_dict['cache_misses'] += 1
+            self.cache[hash_value] = transformed_value
 
         return transformed_value
+
+    #TODO: add a "fit" method to accommodate transforms that need to be fit.
+    def forward(self, dataset, item, col_name):
+        ### this takes most of the time
+        if not hasattr(self, "transform"):
+            raise Exception("Transform not initialized before use.")
+
+        hash_value = self.hash_transform_value(id=dataset.get_sample_id(item), col_name=col_name)
+
+        # start = time.time() 
+        # print(item)
+        if hash_value in self.cache: 
+            transformed_value = self.cache.get(hash_value)
+        else: 
+            obj = dataset[item][col_name]
+            transformed_value = self.transform(obj)
+            self.cache[hash_value] = transformed_value
+        # # end = time.time()
+        # print(f"transforming took {1000 * (end - start)} ms")
+
+        return transformed_value
+
+        # filepath = f"data/tmp/{hash_value}.pkl"
+        # if os.path.isfile(filepath):
+        #     with open(filepath, "rb") as f:
+        #         # self.cache_statistics_dict['cache_hits'] += 1
+        #         transformed_value = pickle.load(f)
+        # else:
+        #     # import pdb; pdb.set_trace()
+        #     if not os.path.isdir("data/tmp"):
+        #         os.makedirs("data/tmp")
+
+        #     obj = dataset[item][col_name]
+        #     transformed_value = self.transform(obj)
+        #     with open(filepath, "wb") as f:
+        #         # self.cache_statistics_dict['cache_misses'] += 1
+        #         pickle.dump(transformed_value, f)
+
 
 class TransformedDataset(DataDetectiveDataset):
     def __init__(self,
         dataset: DataDetectiveDataset,
-        transforms: typing.Dict[str, typing.List[Transform]]
+        transforms: typing.Dict[str, typing.List[Transform]],
     ):
         self.dataset = dataset
         self.include_subject_id_in_data = self.dataset.include_subject_id_in_data
@@ -95,37 +142,41 @@ class TransformedDataset(DataDetectiveDataset):
                 new_datatypes.pop(col_name)
 
             for transform in transform_list:
-                new_column_name_fn = transform.new_column_name_fn
-                new_column_name = new_column_name_fn(col_name)
+                # new_column_name_fn = transform.new_column_name_fn
+                new_column_name = transform.new_column_name(col_name)
                 new_datatype = transform.new_column_datatype
                 new_datatypes[new_column_name] = new_datatype
 
         return new_datatypes
 
     def __getitem__(self, item):
-        new_item = self.dataset[item]
+        start_time = time.time()
+        if hasattr(item, "__len__"): 
+            loader = torch.utils.data.DataLoader(self.dataset, batch_size=len(item), shuffle=False)
+            new_item = next(iter(loader))
+        else: 
+            new_item = self.dataset[item]
+
+        end1 = time.time() 
+        # print(f"loading data took {(end1 - start_time) * 1000} ms")
 
         for col_name, transform_list in self.transforms.items():
             for transform in transform_list:
-                new_column_name_fn = transform.new_column_name_fn
-                new_column_name = new_column_name_fn(col_name)
-                new_item[new_column_name] = transform(new_item[col_name])
+                # new_column_name_fn = transform.new_column_name_fn
+                new_column_name = transform.new_column_name(col_name)
+                # new_item[new_column_name] = transform(new_item[col_name])
+                new_item[new_column_name] = transform(self.dataset, item, col_name)
 
             if all([transform.in_place for transform in transform_list]):
                 new_item.pop(col_name)
 
+        end_time = time.time()
+        # Calculate the duration
+        duration_seconds = end_time - start_time
+        duration_milliseconds = duration_seconds * 1000
+
+        # print(f"Execution time for transformed idx {item}:", duration_milliseconds, "milliseconds")
         return new_item
 
     def __len__(self):
         return self.dataset.__len__()
-
-    # @staticmethod
-    # def hash_column(col_name, col_val, transform_name):
-    #     if hasattr(col_val, "numpy"):
-    #         col_val = col_val.numpy()
-    #
-    #     return joblib.hash((
-    #         # col_name,
-    #         col_val,
-    #         transform_name,
-    #     ))

@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Sequence, Union, Any
 import joblib
 from matplotlib import pyplot as plt
 import numpy as np
+import requests
 import torch
 import torch.utils.data
 from joblib import delayed, Parallel
@@ -563,12 +564,32 @@ def occlusion_interpretability(img, model, occ, color_bounds="auto"):
             occluded = occ(img, (first_dim, second_dim))
             occluded_image_dict[tuple((first_dim, second_dim))] = occluded
 
-            
-    resnet = TRANSFORM_LIBRARY['resnet50']
-    resnet.initialize_transform({})
-    embeddings = np.concatenate([resnet(img) for img in tqdm(occluded_image_dict.values())], axis=0)
+    resnet = TRANSFORM_LIBRARY['resnet50']()
+    resnet.initialize_transform(transform_kwargs={})
+    embeddings = np.concatenate([resnet.forward_item(img) for img in tqdm(occluded_image_dict.values())], axis=0)
 #     embeddings = np.concatenate(Parallel(n_jobs=6)(delayed(resnet)(img) for img in tqdm(occluded_image_dict.values())), axis=0)
-    localized_anomaly_scores = model.decision_function(model.normalize(embeddings))
+    localized_anomaly_scores = model.decision_function(embeddings)
     reshaped_localized_anomaly_score = torch.FloatTensor(list(localized_anomaly_scores)).reshape(img.shape[-2:])
     plot_occ_results(img, reshaped_localized_anomaly_score, occ.width, color_bounds)
     return reshaped_localized_anomaly_score
+
+def download_data_from_google_drive(file_id="1NQWRhc3gr-N2WZJygsDuzmoLwBH62Dot", destination="data.zip"):
+    URL = f"https://drive.usercontent.google.com/download?id={file_id}&export=download&authuser=0&confirm=t&uuid=679d85e4-42f9-430c-924e-f4d879910aaf&at=APZUnTXSiR-kiqOQubwSlrsUGMBc%3A1712004179781"
+    session = requests.Session()
+    response = session.get(URL, stream=True)
+    token = None
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            token = value
+            break
+
+    if token:
+        params = {'id': file_id, 'confirm': token}
+        response = session.get(URL, params=params, stream=True)
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(32768):
+            if chunk:
+                f.write(chunk)
+
+    

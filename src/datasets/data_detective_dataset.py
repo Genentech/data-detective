@@ -11,7 +11,44 @@ from torch import default_generator, randperm
 
 from src.enums.enums import DataType
 
+from collections.abc import MutableMapping
+
+
+class LambdaDictWrapper(MutableMapping):
+    def __init__(self, dictionary):
+        self._data = dictionary
+        self.unwrap = True
+
+    def __getitem__(self, key):
+        value = self._data[key]
+        if callable(value) and self.unwrap:
+            return value()
+        return value
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
+
+    def __delitem__(self, key):
+        del self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+    def keys(self):
+        return self._data.keys()
+
+    def items(self):
+        return [(k, self[k]) for k in self.keys()]
+
+    def values(self):
+        return [self[k] for k in self.keys()]
+
 class DatatypesAndGetItemMeta(type):
+
+
     def __new__(cls, name, bases, dct):
         # Check if the class has a 'get_data' method
         if 'datatypes' in dct:
@@ -19,7 +56,7 @@ class DatatypesAndGetItemMeta(type):
             original_datatypes = dct['datatypes']
             def wrapped_datatypes(self, *args, **kwargs):
                 datatypes_dict = original_datatypes(self, *args, **kwargs)
-                if self.include_subject_id_in_data: 
+                if hasattr(self, "include_subject_id_in_data") and self.include_subject_id_in_data: 
                     datatypes_dict |= {"subject_id": DataType.CATEGORICAL} 
 
                 return datatypes_dict
@@ -30,10 +67,14 @@ class DatatypesAndGetItemMeta(type):
             # Wrap the 'get_data' method with additional behavior
             original_getitem = dct['__getitem__']
             def wrapped_getitem(self, *args, **kwargs):
+                from src.datasets.column_filtered_dataset import ColumnFilteredDataset
+                from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
+                from src.transforms.embedding_transformer import TransformedDataset
+
                 assert len(args) == 1, f"You must provide exactly one argument to __getitem__, you passed {args}."
                 try: 
                     # handles the case of subsetting
-                    if hasattr(self, "index_df") and isinstance(args[0], int): 
+                    if hasattr(self, "index_df") and isinstance(args[0], int) and not any([isinstance(self, klass) for klass in [ColumnFilteredDataset, OneHotEncodedDataset, TransformedDataset]]): 
                         new_args = (self.index_df.iloc[args[0]]['data_idx'], )
                     else: 
                         new_args = args
@@ -194,10 +235,11 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     # can be overridden
     # maps from data index 
     def get_sample_id(self, data_idx: int, sample_ids: list = None) -> str: 
-        try: 
-            return self.index_df[self.index_df.index == data_idx]['sample_id'].item()
-        except Exception: 
-            c=3
+        return self.index_df[self.index_df.index == data_idx]['sample_id'].item()
+        # try: 
+        #     return self.index_df[self.index_df.index == data_idx]['sample_id'].item()
+        # except Exception: 
+        #     c=3
 
     def get_id(self, sample_idx) -> Dict[int, Union[str, int]]: 
         id_dict = {

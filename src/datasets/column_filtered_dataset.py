@@ -5,7 +5,7 @@ from typing import List
 import torch
 from torch.utils.data import Dataset
 
-from src.datasets.data_detective_dataset import DataDetectiveDataset
+from src.datasets.data_detective_dataset import DataDetectiveDataset, LambdaDictWrapper
 from src.enums.enums import DataType
 
 
@@ -28,11 +28,22 @@ class ColumnFilteredDataset(DataDetectiveDataset):
         @param idx: the dataset index. Only accepts integer indices.
         @return: A dictionary consisting of the data and the label.
         """
-        return {
-            column_name: entry
-            for column_name, entry in self.unfiltered_dataset.__getitem__(index).items()
-            if self.include_column(column_name)
-        }
+        original_item = self.unfiltered_dataset.__getitem__(index)
+        if isinstance(original_item, LambdaDictWrapper):
+            original_item.unwrap = False
+            new_item = LambdaDictWrapper({
+                column_name: entry
+                for column_name, entry in original_item.items()
+                if self.include_column(column_name)
+            })
+        else: 
+            new_item = {
+                column_name: entry
+                for column_name, entry in original_item.items()
+                if self.include_column(column_name)
+            }
+
+        return new_item
 
     def __len__(self) -> int:
         """
