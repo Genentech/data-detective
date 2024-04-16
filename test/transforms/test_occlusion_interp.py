@@ -107,8 +107,8 @@ class TestOcclusionInterp:
         # results = data_detective_engine.validate_from_schema(full_validation_schema, data_object)
         print("--- %s seconds ---" % (time.time() - start_time))
 
-        resnet = TRANSFORM_LIBRARY['resnet50']
-        resnet.initialize_transform({})
+        resnet = TRANSFORM_LIBRARY['resnet50']()
+        resnet.initialize_transform(transform_kwargs={})
         print(resnet)
 
 

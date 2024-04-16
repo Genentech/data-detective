@@ -17,8 +17,10 @@ class Resnet50Transform(Transform):
         super().initialize_transform(transform_kwargs=transform_kwargs)
         import torchvision.models
 
-        transform_kwargs.pop("data_object")
-        transform_kwargs.pop("column")
+        if "data_object" in transform_kwargs.keys():
+            transform_kwargs.pop("data_object")
+        if "column" in transform_kwargs.keys():
+            transform_kwargs.pop("column")
 
         resnet = torchvision.models.resnet50(
             weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2, **transform_kwargs
@@ -57,8 +59,10 @@ class VITTransform(Transform):
         super().initialize_transform(transform_kwargs=transform_kwargs)
         from transformers import AutoImageProcessor, ViTModel
 
-        transform_kwargs.pop("data_object")
-        transform_kwargs.pop("column")
+        if "data_object" in transform_kwargs.keys():
+            transform_kwargs.pop("data_object")
+        if "column" in transform_kwargs.keys():
+            transform_kwargs.pop("column")
 
         self.image_processor = AutoImageProcessor.from_pretrained(
             "google/vit-base-patch16-224-in21k"
@@ -94,8 +98,11 @@ class BERTTransform(Transform):
         super().initialize_transform(transform_kwargs=transform_kwargs)
         from transformers import AutoTokenizer, BertModel
 
-        transform_kwargs.pop("data_object")
-        transform_kwargs.pop("column")
+        if "data_object" in transform_kwargs.keys():
+            transform_kwargs.pop("data_object")
+        if "column" in transform_kwargs.keys():
+            transform_kwargs.pop("column")
+
 
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
         self.model = BertModel.from_pretrained("bert-base-uncased")
@@ -119,8 +126,11 @@ class HistogramTransform(Transform):
     def initialize_transform(self, transform_kwargs):
         super().initialize_transform(transform_kwargs=transform_kwargs)
 
-        transform_kwargs.pop("data_object")
-        transform_kwargs.pop("column")
+        if "data_object" in transform_kwargs.keys():
+            transform_kwargs.pop("data_object")
+        if "column" in transform_kwargs.keys():
+            transform_kwargs.pop("column")
+
 
         self.num_bins = transform_kwargs.get("bins", 10)
 
@@ -172,8 +182,35 @@ class ZeroOneTransform(Transform):
     def new_column_name(self, original_name): 
         return f"{original_name}_unit_normed"
 
+class GaussianBlurTransform(Transform): 
+    def __init__(self, in_place: bool = False, cache_values: bool = True):        
+        super().__init__(
+            new_column_datatype=DataType.IMAGE,
+            in_place=in_place, 
+            cache_values=cache_values
+        )
+    
+    def initialize_transform(self, transform_kwargs):
+        from torchvision.transforms import GaussianBlur
+
+        super().initialize_transform(transform_kwargs=transform_kwargs)
+
+        if "data_object" in transform_kwargs.keys():
+            transform_kwargs.pop("data_object")
+        if "column" in transform_kwargs.keys():
+            transform_kwargs.pop("column")
+
+        self.transform_obj = GaussianBlur(**transform_kwargs)
+
+    def transform(self, x):
+        return self.transform_obj(x)
+
+    def new_column_name(self, original_name): 
+        return f"blurred_{original_name}"
+
 TRANSFORM_LIBRARY = {
     "BERT": BERTTransform,
+    "gaussian_blur": GaussianBlurTransform,
     "histogram": HistogramTransform,
     "resnet50": Resnet50Transform,
     "ViT": VITTransform, 

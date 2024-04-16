@@ -13,108 +13,23 @@ from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
-class PickleableResnetTransform(torch.nn.Module):
-    cache = LRUCache(maxsize=50000)
-
-    def __init__(self, in_place: bool = False, cache_values: bool = True):
-        super().__init__()
-        self.new_column_datatype = DataType.MULTIDIMENSIONAL
-        self.in_place = in_place
-        self.cache_values = cache_values
-
-        # if self.cache_values:
-        #     self.cache_statistics_dict = defaultdict(lambda: 0)
-
-    def new_column_name_fn(self, old_name): 
-        return f"resnet50_{old_name}"
-
-    def transform(self):
-        if len(x.shape) == 2:
-            # add channel dimension
-            x = torch.unsqueeze(x, 0)
-        if len(x.shape) == 3:
-            # need a 4th dimension
-            x = torch.unsqueeze(x, 0)
-        if x.shape[1] == 1:
-            # if 1ch need from 1ch to 3ch RGB
-            x = x.expand(x.shape[0], 3, *x.shape[2:])
-        x = self.backbone(x)
-        x = x.squeeze()
-        x = x.reshape((-1, 2048))
-        x = x.detach().numpy()
-        return x
-
-    def hash_transform_value(self, id=None, col_name=None):
-        # if hasattr(val, "numpy"):
-        #     val = val.numpy()
-
-        #todo: add assertion that no two transforms have the same name
-        transform_name = self.new_column_name_fn("")
-        
-        return joblib.hash((
-            id, 
-            col_name,
-            transform_name,
-            {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
-        ))
-
-    def initialize_transform(self, transform_kwargs):
-        self.options = transform_kwargs
-        import torchvision.models
-
-        transform_kwargs.pop("data_object")
-        transform_kwargs.pop("column")
-
-        resnet = torchvision.models.resnet50(
-            weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2, **transform_kwargs
-        )
-        modules = list(resnet.children())[:-1]
-        self.backbone = torch.nn.Sequential(torch.nn.Upsample((224, 224)), *modules)
-
-
-    #TODO: add a "fit" method to accommodate transforms that need to be fit.
-
-    def forward(self, dataset, item, col_name):
-        ### this takes most of the time
-        if not hasattr(self, "transform"):
-            raise Exception("Transform not initialized before use.")
-
-        hash_value = self.hash_transform_value(id=dataset.get_sample_id(item), col_name=col_name)
-
-        # start = time.time() 
-        # if hash_value in self.cache: 
-        #     transformed_value = self.cache.get(hash_value)
-        #     print("cache hit")
-        #     self.cache_statistics_dict['cache_hits'] += 1
-        # else: 
-        #     obj = dataset[item][col_name]
-        #     transformed_value = self.transform(obj)
-        #     self.cache[hash_value] = transformed_value
-        #     print("cache miss")
-        #     self.cache_statistics_dict['cache_miss'] += 1
-        # end = time.time()
-        # print(f"transforming took {1000 * (end - start)} ms")
-
-        filepath = f"data/tmp/{hash_value}.pkl"
-        if os.path.isfile(filepath):
-            with open(filepath, "rb") as f:
-                # self.cache_statistics_dict['cache_hits'] += 1
-                transformed_value = pickle.load(f)
-        else:
-            # import pdb; pdb.set_trace()
-            if not os.path.isdir("data/tmp"):
-                os.makedirs("data/tmp")
-
-            obj = dataset[item][col_name]
-            transformed_value = self.transform(obj)
-            with open(filepath, "wb") as f:
-                # self.cache_statistics_dict['cache_misses'] += 1
-                pickle.dump(transformed_value, f)
-
-        return transformed_value
-
 class Transform(torch.nn.Module):
     cache = LRUCache(maxsize=50000)
+
+    def dump_cache_to_disk():
+        filepath = 'data/tmp/cache.pkl'
+        with open(filepath, 'wb') as f:
+            pickle.dump(Transform.cache, f)
+        print(f"Cache written to {filepath}")
+
+    def load_cache_from_disk():
+        filepath = 'data/tmp/cache.pkl'
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as f:
+                Transform.cache = pickle.load(f)
+            print(f"Cache loaded from {filepath}")
+        else:
+            print(f"File {filepath} does not exist. Cache not loaded.")
 
     def __init__(self, new_column_datatype: DataType, in_place: bool = False, cache_values: bool = True):
         super().__init__()
@@ -136,11 +51,62 @@ class Transform(torch.nn.Module):
             {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
         ))
 
+    def hash_object(self, obj):
+        if hasattr(obj, "numpy"):
+            obj = obj.numpy()
+
+        #todo: add assertion that no two transforms have the same name
+        transform_name = self.new_column_name("")
+        
+        return joblib.hash((
+            obj,
+            transform_name,
+            {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
+        ))
+
     def initialize_transform(self, transform_kwargs):
         self.options = transform_kwargs
 
-    #TODO: add a "fit" method to accommodate transforms that need to be fit.
+    def forward_item(self, obj):
+        ### this takes most of the time
+        if not hasattr(self, "transform"):
+            raise Exception("Transform not initialized before use.")
 
+        hash_value = self.hash_object(obj)
+
+        # start = time.time() 
+        # print(item)
+        if hash_value in self.cache: 
+            transformed_value = self.cache.get(hash_value)
+            # print("cache hit")
+            # self.cache_statistics_dict['cache_hits'] += 1
+        else: 
+            transformed_value = self.transform(obj)
+            self.cache[hash_value] = transformed_value
+            # print("cache miss")
+            # self.cache_statistics_dict['cache_miss'] += 1
+        # # end = time.time()
+        # print(f"transforming took {1000 * (end - start)} ms")
+
+        # filepath = f"data/tmp/{hash_value}.pkl"
+        # if os.path.isfile(filepath):
+        #     with open(filepath, "rb") as f:
+        #         # self.cache_statistics_dict['cache_hits'] += 1
+        #         transformed_value = pickle.load(f)
+        # else:
+        #     # import pdb; pdb.set_trace()
+        #     if not os.path.isdir("data/tmp"):
+        #         os.makedirs("data/tmp")
+
+        #     obj = dataset[item][col_name]
+        #     transformed_value = self.transform(obj)
+        #     with open(filepath, "wb") as f:
+        #         # self.cache_statistics_dict['cache_misses'] += 1
+        #         pickle.dump(transformed_value, f)
+
+        return transformed_value
+
+    #TODO: add a "fit" method to accommodate transforms that need to be fit.
     def forward(self, dataset, item, col_name):
         ### this takes most of the time
         if not hasattr(self, "transform"):
@@ -149,6 +115,7 @@ class Transform(torch.nn.Module):
         hash_value = self.hash_transform_value(id=dataset.get_sample_id(item), col_name=col_name)
 
         # start = time.time() 
+        # print(item)
         if hash_value in self.cache: 
             transformed_value = self.cache.get(hash_value)
             # print("cache hit")
@@ -180,80 +147,6 @@ class Transform(torch.nn.Module):
 
         return transformed_value
 
-# class Transform(torch.nn.Module):
-#     cache = LRUCache(maxsize=50000)
-
-#     def __init__(self, transform_class, new_column_name_fn: typing.Callable[[str], str], new_column_datatype: DataType,
-#                  in_place: bool = False, cache_values: bool = True):
-#         super().__init__()
-#         self.transform_class = transform_class
-#         self.new_column_name_fn = new_column_name_fn
-#         self.new_column_datatype = new_column_datatype
-#         self.in_place = in_place
-#         self.cache_values = cache_values
-
-#         # if self.cache_values:
-#         #     self.cache_statistics_dict = defaultdict(lambda: 0)
-
-#     def hash_transform_value(self, id=None, col_name=None):
-#         # if hasattr(val, "numpy"):
-#         #     val = val.numpy()
-
-#         #todo: add assertion that no two transforms have the same name
-#         transform_name = self.new_column_name_fn("")
-        
-#         return joblib.hash((
-#             id, 
-#             col_name,
-#             transform_name,
-#             {k: v for k, v in self.options.items() if k not in ["column", "data_object"]},
-#         ))
-
-#     def initialize_transform(self, transform_kwargs):
-#         self.options = transform_kwargs
-#         self.transform = self.transform_class(**transform_kwargs)
-
-#     #TODO: add a "fit" method to accommodate transforms that need to be fit.
-
-#     def forward(self, dataset, item, col_name):
-#         ### this takes most of the time
-#         if not hasattr(self, "transform"):
-#             raise Exception("Transform not initialized before use.")
-
-#         hash_value = self.hash_transform_value(id=dataset.get_sample_id(item), col_name=col_name)
-
-#         # start = time.time() 
-#         # if hash_value in self.cache: 
-#         #     transformed_value = self.cache.get(hash_value)
-#         #     print("cache hit")
-#         #     self.cache_statistics_dict['cache_hits'] += 1
-#         # else: 
-#         #     obj = dataset[item][col_name]
-#         #     transformed_value = self.transform(obj)
-#         #     self.cache[hash_value] = transformed_value
-#         #     print("cache miss")
-#         #     self.cache_statistics_dict['cache_miss'] += 1
-#         # end = time.time()
-#         # print(f"transforming took {1000 * (end - start)} ms")
-
-#         filepath = f"data/tmp/{hash_value}.pkl"
-#         if os.path.isfile(filepath):
-#             with open(filepath, "rb") as f:
-#                 # self.cache_statistics_dict['cache_hits'] += 1
-#                 transformed_value = pickle.load(f)
-#         else:
-#             # import pdb; pdb.set_trace()
-#             if not os.path.isdir("data/tmp"):
-#                 os.makedirs("data/tmp")
-
-#             obj = dataset[item][col_name]
-#             transformed_value = self.transform(obj)
-#             with open(filepath, "wb") as f:
-#                 # self.cache_statistics_dict['cache_misses'] += 1
-#                 pickle.dump(transformed_value, f)
-
-#         return transformed_value
-
 class TransformedDataset(DataDetectiveDataset):
     def __init__(self,
         dataset: DataDetectiveDataset,
@@ -265,7 +158,6 @@ class TransformedDataset(DataDetectiveDataset):
         self.index_df = self.dataset.index_df
         
         self.transforms = transforms
-
 
     def datatypes(self):
         dataset = self.dataset
@@ -287,8 +179,14 @@ class TransformedDataset(DataDetectiveDataset):
 
     def __getitem__(self, item):
         start_time = time.time()
+        if hasattr(item, "__len__"): 
+            loader = torch.utils.data.DataLoader(self.dataset, batch_size=len(item), shuffle=False)
+            new_item = next(iter(loader))
+        else: 
+            new_item = self.dataset[item]
 
-        new_item = self.dataset[item]
+        end1 = time.time() 
+        # print(f"loading data took {(end1 - start_time) * 1000} ms")
 
         for col_name, transform_list in self.transforms.items():
             for transform in transform_list:

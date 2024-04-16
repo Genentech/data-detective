@@ -1,3 +1,4 @@
+import time
 from typing import Set, Dict, Type
 
 import numpy as np
@@ -74,20 +75,28 @@ class ADBenchValidatorMethodFactory:
                     column: [] for column in entire_dataset.datatypes().keys()
                 }
 
-                loader = DataLoader(entire_dataset, batch_size=1000, shuffle=False)
+                start = time.time() 
+                loader = DataLoader(entire_dataset, batch_size=min(len(entire_dataset), 1000),
+                                #     sampler=torch.utils.data.BatchSampler(
+                                #         torch.utils.data.SequentialSampler(entire_dataset), 
+                                #         batch_size=1000, 
+                                #         drop_last=False
+                                #    ),
+                                    shuffle=False)
+
                 for batch in loader:
                     for column, column_data in batch.items():
                         # print(f"col {column}")
                         # print(column_data.shape)
                         matrix_dict[column].append(column_data)
+                end = time.time() 
+                print(f"time needed: {(end - start)*1000} ms")
 
                 for column in entire_dataset.datatypes().keys():
                     is_3d = len(matrix_dict[column][0].shape) == 3
                     concatenated = torch.cat(matrix_dict[column], dim=1 if is_3d else 0)
-                    concatenated = concatenated.reshape((-1, concatenated.shape[-1]))
+                    concatenated = concatenated.reshape((len(entire_dataset), -1))
                     matrix_dict[column] = concatenated
-
-                print(matrix_dict['resnet50_backbone_mnist_image'].shape)
                 
                 kwargs_dict = {
                     f"{column}_results": {

@@ -10,7 +10,7 @@ from typing import Dict, List, Any, Tuple
 
 from src.datasets.one_hot_encoded_dataset import OneHotEncodedDataset
 from src.enums.enums import DataType
-from src.transforms.embedding_transformer import TransformedDataset
+from src.transforms.embedding_transformer import Transform, TransformedDataset
 from src.transforms.transform_library import TRANSFORM_LIBRARY
 from src.utils import snake_to_camel, filter_dataset
 from src.validators.data_validator import DataValidator
@@ -109,6 +109,7 @@ class DataDetectiveEngine:
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
         filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
+        # filtered_transformed_onehot_encoded_data_object = filtered_transformed_data_object
 
             
         return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
@@ -164,10 +165,13 @@ class DataDetectiveEngine:
         do the validation. 
         """
         # this specifies whether to use the default validators or not.
+        Transform.load_cache_from_disk()
+
         default_inclusion = config_dict.get("default_inclusion", True)
         validators = config_dict["validators"]
 
         data_objects = []
+
 
         for validator_class_name, validator_params in validators.items():
             data_object, tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
@@ -201,6 +205,8 @@ class DataDetectiveEngine:
                 result_dict[validator] = {}
 
             result_dict[validator][validator_method] = results
+
+        Transform.dump_cache_to_disk()
 
         return result_dict
 
