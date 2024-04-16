@@ -11,7 +11,7 @@ from constants import FloatTensor
 from src.datasets.data_detective_dataset import DataDetectiveDataset, LambdaDictWrapper
 from src.enums.enums import DataType
 
-DATASET_SIZE = 4000
+DATASET_SIZE = 1000
 
 class TutorialDataset(DataDetectiveDataset):
     def __init__(self, normal_vec_size=2, **kwargs):
@@ -40,10 +40,6 @@ class TutorialDataset(DataDetectiveDataset):
 
         def get_img():
             # print("unwrapping image")
-            import traceback; print(traceback.print_stack())
-            for _ in range(5):
-                print()
-            import pdb; pdb.set_trace()
             sample = self.mnist.__getitem__(idx)
             mnist_image = sample[0]
             output_size = (mnist_image.size(1) * 55, mnist_image.size(2) * 55)

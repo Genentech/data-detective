@@ -164,10 +164,10 @@ class DataDetectiveEngine:
         specified in the docstring; best practice constitutes including the minimal amount of rows or columns necessary to 
         do the validation. 
         """
+        Transform.load_cache_from_disk()
+
         validators = config_dict["validators"]
-
         data_objects = []
-
 
         for validator_class_name, validator_params in validators.items():
             data_object, tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)

@@ -1,4 +1,5 @@
 from collections import defaultdict
+import copy
 from typing import Dict
 import joblib
 
@@ -35,7 +36,7 @@ class DuplicateTestingDataset(DataDetectiveDataset):
         self.show_id = base_dataset.show_id
         self.index_df = base_dataset.index_df
 
-        super().__init__()
+        super().__init__(sample_ids=range(len(self)), subject_ids=range(len(self)))
     
     def generate_dup_pairs(self, num_duplicates): 
         pairs = {}
@@ -53,7 +54,7 @@ class DuplicateTestingDataset(DataDetectiveDataset):
         return pairs
 
     def perturb_datapoint(self, datapoint, max_perturbation_amount=0.001, pert_column=None): 
-        datapoint = datapoint.copy()
+        datapoint = copy.deepcopy(datapoint)
 
         def perturb_continuous(val): 
             return val * (1 + np.random.uniform(-max_perturbation_amount, max_perturbation_amount))
@@ -159,7 +160,8 @@ class TestNearDuplicateValidatorMethod:
             "validators": {
                 "duplicate_data_validator": {
                     "validator_kwargs": {
-                        "angle_threshold": 7.,
+                        "angle_threshold": 19.1,
+                        # "angle_threshold": 0.0001,
                     }
                 }
             },
@@ -246,7 +248,7 @@ class TestNearDuplicateValidatorMethod:
                 errors.append(dup_set)
                 print(f"{dup_set} in method_dup_sets but not in gt_dup_sets.")
 
-        assert len(errors) * 2 / (len(method_dup_sets) + len(gt_dup_sets)) < 0.25
+        assert len(errors) * 2 / (len(method_dup_sets) + len(gt_dup_sets)) < 0.05
 
     def test_with_near_column_duplicates(self):
         np.random.seed(42)
