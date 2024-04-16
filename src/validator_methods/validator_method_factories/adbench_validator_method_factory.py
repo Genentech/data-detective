@@ -121,13 +121,6 @@ class ADBenchValidatorMethodFactory:
                 @return:
                 """
                 model_instance = model()
-                # data_matrix = (data_matrix - data_matrix.min()) / (data_matrix.max() - data_matrix.min())
-                min_vec, max_vec = data_matrix.min(axis=0), data_matrix.max(axis=0)
-                def normalize(data): 
-                    return (data - min_vec) / (max_vec - min_vec)
-                model_instance.normalize = normalize
-
-                data_matrix = model_instance.normalize(data_matrix)
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
 
