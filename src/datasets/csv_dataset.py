@@ -8,16 +8,19 @@ from PIL import Image
 from typing import Dict
 
 from constants import FloatTensor
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType
 
 
-class CSVDataset:
+class CSVDataset(DataDetectiveDataset):
     def __init__(self, filepath: str, datatype_dict: Dict[str, DataType]):
         self.datatypes_dict = datatype_dict
         pth = os.path.join("data", filepath)
         self.df = pd.read_csv(pth)
         self.df = self.df[list(datatype_dict.keys())]
         self.df = self.df.dropna()
+
+        super().__init__()
 
     def __len__(self) -> int:
         """

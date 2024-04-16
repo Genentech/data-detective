@@ -38,9 +38,6 @@ class Transform(torch.nn.Module):
         self.cache_values = cache_values
 
     def hash_transform_value(self, id=None, col_name=None):
-        # if hasattr(val, "numpy"):
-        #     val = val.numpy()
-
         #todo: add assertion that no two transforms have the same name
         transform_name = self.new_column_name("")
         
@@ -78,31 +75,9 @@ class Transform(torch.nn.Module):
         # print(item)
         if hash_value in self.cache: 
             transformed_value = self.cache.get(hash_value)
-            # print("cache hit")
-            # self.cache_statistics_dict['cache_hits'] += 1
         else: 
             transformed_value = self.transform(obj)
             self.cache[hash_value] = transformed_value
-            # print("cache miss")
-            # self.cache_statistics_dict['cache_miss'] += 1
-        # # end = time.time()
-        # print(f"transforming took {1000 * (end - start)} ms")
-
-        # filepath = f"data/tmp/{hash_value}.pkl"
-        # if os.path.isfile(filepath):
-        #     with open(filepath, "rb") as f:
-        #         # self.cache_statistics_dict['cache_hits'] += 1
-        #         transformed_value = pickle.load(f)
-        # else:
-        #     # import pdb; pdb.set_trace()
-        #     if not os.path.isdir("data/tmp"):
-        #         os.makedirs("data/tmp")
-
-        #     obj = dataset[item][col_name]
-        #     transformed_value = self.transform(obj)
-        #     with open(filepath, "wb") as f:
-        #         # self.cache_statistics_dict['cache_misses'] += 1
-        #         pickle.dump(transformed_value, f)
 
         return transformed_value
 
@@ -118,16 +93,14 @@ class Transform(torch.nn.Module):
         # print(item)
         if hash_value in self.cache: 
             transformed_value = self.cache.get(hash_value)
-            # print("cache hit")
-            # self.cache_statistics_dict['cache_hits'] += 1
         else: 
             obj = dataset[item][col_name]
             transformed_value = self.transform(obj)
             self.cache[hash_value] = transformed_value
-            # print("cache miss")
-            # self.cache_statistics_dict['cache_miss'] += 1
         # # end = time.time()
         # print(f"transforming took {1000 * (end - start)} ms")
+
+        return transformed_value
 
         # filepath = f"data/tmp/{hash_value}.pkl"
         # if os.path.isfile(filepath):
@@ -145,7 +118,6 @@ class Transform(torch.nn.Module):
         #         # self.cache_statistics_dict['cache_misses'] += 1
         #         pickle.dump(transformed_value, f)
 
-        return transformed_value
 
 class TransformedDataset(DataDetectiveDataset):
     def __init__(self,
@@ -208,14 +180,3 @@ class TransformedDataset(DataDetectiveDataset):
 
     def __len__(self):
         return self.dataset.__len__()
-
-    # @staticmethod
-    # def hash_column(col_name, col_val, transform_name):
-    #     if hasattr(col_val, "numpy"):
-    #         col_val = col_val.numpy()
-    #
-    #     return joblib.hash((
-    #         # col_name,
-    #         col_val,
-    #         transform_name,
-    #     ))
