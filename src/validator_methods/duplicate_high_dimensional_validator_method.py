@@ -7,6 +7,7 @@ import scipy.stats
 import torch
 from torch.utils.data import Dataset
 
+from src.datasets.data_detective_dataset import DataDetectiveDataset
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
 
@@ -51,11 +52,13 @@ class DuplicateHighDimensionalValidatorMethod(DataValidatorMethod):
 
 
     @staticmethod
-    def validate( column_name: str, entire_set: torch.utils.data.Dataset ) -> List[Tuple[int, int]]:
+    def validate( column_name: str, entire_set: DataDetectiveDataset ) -> List[Tuple[int, int]]:
         hash_indices_dict = {}
 
-        for idx in entire_set.__len__():
+        for idx in range(entire_set.__len__()):
             item = entire_set[idx][column_name]
+            if hasattr(item, "numpy"):
+                item = item.cpu().numpy()
             item_hash = joblib.hash(item)
 
             if item_hash in hash_indices_dict:

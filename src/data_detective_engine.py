@@ -161,8 +161,6 @@ class DataDetectiveEngine:
         specified in the docstring; best practice constitutes including the minimal amount of rows or columns necessary to 
         do the validation. 
         """
-        # this specifies whether to use the default validators or not.
-        default_inclusion = config_dict.get("default_inclusion", True)
         validators = config_dict["validators"]
 
         data_objects = []

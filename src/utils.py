@@ -568,7 +568,7 @@ def occlusion_interpretability(img, model, occ, color_bounds="auto"):
     resnet.initialize_transform({})
     embeddings = np.concatenate([resnet(img) for img in tqdm(occluded_image_dict.values())], axis=0)
 #     embeddings = np.concatenate(Parallel(n_jobs=6)(delayed(resnet)(img) for img in tqdm(occluded_image_dict.values())), axis=0)
-    localized_anomaly_scores = model.decision_function(embeddings)
+    localized_anomaly_scores = model.decision_function(model.normalize(embeddings))
     reshaped_localized_anomaly_score = torch.FloatTensor(list(localized_anomaly_scores)).reshape(img.shape[-2:])
     plot_occ_results(img, reshaped_localized_anomaly_score, occ.width, color_bounds)
     return reshaped_localized_anomaly_score

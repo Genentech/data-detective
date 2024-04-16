@@ -26,7 +26,7 @@ class Transform(torch.nn.Module):
 
     def hash_transform_value(self, val):
         if hasattr(val, "numpy"):
-            val = val.numpy()
+            val = val.cpu().numpy()
 
         #todo: add assertion that no two transforms have the same name
         transform_name = self.new_column_name_fn("")
@@ -51,9 +51,15 @@ class Transform(torch.nn.Module):
 
         filepath = f"data/tmp/{hash_value}.pkl"
         if os.path.isfile(filepath):
-            with open(filepath, "rb") as f:
-                self.cache_statistics_dict['cache_hits'] += 1
-                transformed_value = pickle.load(f)
+            try: 
+                with open(filepath, "rb") as f:
+                    transformed_value = pickle.load(f)
+                    self.cache_statistics_dict['cache_hits'] += 1
+            except Exception: 
+                transformed_value = self.transform(obj)
+                with open(filepath, "wb") as f:
+                    pickle.dump(transformed_value, f)
+                    self.cache_statistics_dict['cache_misses'] += 1
         else:
             # import pdb; pdb.set_trace()
             if not os.path.isdir("data/tmp"):
@@ -61,8 +67,8 @@ class Transform(torch.nn.Module):
 
             transformed_value = self.transform(obj)
             with open(filepath, "wb") as f:
-                self.cache_statistics_dict['cache_misses'] += 1
                 pickle.dump(transformed_value, f)
+                self.cache_statistics_dict['cache_misses'] += 1
 
         return transformed_value
 

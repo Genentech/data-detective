@@ -11,11 +11,11 @@ from src.enums.enums import DataType
 DATASET_SIZE = 500
 
 class TutorialDataset(DataDetectiveDataset):
-    def __init__(self, **kwargs):
+    def __init__(self, normal_vec_size=2, **kwargs):
         self.mnist = MNIST(**kwargs)
         dataset_size = DATASET_SIZE
         np.random.seed(42)
-        self.normal_column = np.random.normal(size=(dataset_size, 2))
+        self.normal_column = np.random.normal(size=(dataset_size, normal_vec_size))
         self.normal_column_2 = np.random.normal(size=dataset_size)
 
         super().__init__(
@@ -98,6 +98,6 @@ class TutorialDataset(DataDetectiveDataset):
         ax.xaxis.set_ticks_position('bottom')
         ax.yaxis.set_ticks_position('left')
 
-        plt.scatter(sample["normal_vector_2"], 0)
+        plt.scatter(sample["normal_vector_2"][:2], 0)
         plt.show()
 
