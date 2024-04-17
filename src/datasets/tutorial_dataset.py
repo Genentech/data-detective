@@ -3,7 +3,6 @@ from typing import Union, Dict
 import torch
 
 import numpy as np
-from litdata import StreamingDataset
 from matplotlib import pyplot as plt
 from torchvision.datasets import MNIST
 

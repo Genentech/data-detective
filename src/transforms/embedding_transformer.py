@@ -18,8 +18,13 @@ class Transform(torch.nn.Module):
 
     def dump_cache_to_disk():
         filepath = 'data/tmp/cache.pkl'
+        # Ensure all directories in the path are created
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
+        # Open the file and write to it
         with open(filepath, 'wb') as f:
             pickle.dump(Transform.cache, f)
+        
         print(f"Cache written to {filepath}")
 
     def load_cache_from_disk():
