@@ -76,6 +76,11 @@ class ColumnFilteredDataset(DataDetectiveDataset):
         has_matching_name = any([re.compile(reg_exp).match(column_name) for reg_exp in self.matching_regexes])
 
         return has_matching_name and has_matching_datatype
+    
+    def get_matrix(self, column_wise=True, columns=None): 
+        if columns is not None: 
+            columns = [column for column in columns if self.include_column(column_name)]
+        return self.unfiltered_dataset.get_matrix(column_wise=column_wise, columns=columns)
 
     def datatypes(self) -> typing.Dict[str, DataType]:
         """

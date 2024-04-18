@@ -1,9 +1,9 @@
+import re
 from typing import Dict, Union
 import pandas as pd
 
 from PIL import Image
 import torch
-from torchvision.datasets import CIFAR10
 from torchvision import transforms
 
 
@@ -65,6 +65,35 @@ class PMCOADataset(DataDetectiveDataset):
             "pmcoa_image": DataType.IMAGE,
             "caption": DataType.TEXT,
             "clip_alignment_score": DataType.CONTINUOUS,
-            "im_clip_embedding": DataType.MULTIDIMENSIONAL,
-            "text_clip_embedding": DataType.MULTIDIMENSIONAL, 
+            "im_clip_embed": DataType.MULTIDIMENSIONAL,
+            "text_clip_embed": DataType.MULTIDIMENSIONAL, 
         }
+
+
+    def get_matrix(self, column_wise=True, columns=None): 
+        if columns is None: 
+            columns = ["im_clip_embed", "text_clip_embed"]
+
+        print("in correct get_matrix")
+        matrix_df = self.df.loc[self.index_df['data_idx']]
+
+        # Regular expression pattern for column names followed by an underscore and an integer
+        pattern = re.compile(r'^(?:{}|\w+_\d+)$'.format('|'.join(columns)))
+
+        # Filter DataFrame columns using regular expression pattern
+        matrix_df = matrix_df.filter(regex=pattern)
+
+        if column_wise: 
+            matrix_dict = {}
+
+            for column in columns: 
+                columns = [df_col for df_col in matrix_df.columns if df_col[:6] == column[:6]]
+                matrix_dict[column] = matrix_df[columns].values
+                print(matrix_dict[column].shape)
+            
+            return matrix_dict
+        else: 
+            columns = [col for col in matrix_df.columns if "embed" in col]
+            matrix = matrix_df[columns].values
+            return matrix
+        

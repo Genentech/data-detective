@@ -71,15 +71,16 @@ class ADBenchMultimodalValidatorMethodFactory:
                 """
                 entire_dataset: Dataset = data_object["entire_set"]
 
-                matrix = []
+                # matrix = []
 
-                for idx in range(entire_dataset.__len__()):
-                    sample = entire_dataset[idx]
-                    matrix.append(
-                        np.concatenate([k.flatten() for k in sample.values()])
-                    )
+                # for idx in range(entire_dataset.__len__()):
+                #     sample = entire_dataset[idx]
+                #     matrix.append(
+                #         np.concatenate([k.flatten() for k in sample.values()])
+                #     )
 
-                matrix = np.array(matrix)
+                # matrix = np.array(matrix)
+                matrix = entire_dataset.get_matrix(column_wise=False)
 
                 kwargs_dict = {
                     f"results": {

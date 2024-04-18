@@ -1,13 +1,16 @@
 from abc import abstractmethod
 import math
+import time
 from typing import Any, Dict, List, Optional, Union
 import copy
 import warnings
 import joblib
+import numpy as np
 import pandas as pd
 import torch
 from torch._utils import _accumulate
 from torch import default_generator, randperm
+from torch.utils.data import DataLoader
 
 from src.enums.enums import DataType
 
@@ -256,6 +259,53 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
     # not necessary to override
     def __len__(self) -> int: 
         return len(self.index_df)
+
+    def get_matrix(self, column_wise=True, columns=None): 
+        if columns is None: 
+            columns = [column for column, datatype in self.datatypes().items() if datatype in  {DataType.MULTIDIMENSIONAL, DataType.CONTINUOUS, DataType.CATEGORICAL}]
+
+        if column_wise: 
+            matrix_dict = {
+                column: [] for column in columns 
+            }
+
+            start = time.time() 
+            loader = DataLoader(self, batch_size=min(len(self), 1000),
+                            #     sampler=torch.utils.data.BatchSampler(
+                            #         torch.utils.data.SequentialSampler(entire_dataset), 
+                            #         batch_size=1000, 
+                            #         drop_last=False
+                            #    ),
+                                shuffle=False)
+
+            for batch in loader:
+                for column, column_data in batch.items():
+                    if column in columns: 
+                        # print(f"col {column}")
+                        # print(column_data.shape)
+                        matrix_dict[column].append(column_data)
+            end = time.time() 
+
+            for column in columns:
+                is_3d = len(matrix_dict[column][0].shape) == 3
+                concatenated = torch.cat(matrix_dict[column], dim=1 if is_3d else 0)
+                concatenated = concatenated.reshape((len(self), -1))
+                matrix_dict[column] = concatenated
+
+            return matrix_dict
+        else: 
+            matrix = []
+
+            for idx in range(self.__len__()):
+                sample = self[idx]
+                sample = {key: sample[key] for key in columns}
+                matrix.append(
+                    np.concatenate([k.flatten() for k in sample.values()])
+                )
+
+            matrix = np.array(matrix)
+
+            return matrix
 
     @abstractmethod
     def datatypes(self) -> Dict[str, DataType]: 

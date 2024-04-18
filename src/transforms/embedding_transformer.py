@@ -185,3 +185,9 @@ class TransformedDataset(DataDetectiveDataset):
 
     def __len__(self):
         return self.dataset.__len__()
+
+    def get_matrix(self, column_wise=True, columns=None): 
+        if self.transforms == {}:
+            return self.dataset.get_matrix(column_wise=column_wise, columns=columns)
+        else: 
+            return DataDetectiveDataset.get_matrix(self.dataset, column_wise=column_wise, columns=columns)
