@@ -37,6 +37,10 @@ pip install transformers
 
 ```
 
+## Quickstart
+
+To get started as quickly as possible, please see Quickstart.ipynb in the root directory of this repo.
+
 # Contributing
 
 To contribute to Data Detective, please first complete the `ExtendingDD` jupyter notebook to learn more about 
