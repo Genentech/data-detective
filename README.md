@@ -4,22 +4,13 @@
 
 Data Detective is an open-source, modular, extensible validation framework for identifying potential issues with heterogeneous, multimodal data.
 
-## Usage Overview
-
-The user must provide a torch dataset describing the datatype of each of its columns with an object
-mapping each column to its data type. In order to make use of some of Data Detective’s validators,
-the dataset needs to be preprocessed and split, as this allows Data Detective to find mistakes from the preprocessing stage (such as miscoding errors) or the splitting stage (such as splits that are not IID);
-however, the user can also provide the raw unsplit dataset if the user does not want to include these
-checks. If the user wants to override the default run configuration, they can provide a validation
-schema specifying included validations and their options. From there, Data Detective automatically
-identifies the relevant validation methods from the selected validators for each datatype and applies
-them, returning the results back to the user. For a more detailed usage overview, see the tutorial.
-
-## Examples of questions that are in scope for Data Validator to address
+## Examples of issues that are in scope for Data Detective to detect
 - Do splits used for model training come from othe same distribution?
-- Are there any serious outliers present in the dataset?
+- Are there any anomalies present in the dataset?
 - Are the conditional independences we expect in the data obeyed?
 - Are the datapoints at inference in the same distribution as what we have used to train/test the model?
+- Are there near or exact duplicates present within the dataset?
+- Are there mislabeled samples present within the dataset?
 
 ## Installation Steps
 After cloning the repository and `cd`'ing into the directory, run the following commands. 
@@ -29,14 +20,9 @@ After cloning the repository and `cd`'ing into the directory, run the following 
 git clone https://github.com/thelahunginjeet/pyrankagg.git
 git clone https://github.com/thelahunginjeet/kbutil.git
 
-# only if you want DIFFI validator method support 
-git clone https://github.com/mattiacarletti/DIFFI.git
-
 # install all other packages
 virtualenv dd_env -p python3.9 
 source dd_env/bin/activate
-# READ: only do the following line if on Ubuntu.
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py | python3.9 - 
 pip3 install -r requirements.txt
 dd_env/bin/python -m ipykernel install --name=dd_env 
 ```
@@ -50,6 +36,10 @@ If you are planning to make use of the pretrained transform library for high dim
 pip install transformers
 
 ```
+
+## Quickstart
+
+To get started as quickly as possible, please see Quickstart.ipynb in the root directory of this repo.
 
 # Contributing
 
