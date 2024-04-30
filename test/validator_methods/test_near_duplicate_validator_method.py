@@ -548,16 +548,14 @@ class TestNearDuplicateValidatorMethod:
             ])
         )
 
-        #TODO: lists for validation sets and test sets.
-        data_object: Dict[str, torch.utils.data.Dataset] = {
+        data_object: Dict[str, DataDetectiveDataset] = {
             "entire_set": duplicate_dataset
         }
 
         dup_results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)['duplicate_data_validator']
         assert dup_results['duplicate_high_dimensional_validator_method']['mnist_image'] == []
         assert dup_results['duplicate_high_dimensional_validator_method']['normal_vector'] == []
-
         assert dup_results['duplicate_sample_validator_method']['results'] == []
 
-        assert dup_results['near_duplicate_multidimensional_validator_method']['normal_vector'] == []
-        c=3
+        assert len(dup_results['near_duplicate_multidimensional_validator_method']['normal_vector']) == 0
+        assert len(dup_results['near_duplicate_sample_validator_method']['results']) == 0

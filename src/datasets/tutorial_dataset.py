@@ -42,7 +42,8 @@ class TutorialDataset(DataDetectiveDataset):
             sample = self.mnist.__getitem__(idx)
             mnist_image = sample[0]
             output_size = (mnist_image.size(1) * 55, mnist_image.size(2) * 55)
-            upsampled_tensor = torch.nn.functional.interpolate(mnist_image.unsqueeze(0), size=output_size, mode='bilinear', align_corners=False)
+            upsampled_tensor = mnist_image
+            # upsampled_tensor = torch.nn.functional.interpolate(mnist_image.unsqueeze(0), size=output_size, mode='bilinear', align_corners=False)
 
             if idx == 10: 
                 upsampled_tensor = 1 - upsampled_tensor
@@ -82,9 +83,9 @@ class TutorialDataset(DataDetectiveDataset):
         """
         # src: https://stackoverflow.com/questions/31556446/how-to-draw-axis-in-the-middle-of-the-figure
         sample = self[idx]
-        print(sample["label"])
-        print(sample["mnist_image"].min(), sample['mnist_image'].max())
+        # print(sample["mnist_image"].min(), sample['mnist_image'].max())
         plt.imshow(sample["mnist_image"].squeeze())
+        plt.title(f'MNIST Image (label {sample["label"]})', y=-0.15)  # Title at the bottom        plt.show()
         plt.show()
 
         ax = plt.gca()
@@ -104,23 +105,22 @@ class TutorialDataset(DataDetectiveDataset):
         ax.yaxis.set_ticks_position('left')
 
         plt.scatter(*sample["normal_vector"])
+        plt.title(f'Normal Vector', y=-0.15)  
         plt.show()
 
-        ax = plt.gca()
-        ax.set_xlim([-4, 4])
-        ax.set_ylim([-4, 4])
-        ax.set_box_aspect(1)
-        # Move left y-axis and bottom x-axis to centre, passing through (0,0)
-        ax.spines['left'].set_position('center')
-        ax.spines['bottom'].set_position('center')
+        def plot_number_line(data_point, num_std=3):
+            # Generate values based on standard normal distribution within the specified range
+            values = np.linspace(-num_std, num_std, 1000)
+            
+            plt.figure(figsize=(5, 1))  # Adjust the figure size as needed
+            # plt.axhline(y=0, color='k')  # Draw x-axis
+            plt.plot(values, np.zeros_like(values), color='black')  # Plot number line
+            plt.scatter(data_point, 0, color='r', s=50, label='Data Point')  # Plot the data point
+            plt.xlabel('Normal Sample')  # Label x-axis
+            plt.grid(True)  # Show grid
+            plt.ylim(-0.1,0.1)  # Set y-limits for number line
+            plt.yticks([])
 
-        # Eliminate upper and right axes
-        ax.spines['right'].set_color('none')
-        ax.spines['top'].set_color('none')
+            plt.show()
 
-        # Show ticks in the left and lower axes only
-        ax.xaxis.set_ticks_position('bottom')
-        ax.yaxis.set_ticks_position('left')
-
-        plt.scatter(sample["normal_vector_2"][:2], 0)
-        plt.show()
+        plot_number_line(sample['normal_vector_2'])

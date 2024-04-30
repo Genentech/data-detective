@@ -20,12 +20,12 @@ class Action:
     - dropping the top_k anomalous samples in the entire_set before splitting. 
     - eliminating duplicates from the dataset. 
     
-    Actions are functional mutations on the dataset, meaning that they 
+    Actions are functional mutations on the dataset, meaning that they take an object and modify it.
     """
     @abstractmethod
     def get_new_data_object(
         schema: Dict, 
-        data_object: Dict[str, Union[torch.utils.data.Dataset, Dict[str, torch.utils.data.Dataset]]],
+        data_object: Dict[str, Union[DataDetectiveDataset, Dict[str, DataDetectiveDataset]]],
         aggregated_results: pd.DataFrame
     ): 
         pass
@@ -40,7 +40,7 @@ class RemoveTopKAnomalousSamplesAction(Action):
         data_object: Dict[str, Union[DataDetectiveDataset, Dict[str, DataDetectiveDataset]]],
         aggregated_results: pd.DataFrame, 
         aggregated_results_key: str = None,
-    ): 
+    ) -> Dict[str, Union[Dict[str, DataDetectiveDataset], DataDetectiveDataset]]: 
         """
         Removes top k anomalous samples from the entire set, propagating results to all datasets and splits.
         If there are duplicates, it will continue removing samples from worst to best until at least K samples are removed.
@@ -83,10 +83,11 @@ class RemoveTopKAnomalousSamplesAction(Action):
 
 class ResplitDataAction(Action):
     def get_new_data_object(
-        data_object: Dict[str, Union[torch.utils.data.Dataset, Dict[str, torch.utils.data.Dataset]]],
+        data_object: Dict[str, Union[DataDetectiveDataset, Dict[str, DataDetectiveDataset]]],
         aggregated_results: pd.DataFrame, 
     ): 
         """
         todo: implement
+        An action to take a data object and resplit it from the entire set.
         """
         return data_object
