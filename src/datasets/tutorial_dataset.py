@@ -13,9 +13,12 @@ from src.enums.enums import DataType
 DATASET_SIZE = 1000
 
 class TutorialDataset(DataDetectiveDataset):
-    def __init__(self, normal_vec_size=2, **kwargs):
+    def __init__(self, normal_vec_size=2, input_len=None, **kwargs):
         self.mnist = MNIST(**kwargs)
-        dataset_size = DATASET_SIZE
+        if input_len is not None: 
+            dataset_size = input_len
+        else: 
+            dataset_size = DATASET_SIZE
         np.random.seed(42)
         self.normal_column = np.random.normal(size=(dataset_size, normal_vec_size))
         self.normal_column_2 = np.random.normal(size=dataset_size)

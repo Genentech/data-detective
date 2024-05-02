@@ -95,7 +95,6 @@ class ADBenchValidatorMethodFactory:
                 @return:
                 """
                 model_instance = model()
-                print(data_matrix)
                 model_instance.fit(data_matrix)
                 anomaly_scores = model_instance.decision_function(data_matrix)
 
