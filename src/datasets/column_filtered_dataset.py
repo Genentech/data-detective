@@ -79,7 +79,7 @@ class ColumnFilteredDataset(DataDetectiveDataset):
     
     def get_matrix(self, column_wise=True, columns=None): 
         if columns is not None: 
-            columns = [column for column in columns if self.include_column(column_name)]
+            columns = [column for column in columns if self.include_column(column)]
         return self.unfiltered_dataset.get_matrix(column_wise=column_wise, columns=columns)
 
     def datatypes(self) -> typing.Dict[str, DataType]:

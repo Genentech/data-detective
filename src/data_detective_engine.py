@@ -112,7 +112,12 @@ class DataDetectiveEngine:
         # filtered_transformed_onehot_encoded_data_object = filtered_transformed_data_object
 
             
-        return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
+        # return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
+        #     data_object=filtered_transformed_onehot_encoded_data_object,
+        #     validator_kwargs=validator_kwargs
+        # )
+
+        return validator_class_object.get_task_list(
             data_object=filtered_transformed_onehot_encoded_data_object,
             validator_kwargs=validator_kwargs
         )
@@ -167,11 +172,9 @@ class DataDetectiveEngine:
         Transform.load_cache_from_disk()
 
         validators = config_dict["validators"]
-        data_objects = []
 
         for validator_class_name, validator_params in validators.items():
-            data_object, tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
-            data_objects.append(data_object)
+            tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
             for task in tasks:
                 task_queue.put(task)
 
