@@ -183,6 +183,7 @@ class DataDetectiveEngine:
 
         if run_concurrently:
             with multiprocessing.pool.ThreadPool(100) as pool:
+            # with multiprocessing.pool.Pool(4) as pool:
                 while task_queue.qsize() > 0:
                     task, args = task_queue.get()
                     res = pool.apply_async(task, args)
