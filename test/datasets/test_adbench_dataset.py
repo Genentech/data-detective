@@ -4,7 +4,6 @@ import torchvision.transforms as transforms
 
 from constants import FloatTensor
 from src.datasets.my_cifar_10 import MyCIFAR10
-from src.datasets.adbench_dataset import ADBenchDataset
 from src.enums.enums import DataType
 
 @pytest.fixture

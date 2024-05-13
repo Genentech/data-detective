@@ -3,7 +3,7 @@ from typing import Set, Type
 from src.validator_methods.data_validator_method import DataValidatorMethod
 
 from src.validators.data_validator import DataValidator
-from src.validator_methods.validator_method_factories.adbench_validator_method_factory import CBLOFAnomalyValidatorMethod, PCAAnomalyValidatorMethod, IForestAnomalyValidatorMethod
+from src.validator_methods.validator_method_factories.adbench_validator_method_factory import ADBenchValidatorMethodFactory, CBLOFAnomalyValidatorMethod, PCAAnomalyValidatorMethod, IForestAnomalyValidatorMethod
 
 
 class UnsupervisedAnomalyDataValidator(DataValidator):
@@ -14,10 +14,7 @@ class UnsupervisedAnomalyDataValidator(DataValidator):
     @staticmethod
     def validator_methods() -> Set[Type[DataValidatorMethod]]:
         return {
-            # ADBenchValidatorMethodFactory.get_validator_method("cblof"),
-            # ADBenchValidatorMethodFactory.get_validator_method("pca"),
-            # ADBenchValidatorMethodFactory.get_validator_method("iforest"),
-            CBLOFAnomalyValidatorMethod,
-            PCAAnomalyValidatorMethod,
-            IForestAnomalyValidatorMethod,
+            ADBenchValidatorMethodFactory.get_validator_method("cblof"),
+            ADBenchValidatorMethodFactory.get_validator_method("pca"),
+            ADBenchValidatorMethodFactory.get_validator_method("iforest"),
         }

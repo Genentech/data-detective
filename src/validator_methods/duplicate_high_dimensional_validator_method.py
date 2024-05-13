@@ -2,9 +2,6 @@ from typing import List, Set, Dict, Tuple
 import joblib
 
 import numpy as np
-import pandas as pd
-import scipy.stats
-import torch
 from torch.utils.data import Dataset
 
 from src.datasets.data_detective_dataset import DataDetectiveDataset

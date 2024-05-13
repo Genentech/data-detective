@@ -1,15 +1,12 @@
-import time
 from typing import Set, Dict, Type
 
 import numpy as np
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
 from pytypes import override
-import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod
-
 
 class ADBenchValidatorMethodFactory:
     models = {

@@ -1,11 +1,9 @@
 import os
 import pickle
-from collections import defaultdict
 from cachetools import LRUCache
 import time
 
 import joblib
-import numpy as np
 import torch
 import typing
 
@@ -106,23 +104,6 @@ class Transform(torch.nn.Module):
         # print(f"transforming took {1000 * (end - start)} ms")
 
         return transformed_value
-
-        # filepath = f"data/tmp/{hash_value}.pkl"
-        # if os.path.isfile(filepath):
-        #     with open(filepath, "rb") as f:
-        #         # self.cache_statistics_dict['cache_hits'] += 1
-        #         transformed_value = pickle.load(f)
-        # else:
-        #     # import pdb; pdb.set_trace()
-        #     if not os.path.isdir("data/tmp"):
-        #         os.makedirs("data/tmp")
-
-        #     obj = dataset[item][col_name]
-        #     transformed_value = self.transform(obj)
-        #     with open(filepath, "wb") as f:
-        #         # self.cache_statistics_dict['cache_misses'] += 1
-        #         pickle.dump(transformed_value, f)
-
 
 class TransformedDataset(DataDetectiveDataset):
     def __init__(self,

@@ -1,5 +1,4 @@
 from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
-from src.enums.enums import DataType
 
 
 class TestSyntheticNormalDataset:

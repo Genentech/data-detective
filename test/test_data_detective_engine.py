@@ -1,9 +1,7 @@
 from typing import Dict
 
 import torch
-from torchvision.transforms import transforms
 
-from constants import SEED
 from src.datasets.data_detective_dataset import dd_random_split
 from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 from src.data_detective_engine import DataDetectiveEngine

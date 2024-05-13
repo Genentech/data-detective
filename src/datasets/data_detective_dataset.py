@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch._utils import _accumulate
-from torch import default_generator, randperm
+from torch import randperm
 from torch.utils.data import DataLoader
 
 from src.enums.enums import DataType

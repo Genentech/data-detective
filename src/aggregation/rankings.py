@@ -1,9 +1,7 @@
 import typing
 from enum import Enum
-import numpy as np
 
 import pandas as pd
-import scipy
 from typing import List, Union
 
 from pyrankagg.rankagg import FullListRankAggregator

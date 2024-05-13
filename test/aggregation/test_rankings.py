@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from src.aggregation.rankings import ResultAggregator, RankingAggregationMethod, ScoreAggregationMethod
-from src.datasets.adbench_dataset import ADBenchDDDataset, ADBenchDataset
+from src.datasets.adbench_dataset import ADBenchDDDataset
 from src.datasets.data_detective_dataset import DataDetectiveDataset, dd_random_split
 from src.data_detective_engine import DataDetectiveEngine
 from src.enums.enums import DataType

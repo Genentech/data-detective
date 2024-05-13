@@ -1,11 +1,7 @@
-import json
 from typing import Dict
 
 import numpy as np
-import pandas as pd
-import sklearn.metrics
 import torch
-from torchvision.transforms import transforms
 from src.datasets.data_detective_dataset import DataDetectiveDataset, dd_random_split
 from src.data_detective_engine import DataDetectiveEngine
 

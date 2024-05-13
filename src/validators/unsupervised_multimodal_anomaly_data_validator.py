@@ -2,7 +2,6 @@ from typing import Set, Type
 
 from src.validator_methods.data_validator_method import DataValidatorMethod
 # from src.validator_methods.diffi_anomaly_explanation_validator_method import DiffiAnomalyExplanationValidatorMethod
-from src.validator_methods.shap_tree_validator_method import ShapTreeValidatorMethod
 from src.validator_methods.validator_method_factories.adbench_multimodal_validator_method_factory import \
     ADBenchMultimodalValidatorMethodFactory
 

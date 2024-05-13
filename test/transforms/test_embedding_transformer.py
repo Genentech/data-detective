@@ -2,16 +2,13 @@ from typing import Dict
 
 import pytest
 import torch
-import torchvision.transforms.functional
 from torchvision.models import resnet50, ResNet50_Weights
-from torchvision.transforms import GaussianBlur
 
 import torchvision.transforms as transforms
 
 from src.datasets.data_detective_dataset import dd_random_split
 from src.datasets.my_cifar_10 import MyCIFAR10
-from src.enums.enums import DataType
-from src.transforms.embedding_transformer import Transform, TransformedDataset
+from src.transforms.embedding_transformer import TransformedDataset
 from src.data_detective_engine import DataDetectiveEngine
 from src.transforms.transform_library import GaussianBlurTransform
 

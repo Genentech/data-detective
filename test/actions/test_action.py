@@ -1,17 +1,13 @@
-import json
 from typing import Dict, Union
 
 import numpy as np
-import pandas as pd
-import sklearn.metrics
 import torch
-from torchvision.transforms import transforms
 
 from src.actions.action import RemoveTopKAnomalousSamplesAction
 from src.aggregation.rankings import RankingAggregationMethod, ResultAggregator
 from src.datasets.data_detective_dataset import DataDetectiveDataset, dd_random_split
 from src.data_detective_engine import DataDetectiveEngine
-from src.datasets.adbench_dataset import ADBenchDDDataset, ADBenchDataset
+from src.datasets.adbench_dataset import ADBenchDDDataset
 from src.enums.enums import DataType
 
 SEED = 142

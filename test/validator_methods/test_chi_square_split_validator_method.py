@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from src.datasets.data_detective_dataset import dd_random_split
-from src.datasets.synthetic_normal_dataset import SyntheticCategoricalDataset, SyntheticNormalDatasetContinuous
+from src.datasets.synthetic_normal_dataset import SyntheticCategoricalDataset
 from src.data_detective_engine import DataDetectiveEngine
 
 

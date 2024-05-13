@@ -1,5 +1,4 @@
-import copy
-import multiprocessing.pool
+import pathos.multiprocessing
 import queue
 import torch
 
@@ -109,13 +108,6 @@ class DataDetectiveEngine:
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
         filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
-        # filtered_transformed_onehot_encoded_data_object = filtered_transformed_data_object
-
-            
-        # return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
-        #     data_object=filtered_transformed_onehot_encoded_data_object,
-        #     validator_kwargs=validator_kwargs
-        # )
 
         return validator_class_object.get_task_list(
             data_object=filtered_transformed_onehot_encoded_data_object,
@@ -182,11 +174,11 @@ class DataDetectiveEngine:
         result_dict = {}
 
         if run_concurrently:
-            with multiprocessing.pool.ThreadPool(100) as pool:
-            # with multiprocessing.pool.Pool(4) as pool:
+            
+            with pathos.multiprocessing.ProcessingPool(4) as pool:
                 while task_queue.qsize() > 0:
                     task, args = task_queue.get()
-                    res = pool.apply_async(task, args)
+                    res = pool.amap(task, args)
                     result_items.append(res)
 
                 pool.close()

@@ -5,8 +5,6 @@ import pytest
 import torch
 from torchvision.transforms import transforms
 
-from constants import SEED
-from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.my_cifar_10 import MyCIFAR10
 from src.datasets.my_fashion_mnist import MyFashionMNIST
 from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
@@ -105,7 +103,6 @@ class TestHistogramImageAnomalyValidatorMethod:
 
 
         # takes too long
-        pass 
 
         # results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         # experiment_results = results['unsupervised_anomaly_data_validator']['histogram_cifar_image_anomaly_validator_method']['results']
@@ -154,7 +151,6 @@ class TestHistogramImageAnomalyValidatorMethod:
         }
 
         # takes too long
-        pass 
 
         # results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         # experiment_results = results['unsupervised_anomaly_data_validator']['histogram_image_anomaly_validator_method']['results']

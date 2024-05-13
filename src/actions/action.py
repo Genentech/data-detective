@@ -2,7 +2,6 @@ from abc import abstractmethod
 import copy
 from typing import Dict, Union
 import pandas as pd
-import torch
 
 from src.datasets.data_detective_dataset import DataDetectiveDataset
 
@@ -29,6 +28,7 @@ class Action:
         aggregated_results: pd.DataFrame
     ): 
         pass
+
 
 class RemoveTopKAnomalousSamplesAction(Action):
     def __init__(self, k=10, remove_all_duplicates=True):
@@ -80,6 +80,7 @@ class RemoveTopKAnomalousSamplesAction(Action):
         print(f"removed samples {sample_ids_to_remove}")
 
         return data_object
+
 
 class ResplitDataAction(Action):
     def get_new_data_object(

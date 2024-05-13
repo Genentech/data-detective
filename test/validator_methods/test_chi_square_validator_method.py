@@ -1,11 +1,8 @@
 from typing import Dict
 
 import numpy as np
-import torch
 
-import src.utils
 
-from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 
 
 class TestChiSquareSplitValidatorMethod:
