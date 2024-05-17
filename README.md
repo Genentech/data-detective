@@ -60,6 +60,7 @@ well-documented and follow the PEP-8 standard.
 
 - Zhang et. al for work on KCI/FCIT, used in validator method
 - Zhao et. al for work on pyod
+- Kevin Brown for work on pyrankagg
 - all interviewed members of Genentech/Roche for continued feedback, development, and user interviews
 
 ### Appendix 1A: Complete list of validator methods
