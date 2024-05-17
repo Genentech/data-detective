@@ -22,7 +22,7 @@ class SyntheticAnomalousDataset(Dataset):
                  desired_normal_class_proportion = 0.5,
                  ) -> None:
 
-        #todo: support case where include_all isn't true
+        
 
         self.original_dataset = original_dataset
         self.normal_class = normal_class

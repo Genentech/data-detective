@@ -1,9 +1,7 @@
 from typing import Dict
 
 import torch
-from torchvision.transforms import transforms
 
-from constants import SEED
 from src.datasets.data_detective_dataset import dd_random_split
 from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 from src.data_detective_engine import DataDetectiveEngine
@@ -31,7 +29,7 @@ class TestDataDetectiveEngine:
         test_size: int = len(normal_dataset) - train_size - val_size
         train_dataset, val_dataset, test_dataset = dd_random_split( normal_dataset, [train_size, val_size, test_size])
 
-        #TODO: lists for validation sets and test sets.
+        
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": normal_dataset
         }

@@ -1,9 +1,7 @@
 import typing
 from enum import Enum
-import numpy as np
 
 import pandas as pd
-import scipy
 from typing import List, Union
 
 from pyrankagg.rankagg import FullListRankAggregator
@@ -24,7 +22,6 @@ class ScoreAggregationMethod(Enum):
     NORMALIZED_AVERAGE = "normalized_average"
 
 class ScoreAggregator(): 
-    #TODO: what is the score list in this function?
     def normalized_average(self, score_df): 
         norm_score_df = (score_df - score_df.min()) / (score_df.max() - score_df.min())
         return norm_score_df.mean(axis=1)
@@ -101,7 +98,6 @@ class ResultAggregator:
             if given_validator_method and (validator_method != given_validator_method):
                 continue
             for data_modality, scores_or_tuple in results_dict.items():
-                #TODO: do we make sure that this is true for all of the methods?
                 if given_data_modality and (data_modality.replace("_results", "") != given_data_modality):
                     continue
 
@@ -129,7 +125,7 @@ class ResultAggregator:
             if given_validator_method and (validator_method != given_validator_method):
                 continue
             for data_modality, scores_or_tuple in results_dict.items():
-                #TODO: do we make sure that this is true for all of the methods?
+                
                 if given_data_modality and (data_modality.replace("_results", "") != given_data_modality):
                     continue
 
@@ -167,6 +163,7 @@ class ResultAggregator:
                 aggregation_method_name = aggregation_method.value
                 scorelist = self.convert_to_scorelist(rankings_df)
                 agg_method = getattr(ResultAggregator.FLRA, aggregation_method_name)
+                import pdb; pdb.set_trace()
                 agg_rankings = agg_method(scorelist)[1]
 
                 rankings_output_df[f"{aggregation_method_name}_agg_rank"] = list(agg_rankings.values())
@@ -210,5 +207,4 @@ class ResultAggregator:
             else:
                 raise Exception(f"aggregation method {aggregation_method.value} not found in score or ranking aggregation methods. Please check in src/aggregation/rankings.py to make sure that it exists.")
 
-        #TODO: find a more sensible way of returning? maybe just a concat is needed... TBD.
         return pd.concat([rankings_output_df, score_output_df], axis=1)

@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-import torch
 
 from typing import Dict, Union
 

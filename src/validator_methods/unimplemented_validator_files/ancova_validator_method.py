@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import Set
 
 from src.enums.enums import DataType, ValidatorMethodParameter
 from src.validator_methods.data_validator_method import DataValidatorMethod

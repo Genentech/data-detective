@@ -1,5 +1,4 @@
-import copy
-import multiprocessing.pool
+import multiprocessing
 import queue
 import torch
 
@@ -109,10 +108,8 @@ class DataDetectiveEngine:
         filtered_data_object = get_filtered_data_object(data_object)
         filtered_transformed_data_object = get_filtered_transformed_data_object(filtered_data_object)
         filtered_transformed_onehot_encoded_data_object = get_one_hot_encoded_data_object(filtered_transformed_data_object)
-        # filtered_transformed_onehot_encoded_data_object = filtered_transformed_data_object
 
-            
-        return filtered_transformed_onehot_encoded_data_object, validator_class_object.get_task_list(
+        return validator_class_object.get_task_list(
             data_object=filtered_transformed_onehot_encoded_data_object,
             validator_kwargs=validator_kwargs
         )
@@ -167,11 +164,9 @@ class DataDetectiveEngine:
         Transform.load_cache_from_disk()
 
         validators = config_dict["validators"]
-        data_objects = []
 
         for validator_class_name, validator_params in validators.items():
-            data_object, tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
-            data_objects.append(data_object)
+            tasks = self.get_task_list(validator_class_name, validator_params, config_dict, data_object)
             for task in tasks:
                 task_queue.put(task)
 
@@ -182,13 +177,14 @@ class DataDetectiveEngine:
             with multiprocessing.pool.ThreadPool(100) as pool:
                 while task_queue.qsize() > 0:
                     task, args = task_queue.get()
-                    res = pool.apply_async(task, args)
+                    res = pool.starmap(task, [args])
                     result_items.append(res)
 
                 pool.close()
                 pool.join()
 
-            result_items = [result_item.get() for result_item in result_items]
+                result_items = [result_item[0] for result_item in result_items]
+                result_items = [result_item for result_item in result_items if result_item is not None]
         else:
             while task_queue.qsize() > 0:
                 task, args = task_queue.get()
@@ -208,7 +204,6 @@ class DataDetectiveEngine:
 
     def parse_transforms(self, transform_dict: Dict[str, Any], root_data_object):
         output_dict = defaultdict(lambda: [])
-        # serialization_dict = defaultdict(lambda: [])
 
         sample_dataset = list(root_data_object.items())[0][1]
         while isinstance(sample_dataset, dict):

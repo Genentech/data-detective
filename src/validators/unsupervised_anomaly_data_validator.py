@@ -1,10 +1,9 @@
 from typing import Set, Type
 
 from src.validator_methods.data_validator_method import DataValidatorMethod
-from src.validator_methods.validator_method_factories.adbench_validator_method_factory import \
-    ADBenchValidatorMethodFactory
 
 from src.validators.data_validator import DataValidator
+from src.validator_methods.validator_method_factories.adbench_validator_method_factory import ADBenchValidatorMethodFactory
 
 
 class UnsupervisedAnomalyDataValidator(DataValidator):

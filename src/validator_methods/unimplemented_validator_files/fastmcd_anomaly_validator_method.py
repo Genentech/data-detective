@@ -16,7 +16,7 @@ from src.validator_methods.data_validator_method import DataValidatorMethod
 from scipy import stats
 
 """
-TODO: this was originally framed as an image anomaly detection task. Need to spend some effort
+this was originally framed as an image anomaly detection task. Need to spend some effort
 to turn it back into a method for tabular outlier detection. 
 """
 

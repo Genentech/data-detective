@@ -29,7 +29,6 @@ class TestKolmogorovSmirnovNormalityValidatorMethod:
         test_size: int = len(normal_dataset) - train_size - val_size
         train_dataset, val_dataset, test_dataset=dd_random_split( normal_dataset, [train_size, val_size, test_size])
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": normal_dataset
         }
@@ -62,7 +61,6 @@ class TestKolmogorovSmirnovNormalityValidatorMethod:
         test_size: int = len(normal_dataset) - train_size - val_size
         train_dataset, val_dataset, test_dataset=dd_random_split( normal_dataset, [train_size, val_size, test_size])
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": normal_dataset
         }

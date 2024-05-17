@@ -1,5 +1,6 @@
 cachetools==5.3.3
 coverage==7.4.1
+huggingface
 ipykernel==6.22.0
 joblib==1.2.0
 matplotlib==3.6.3
@@ -13,3 +14,4 @@ scipy>=1.7.2
 shap==0.41.0
 torch==1.13.1
 torchvision==0.14.1
+transformers==4.40.2

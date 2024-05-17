@@ -5,15 +5,12 @@ import pytest
 import torch
 from torchvision.transforms import transforms
 
-from constants import SEED
-from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.my_cifar_10 import MyCIFAR10
 from src.datasets.my_fashion_mnist import MyFashionMNIST
 from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 
 @pytest.fixture()
 def fashion_mnist():
-    # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
         root='./datasets/FashionMNIST',
         train=True,
@@ -25,7 +22,6 @@ def fashion_mnist():
 
 @pytest.fixture
 def cifar_10():
-    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
         train=True,
@@ -39,7 +35,6 @@ def cifar_10():
 
 @pytest.fixture()
 def synthetic_anomalous_dataset():
-    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
         train=True,
@@ -88,7 +83,6 @@ class TestHistogramImageAnomalyValidatorMethod:
             }
         }
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": synthetic_anomalous_dataset
         }
@@ -105,7 +99,6 @@ class TestHistogramImageAnomalyValidatorMethod:
 
 
         # takes too long
-        pass 
 
         # results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         # experiment_results = results['unsupervised_anomaly_data_validator']['histogram_cifar_image_anomaly_validator_method']['results']
@@ -148,13 +141,11 @@ class TestHistogramImageAnomalyValidatorMethod:
             }
         }
 
-        # TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": fashion_mnist
         }
 
         # takes too long
-        pass 
 
         # results = DataDetectiveEngine().validate_from_schema(test_validation_schema, data_object)
         # experiment_results = results['unsupervised_anomaly_data_validator']['histogram_image_anomaly_validator_method']['results']

@@ -1,30 +1,15 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import PIL
 import time
 import torch
 import torchvision.transforms as transforms
 
-import torch.nn as nn
-import copy
 
-from torch.nn.functional import pad
 
-from constants import FloatTensor
 
-from torchvision.datasets import MNIST
-from typing import Dict, Union
-from tqdm import tqdm
+from typing import Dict
 
-from constants import FloatTensor
-from src.aggregation.rankings import ResultAggregator, RankingAggregationMethod
 from src.data_detective_engine import DataDetectiveEngine
 from src.datasets.data_detective_dataset import dd_random_split
-from src.datasets.my_cifar_10 import MyCIFAR10
 from src.datasets.my_fashion_mnist import MyFashionMNIST
-from src.enums.enums import DataType
-from src.transforms.embedding_transformer import Transform
 from src.transforms.transform_library import TRANSFORM_LIBRARY
 from src.utils import OcclusionTransform, occlusion_interpretability
 

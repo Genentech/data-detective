@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from src.aggregation.rankings import ResultAggregator, RankingAggregationMethod, ScoreAggregationMethod
-from src.datasets.adbench_dataset import ADBenchDDDataset, ADBenchDataset
+from src.datasets.adbench_dataset import ADBenchDDDataset
 from src.datasets.data_detective_dataset import DataDetectiveDataset, dd_random_split
 from src.data_detective_engine import DataDetectiveEngine
 from src.enums.enums import DataType
@@ -43,7 +43,6 @@ class TestADBenchIntegration:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper datasets augmentation strategy
             adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
@@ -100,7 +99,6 @@ class TestADBenchIntegration:
             train_dataset, val_dataset, test_dataset = dd_random_split(everything_but_inference_dataset,
                                                                                      [train_size, val_size, test_size])
 
-            # TODO: lists for validation sets and test sets.
             data_object: Dict[str, DataDetectiveDataset] = {
                 "standard_split": {
                     "training_set": train_dataset,

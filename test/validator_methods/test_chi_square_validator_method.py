@@ -1,11 +1,8 @@
 from typing import Dict
 
 import numpy as np
-import torch
 
-import src.utils
 
-from src.datasets.synthetic_normal_dataset import SyntheticNormalDataset
 
 
 class TestChiSquareSplitValidatorMethod:
@@ -29,7 +26,6 @@ class TestChiSquareSplitValidatorMethod:
         # test_size: int = len(normal_dataset) - train_size - val_size
         # train_dataset, val_dataset, test_dataset=torch.utils.datasets.random_split( normal_dataset, [train_size, val_size, test_size])
         #
-        # #TODO: lists for validation sets and test sets.
         # data_object: Dict[str, torch.utils.datasets.Dataset] = {
         #     "training_set": train_dataset,
         #     "validation_set": val_dataset,
@@ -65,7 +61,6 @@ class TestChiSquareSplitValidatorMethod:
         # val_dataset: SyntheticNormalDataset = SyntheticNormalDataset(num_cols=1, dataset_size=10000, loc=0)
         # test_dataset: SyntheticNormalDataset = SyntheticNormalDataset(num_cols=1, dataset_size=10000, loc=1)
         #
-        # #TODO: lists for validation sets and test sets.
         # data_object: Dict[str, torch.utils.datasets.Dataset] = {
         #     "training_set": train_dataset,
         #     "validation_set": val_dataset,

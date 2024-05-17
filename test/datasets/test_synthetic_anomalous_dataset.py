@@ -1,7 +1,6 @@
 import pytest
 import torch
 import torchvision.transforms as transforms
-from tqdm import tqdm
 
 from src.datasets.my_fashion_mnist import MyFashionMNIST
 from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
@@ -9,7 +8,6 @@ from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 
 @pytest.fixture()
 def synthetic_anomalous_dataset():
-    # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
         root='./datasets/FashionMNIST',
         train=True,

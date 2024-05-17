@@ -1,11 +1,9 @@
 import os
 import pickle
-from collections import defaultdict
 from cachetools import LRUCache
 import time
 
 import joblib
-import numpy as np
 import torch
 import typing
 
@@ -43,7 +41,7 @@ class Transform(torch.nn.Module):
         self.cache_values = cache_values
 
     def hash_transform_value(self, id=None, col_name=None):
-        #todo: add assertion that no two transforms have the same name
+        
         transform_name = self.new_column_name("")
         
         return joblib.hash((
@@ -57,7 +55,7 @@ class Transform(torch.nn.Module):
         if hasattr(obj, "numpy"):
             obj = obj.numpy()
 
-        #todo: add assertion that no two transforms have the same name
+        
         transform_name = self.new_column_name("")
         
         return joblib.hash((
@@ -86,7 +84,7 @@ class Transform(torch.nn.Module):
 
         return transformed_value
 
-    #TODO: add a "fit" method to accommodate transforms that need to be fit.
+    
     def forward(self, dataset, item, col_name):
         ### this takes most of the time
         if not hasattr(self, "transform"):
@@ -106,23 +104,6 @@ class Transform(torch.nn.Module):
         # print(f"transforming took {1000 * (end - start)} ms")
 
         return transformed_value
-
-        # filepath = f"data/tmp/{hash_value}.pkl"
-        # if os.path.isfile(filepath):
-        #     with open(filepath, "rb") as f:
-        #         # self.cache_statistics_dict['cache_hits'] += 1
-        #         transformed_value = pickle.load(f)
-        # else:
-        #     # import pdb; pdb.set_trace()
-        #     if not os.path.isdir("data/tmp"):
-        #         os.makedirs("data/tmp")
-
-        #     obj = dataset[item][col_name]
-        #     transformed_value = self.transform(obj)
-        #     with open(filepath, "wb") as f:
-        #         # self.cache_statistics_dict['cache_misses'] += 1
-        #         pickle.dump(transformed_value, f)
-
 
 class TransformedDataset(DataDetectiveDataset):
     def __init__(self,
@@ -185,3 +166,12 @@ class TransformedDataset(DataDetectiveDataset):
 
     def __len__(self):
         return self.dataset.__len__()
+
+    def get_matrix(self, column_wise=True, columns=None): 
+        if self.transforms == {}:
+            return self.dataset.get_matrix(column_wise=column_wise, columns=columns)
+        else: 
+            if columns is None: 
+                columns = [column for column, datatype in self.datatypes().items() if datatype in {DataType.MULTIDIMENSIONAL, DataType.CONTINUOUS, DataType.CATEGORICAL}]
+
+            return DataDetectiveDataset.get_matrix(self, column_wise=column_wise, columns=columns)

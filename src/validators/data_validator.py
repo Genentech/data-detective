@@ -1,7 +1,4 @@
-import multiprocessing.pool
-import queue
 import os
-import time
 import threading
 from abc import abstractmethod
 from typing import Type, Dict, Set, List, Tuple, Optional
@@ -80,6 +77,9 @@ class DataValidator:
         """
         def thread_print(s):
             print(f"thread {threading.get_ident()}: {s}")
+
+        def process_print(s):
+            print(f"process {os.getpid()}: {s}")
 
         print(f"thread {threading.get_ident()} entered to handle validator method {validator_method().name()}")
         thread_print(f"   running {validator_method().name()}...")
