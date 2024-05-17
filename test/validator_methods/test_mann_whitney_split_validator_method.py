@@ -30,7 +30,6 @@ class TestMannWhitneySplitValidatorMethod:
         test_size: int = len(normal_dataset) - train_size - val_size
         train_dataset, val_dataset, test_dataset=dd_random_split( normal_dataset, [train_size, val_size, test_size])
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "standard_split": {
                 "training_set": train_dataset,
@@ -70,7 +69,6 @@ class TestMannWhitneySplitValidatorMethod:
         val_dataset: SyntheticNormalDatasetContinuous = SyntheticNormalDatasetContinuous(num_cols=1, dataset_size=10000, loc=0)
         test_dataset: SyntheticNormalDatasetContinuous = SyntheticNormalDatasetContinuous(num_cols=1, dataset_size=10000, loc=1)
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "standard_split": {
                 "training_set": train_dataset,

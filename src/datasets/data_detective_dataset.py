@@ -153,7 +153,6 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
         if sample_ids and subject_ids: 
             assert(len(sample_ids) == len(subject_ids))
 
-        #todo: initial_length => __len__(): 
         if sample_ids is not None: 
             initial_length = len(sample_ids)
         elif subject_ids is not None: 
@@ -286,8 +285,9 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
             for idx in range(self.__len__()):
                 sample = self[idx]
                 sample = {key: sample[key] for key in columns}
+
                 matrix.append(
-                    np.concatenate([k.flatten() for k in sample.values()])
+                    np.concatenate([k.flatten() if hasattr(k, "flatten") else np.array([k]) for k in sample.values()])
                 )
 
             matrix = np.array(matrix)

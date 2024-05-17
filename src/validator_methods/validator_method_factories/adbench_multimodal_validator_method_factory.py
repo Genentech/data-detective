@@ -100,10 +100,25 @@ class ADBenchMultimodalValidatorMethodFactory:
                 @param data_matrix: an n x d matrix with the datasets needed for the model.
                 @return: a list of anomaly scores
                 """
-                model_instance = model()
-                model_instance.fit(data_matrix)
-                anomaly_scores = model_instance.decision_function(data_matrix)
+                if model_name == "cblof": 
+                    cont = False
+                    while not cont: 
+                        n_clusters = 8
+                        try: 
+                            model_instance = model()
+                            model_instance.fit(data_matrix)
+                            cont = True
+                        except ValueError: 
+                            n_clusters += 1
+                else: 
+                    model_instance = model()
+                    model_instance.fit(data_matrix)
 
-                return anomaly_scores, id_list
+                anomaly_scores = model_instance.decision_function(data_matrix)
+                return {
+                    id: anomaly_score 
+                    for (id, anomaly_score) 
+                    in zip(id_list, anomaly_scores)
+                }
 
         return ADBenchAnomalyValidatorMethod

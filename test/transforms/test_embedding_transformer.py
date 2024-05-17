@@ -15,7 +15,6 @@ from src.transforms.transform_library import GaussianBlurTransform
 
 @pytest.fixture
 def cifar_10():
-    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
         train=True,
@@ -79,7 +78,6 @@ class TestEmbeddingTransformer:
         test_size: int = len(cifar_10) - train_size - val_size
         train_dataset, val_dataset, test_dataset = dd_random_split(cifar_10, [train_size, val_size, test_size])
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             # "standard_split": {
             #     "training_set": train_dataset,

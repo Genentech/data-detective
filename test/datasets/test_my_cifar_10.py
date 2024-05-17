@@ -8,7 +8,6 @@ from src.enums.enums import DataType
 
 @pytest.fixture
 def cifar_10():
-    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
         train=True,

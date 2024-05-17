@@ -88,7 +88,6 @@ class ResplitDataAction(Action):
         aggregated_results: pd.DataFrame, 
     ): 
         """
-        todo: implement
         An action to take a data object and resplit it from the entire set.
         """
         return data_object

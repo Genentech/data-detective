@@ -8,7 +8,6 @@ from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 
 @pytest.fixture()
 def synthetic_anomalous_dataset():
-    # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
         root='./datasets/FashionMNIST',
         train=True,

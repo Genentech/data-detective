@@ -1,1 +1,0 @@
-#TODO: implement for image <=> image distancing

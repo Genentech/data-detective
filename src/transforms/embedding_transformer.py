@@ -41,7 +41,7 @@ class Transform(torch.nn.Module):
         self.cache_values = cache_values
 
     def hash_transform_value(self, id=None, col_name=None):
-        #todo: add assertion that no two transforms have the same name
+        
         transform_name = self.new_column_name("")
         
         return joblib.hash((
@@ -55,7 +55,7 @@ class Transform(torch.nn.Module):
         if hasattr(obj, "numpy"):
             obj = obj.numpy()
 
-        #todo: add assertion that no two transforms have the same name
+        
         transform_name = self.new_column_name("")
         
         return joblib.hash((
@@ -84,7 +84,7 @@ class Transform(torch.nn.Module):
 
         return transformed_value
 
-    #TODO: add a "fit" method to accommodate transforms that need to be fit.
+    
     def forward(self, dataset, item, col_name):
         ### this takes most of the time
         if not hasattr(self, "transform"):

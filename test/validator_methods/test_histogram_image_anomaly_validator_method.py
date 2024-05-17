@@ -11,7 +11,6 @@ from src.datasets.synthetic_anomalous_dataset import SyntheticAnomalousDataset
 
 @pytest.fixture()
 def fashion_mnist():
-    # TODO: add proper datasets augmentation strategy
     fashion_mnist: MyFashionMNIST = MyFashionMNIST(
         root='./datasets/FashionMNIST',
         train=True,
@@ -23,7 +22,6 @@ def fashion_mnist():
 
 @pytest.fixture
 def cifar_10():
-    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
         train=True,
@@ -37,7 +35,6 @@ def cifar_10():
 
 @pytest.fixture()
 def synthetic_anomalous_dataset():
-    # TODO: add proper datasets augmentation strategy
     cifar_10: MyCIFAR10 = MyCIFAR10(
         root='./datasets/CIFAR10',
         train=True,
@@ -86,7 +83,6 @@ class TestHistogramImageAnomalyValidatorMethod:
             }
         }
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": synthetic_anomalous_dataset
         }
@@ -145,7 +141,6 @@ class TestHistogramImageAnomalyValidatorMethod:
             }
         }
 
-        # TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": fashion_mnist
         }

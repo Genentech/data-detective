@@ -45,7 +45,7 @@ class SyntheticNormalDataset(DataDetectiveDataset):
         """
         Introduces outliers into the dataset. If indices is given, they will be at the start.
         """
-        #TODO: add assertion that indices is a valid.
+        
         if not indices:
             indices = np.random.choice(list(range(self.dataset_size)), size=num_outliers, replace=False)
 
@@ -101,7 +101,7 @@ class SyntheticNormalDatasetContinuous(DataDetectiveDataset):
         """
         Introduces outliers into the dataset. If indices is given, they will be at the start.
         """
-        #TODO: add assertion that indices is a valid.
+        
         if not indices:
             indices = np.random.choice(list(range(self.dataset_size)), size=num_outliers, replace=False)
 

@@ -89,7 +89,6 @@ class DuplicateTestingDataset(DataDetectiveDataset):
             return self.base_dataset[idx]
         
         if self.duplicate_type == "exact":
-            # todo: maybe throw an exception if duplication 
             if self.duplication_breadth == "sample": 
                 dest, source = self.duplicate_pairs[idx]
                 dest_datapoint = self[source]
@@ -101,7 +100,6 @@ class DuplicateTestingDataset(DataDetectiveDataset):
                 dest_datapoint[col] = source_datapoint[col]
                 return dest_datapoint
         elif self.duplicate_type == "near": 
-            # todo: maybe throw an exception if duplication 
             if self.duplication_breadth == "sample": 
                 dest, source = self.duplicate_pairs[idx]
                 source_datapoint = self[source]
@@ -186,7 +184,6 @@ class TestNearDuplicateValidatorMethod:
             duplication_breadth="sample",
         )
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": duplicate_dataset
         }
@@ -283,7 +280,6 @@ class TestNearDuplicateValidatorMethod:
             duplication_breadth="column",
         )
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": duplicate_dataset
         }
@@ -375,7 +371,6 @@ class TestNearDuplicateValidatorMethod:
             duplication_breadth="column",
         )
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": duplicate_dataset
         }
@@ -467,7 +462,6 @@ class TestNearDuplicateValidatorMethod:
             duplication_breadth="sample",
         )
 
-        #TODO: lists for validation sets and test sets.
         data_object: Dict[str, torch.utils.data.Dataset] = {
             "entire_set": duplicate_dataset
         }

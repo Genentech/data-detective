@@ -39,7 +39,7 @@ class TestAction:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper datasets augmentation strategy
+            
             adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
@@ -82,7 +82,7 @@ class TestAction:
             test_size: int = len(everything_but_inference_dataset) - train_size - val_size
             train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
-            #TODO: lists for validation sets and test sets.
+            
             data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
                 "standard_split": {
                     "training_set": train_dataset,
@@ -132,7 +132,7 @@ class TestAction:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper datasets augmentation strategy
+            
             adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
@@ -175,7 +175,7 @@ class TestAction:
             test_size: int = len(everything_but_inference_dataset) - train_size - val_size
             train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
-            #TODO: lists for validation sets and test sets.
+            
             data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
                 "standard_split": {
                     "training_set": train_dataset,

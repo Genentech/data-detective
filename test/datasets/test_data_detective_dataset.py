@@ -188,7 +188,6 @@ class TestDataDetectiveDataset:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper datasets augmentation strategy
             adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
@@ -243,7 +242,6 @@ class TestDataDetectiveDataset:
             test_size: int = len(everything_but_inference_dataset) - train_size - val_size
             train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
-            #TODO: lists for validation sets and test sets.
             data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
                 "standard_split": {
                     "training_set": train_dataset,
@@ -282,7 +280,6 @@ class TestDataDetectiveDataset:
                 "test_set": test_dataset_1,
             },
         }
-        #todo: finish
 
     def test_result_identification(self):
         seed = SEED
@@ -308,7 +305,6 @@ class TestDataDetectiveDataset:
 
         for npz_filename in npz_files:
             print(npz_filename)
-            # TODO: add proper datasets augmentation strategy
             adbench_dataset: ADBenchDDDataset = ADBenchDDDataset(
                 # npz_filename="16_http.npz",
                 npz_filename=npz_filename,
@@ -363,7 +359,6 @@ class TestDataDetectiveDataset:
             test_size: int = len(everything_but_inference_dataset) - train_size - val_size
             train_dataset, val_dataset, test_dataset = dd_random_split( everything_but_inference_dataset, [train_size, val_size, test_size])
 
-            #TODO: lists for validation sets and test sets.
             data_object: Dict[str, Union[Dict, DataDetectiveDataset]] = {
                 "standard_split": {
                     "training_set": train_dataset,

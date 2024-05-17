@@ -70,7 +70,7 @@ class NearDuplicateMultidimensionalValidatorMethod(DataValidatorMethod):
         rows, cols = np.where(cos_sims >= cos_sim_threshold)
 
         # Create a list of pairs
-        # todo: add scores in too.
+        
         all_pairs = np.column_stack((rows, cols))
 
         # Filter pairs where the row index is less than the column index
