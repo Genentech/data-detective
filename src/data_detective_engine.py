@@ -60,7 +60,6 @@ class DataDetectiveEngine:
                     sub_data_object = dataset_or_data_object
                     filtered_data_object[key] = get_filtered_data_object(sub_data_object)
                 else: 
-                    # TODO: implement filtering correctly on the torch datasets.
                     dataset = dataset_or_data_object
                     filtered_data_object[key] = filter_dataset(dataset, include_lst)
 
@@ -95,7 +94,6 @@ class DataDetectiveEngine:
                     sub_data_object = dataset_or_data_object
                     one_hot_encoded_data_object[key] = get_one_hot_encoded_data_object(sub_data_object)
                 else: 
-                    # TODO: implement filtering correctly on the torch datasets.
                     dataset = dataset_or_data_object
                     has_categorical_data = DataType.CATEGORICAL in dataset.datatypes().values()
                     if has_categorical_data: 
