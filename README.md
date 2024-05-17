@@ -4,6 +4,8 @@
 
 Data Detective is an open-source, modular, extensible validation framework for identifying potential issues with heterogeneous, multimodal data.
 
+![image](https://github.com/gred-ecdi/datadetective/assets/97565124/53b70eab-3b38-44e9-bafa-ff660d959f7e)
+
 ## Examples of issues that are in scope for Data Detective to detect
 - Do splits used for model training come from othe same distribution?
 - Are there any anomalies present in the dataset?
@@ -40,8 +42,6 @@ pip install transformers
 ## Quickstart
 
 To get started as quickly as possible, please see Quickstart.ipynb in the root directory of this repo.
-
-![image](https://github.com/gred-ecdi/datadetective/assets/97565124/53b70eab-3b38-44e9-bafa-ff660d959f7e)
 
 
 
