@@ -1,0 +1,17 @@
+cachetools==5.3.3
+coverage==7.4.1
+huggingface
+ipykernel==6.22.0
+joblib==1.2.0
+matplotlib==3.6.3
+numpy==1.22.4
+pathos==0.3.2
+pillow==9.2.0
+pyod==1.0.7
+pytest==7.1.2
+scikit-learn==1.2
+scipy>=1.7.2
+shap==0.41.0
+torch==1.13.1
+torchvision==0.14.1
+transformers==4.40.2
