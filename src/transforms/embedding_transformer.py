@@ -171,4 +171,7 @@ class TransformedDataset(DataDetectiveDataset):
         if self.transforms == {}:
             return self.dataset.get_matrix(column_wise=column_wise, columns=columns)
         else: 
-            return DataDetectiveDataset.get_matrix(self.dataset, column_wise=column_wise, columns=columns)
+            if columns is None: 
+                columns = [column for column, datatype in self.datatypes().items() if datatype in {DataType.MULTIDIMENSIONAL, DataType.CONTINUOUS, DataType.CATEGORICAL}]
+
+            return DataDetectiveDataset.get_matrix(self, column_wise=column_wise, columns=columns)

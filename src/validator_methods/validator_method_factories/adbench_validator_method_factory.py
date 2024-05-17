@@ -1,6 +1,7 @@
 from typing import Set, Dict, Type
 
 import numpy as np
+
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
 from torch.utils.data import Dataset
 
@@ -66,7 +67,6 @@ class ADBenchValidatorMethodFactory:
                 should_return_model_instance = validator_kwargs.get("should_return_model_instance", False)
                 entire_dataset: Dataset = data_object["entire_set"]
                 matrix_dict = entire_dataset.get_matrix(column_wise=True)
-                
                 kwargs_dict = {
                     f"{column}_results": {
                         "data_matrix": column_data,

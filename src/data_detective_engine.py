@@ -1,4 +1,4 @@
-import pathos.multiprocessing
+import multiprocessing
 import queue
 import torch
 
@@ -174,18 +174,17 @@ class DataDetectiveEngine:
         result_dict = {}
 
         if run_concurrently:
-            with pathos.multiprocessing.ProcessingPool(4) as pool:
-                pool.restart()
+            with multiprocessing.pool.ThreadPool(100) as pool:
                 while task_queue.qsize() > 0:
                     task, args = task_queue.get()
-                    # res = pool.amap(task, args)
-                    res = pool.amap(task, *[[k] for k in args])
+                    res = pool.starmap(task, [args])
                     result_items.append(res)
 
                 pool.close()
                 pool.join()
 
-            result_items = [result_item.get() for result_item in result_items]
+                result_items = [result_item[0] for result_item in result_items]
+                result_items = [result_item for result_item in result_items if result_item is not None]
         else:
             while task_queue.qsize() > 0:
                 task, args = task_queue.get()
@@ -193,7 +192,7 @@ class DataDetectiveEngine:
 
         # ipdb> p [[dataset.cache_statistics_dict for dataset in data_object.values()] for data_object in data_objects]
         result_items = [result_item for result_item in result_items if result_item is not None]
-        for validator, validator_method, results in [item[0] for item in result_items]:
+        for validator, validator_method, results in result_items:
             if validator not in result_dict.keys():
                 result_dict[validator] = {}
 
@@ -205,7 +204,6 @@ class DataDetectiveEngine:
 
     def parse_transforms(self, transform_dict: Dict[str, Any], root_data_object):
         output_dict = defaultdict(lambda: [])
-        # serialization_dict = defaultdict(lambda: [])
 
         sample_dataset = list(root_data_object.items())[0][1]
         while isinstance(sample_dataset, dict):

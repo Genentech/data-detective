@@ -1,6 +1,5 @@
 from abc import abstractmethod
 import math
-import time
 from typing import Any, Dict, List, Optional, Union
 import copy
 import warnings
@@ -50,8 +49,6 @@ class LambdaDictWrapper(MutableMapping):
         return [self[k] for k in self.keys()]
 
 class DatatypesAndGetItemMeta(type):
-
-
     def __new__(cls, name, bases, dct):
         # Check if the class has a 'get_data' method
         if 'datatypes' in dct:
@@ -262,30 +259,20 @@ class DataDetectiveDataset(torch.utils.data.Dataset, metaclass=DatatypesAndGetIt
 
     def get_matrix(self, column_wise=True, columns=None): 
         if columns is None: 
-            columns = [column for column, datatype in self.datatypes().items() if datatype in  {DataType.MULTIDIMENSIONAL, DataType.CONTINUOUS, DataType.CATEGORICAL}]
+            columns = [column for column, datatype in self.datatypes().items() if datatype in {DataType.MULTIDIMENSIONAL, DataType.CONTINUOUS, DataType.CATEGORICAL}]
 
         if column_wise: 
             matrix_dict = {
                 column: [] for column in columns 
             }
 
-            start = time.time() 
-            loader = DataLoader(self, batch_size=min(len(self), 1000),
-                            #     sampler=torch.utils.data.BatchSampler(
-                            #         torch.utils.data.SequentialSampler(entire_dataset), 
-                            #         batch_size=1000, 
-                            #         drop_last=False
-                            #    ),
-                                shuffle=False)
+            loader = DataLoader(self, batch_size=min(len(self), 1000), shuffle=False)
 
             for batch in loader:
                 for column, column_data in batch.items():
                     if column in columns: 
-                        # print(f"col {column}")
-                        # print(column_data.shape)
                         matrix_dict[column].append(column_data)
-            end = time.time() 
-
+            
             for column in columns:
                 is_3d = len(matrix_dict[column][0].shape) == 3
                 concatenated = torch.cat(matrix_dict[column], dim=1 if is_3d else 0)
