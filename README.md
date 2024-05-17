@@ -4,7 +4,7 @@
 
 Data Detective is an open-source, modular, extensible validation framework for identifying potential issues with heterogeneous, multimodal data.
 
-# Workfloa
+# Workflow
 ![image](https://github.com/gred-ecdi/datadetective/assets/97565124/53b70eab-3b38-44e9-bafa-ff660d959f7e)
 
 ## Examples of issues that are in scope for Data Detective to detect
