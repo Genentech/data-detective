@@ -56,6 +56,12 @@ administrator before being merged into the master branch.
 There should be at least one test attached to each validator method / transform. All submitted code should be 
 well-documented and follow the PEP-8 standard. 
 
+# Acknowledgements
+
+- Zhang et. al for work on KCI/FCIT, used in validator method
+- Zhao et. al for work on pyod
+- all interviewed members of Genentech/Roche for continued feedback, development, and user interviews
+
 ### Appendix 1A: Complete list of validator methods
 
 | name | path | method description | data types | operable split types | 
