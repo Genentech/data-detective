@@ -41,6 +41,9 @@ pip install transformers
 
 To get started as quickly as possible, please see Quickstart.ipynb in the root directory of this repo.
 
+![image](https://github.com/gred-ecdi/datadetective/assets/97565124/0fcb2b2d-bca9-4a90-b804-0ac82b05a935)
+
+
 # Contributing
 
 To contribute to Data Detective, please first complete the `ExtendingDD` jupyter notebook to learn more about 
