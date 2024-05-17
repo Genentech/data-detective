@@ -174,11 +174,12 @@ class DataDetectiveEngine:
         result_dict = {}
 
         if run_concurrently:
-            
             with pathos.multiprocessing.ProcessingPool(4) as pool:
+                pool.restart()
                 while task_queue.qsize() > 0:
                     task, args = task_queue.get()
-                    res = pool.amap(task, args)
+                    # res = pool.amap(task, args)
+                    res = pool.amap(task, *[[k] for k in args])
                     result_items.append(res)
 
                 pool.close()
@@ -192,7 +193,7 @@ class DataDetectiveEngine:
 
         # ipdb> p [[dataset.cache_statistics_dict for dataset in data_object.values()] for data_object in data_objects]
         result_items = [result_item for result_item in result_items if result_item is not None]
-        for validator, validator_method, results in result_items:
+        for validator, validator_method, results in [item[0] for item in result_items]:
             if validator not in result_dict.keys():
                 result_dict[validator] = {}
 
