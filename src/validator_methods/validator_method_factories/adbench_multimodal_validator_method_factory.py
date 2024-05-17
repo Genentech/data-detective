@@ -2,7 +2,6 @@ from typing import Set, Dict, Type
 
 import numpy as np
 from pyod.models import ecod, copod, cblof, cof, iforest, pca, loda, hbos, sod, ocsvm, lof, knn
-from pytypes import override
 from torch.utils.data import Dataset
 
 from src.enums.enums import DataType, ValidatorMethodParameter
@@ -38,7 +37,6 @@ class ADBenchMultimodalValidatorMethodFactory:
             """
             A method for determining multidimensional anomalies. Operates on continuous datasets.
             """
-            @override
             def name(self) -> str:
                 method_name = model.__module__.split(".")[-1]
                 return f"{method_name}_multimodal_anomaly_validator_method"
