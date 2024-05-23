@@ -4,10 +4,6 @@
 
 Data Detective is an open-source, modular, extensible validation framework for identifying potential issues with heterogeneous, multimodal data.
 
-# Workflow
-![Frame 33](https://github.com/gred-ecdi/datadetective/assets/97565124/f6519c9c-87f7-4a02-918a-abb22cb8b826)
-
-
 ## Examples of issues that are in scope for Data Detective to detect
 - Do splits used for model training come from othe same distribution?
 - Are there any anomalies present in the dataset?
@@ -15,6 +11,11 @@ Data Detective is an open-source, modular, extensible validation framework for i
 - Are the datapoints at inference in the same distribution as what we have used to train/test the model?
 - Are there near or exact duplicates present within the dataset?
 - Are there mislabeled samples present within the dataset?
+
+# Workflow
+![Frame 33](https://github.com/gred-ecdi/datadetective/assets/97565124/f6519c9c-87f7-4a02-918a-abb22cb8b826)
+![image](https://github.com/gred-ecdi/datadetective/assets/97565124/18c187af-79a2-4c63-87f4-4f35b1ce51db)
+
 
 ## Installation Steps
 After cloning the repository and `cd`'ing into the directory, run the following commands. 
