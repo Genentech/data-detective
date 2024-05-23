@@ -43,7 +43,7 @@ pip install transformers
 | notebook | description |
 | ----- | ----- |
 | Tutorial | To get started on our tutorial dataset and step through each part of an investigation, see the tutorial. |
-| Quickstart | To get started as quickly as possible on your own data, please see Quickstart.ipynb in the root directory of this repo. |
+| Quickstart | To get started as quickly as possible on your own data, please see Quickstart.ipynb in the examples folder. |
 | Extending DD | To extend the capacity of Data Detective to your custom validation or transform needs, see ExtendingDD.ipynb |
 
 
