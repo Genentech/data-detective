@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 setup(
     name='ddetect',
     version='0.1.0',
-    packages=find_packages(),
+    # packages=find_packages(),
+    packages=['ddetect'],
     install_requires=[
         # List your project dependencies here
         "coverage==7.4.1",
@@ -20,10 +21,12 @@ setup(
         "scipy>=1.7.2",
         "torch==1.13.1",
         "torchvision==0.14.1",
+        "pyrankagg @ git+https://github.com/thelahunginjeet/pyrankagg.git",
+        "kbutil @ git+https://github.com/thelahunginjeet/kbutil.git",    
     ],
     dependency_links = [
-        "git+git://github.com/thelahunginjeet/pyrankagg.git",
-        "git+git://github.com/thelahunginjeet/kbutil.git"
+        "pyrankagg @ git+https://github.com/thelahunginjeet/pyrankagg.git",
+        "kbutil @ git+https://github.com/thelahunginjeet/kbutil.git",    
     ],
     entry_points={
         'console_scripts': [
