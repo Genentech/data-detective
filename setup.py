@@ -18,9 +18,12 @@ setup(
         "pytest==7.1.2",
         "scikit-learn==1.2",
         "scipy>=1.7.2",
-        "shap==0.41.0",
         "torch==1.13.1",
         "torchvision==0.14.1",
+    ],
+    dependency_links = [
+        "git+git://github.com/thelahunginjeet/pyrankagg.git",
+        "git+git://github.com/thelahunginjeet/kbutil.git"
     ],
     entry_points={
         'console_scripts': [
@@ -50,7 +53,7 @@ identification of potential data-related issues.',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License',
-        'Programming Language :: Python :: 3.9',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.10',
     ],
 )
