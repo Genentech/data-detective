@@ -14,7 +14,8 @@ Data Detective is an open-source, modular, extensible validation framework for i
 
 # Workflow
 ![Frame 33](https://github.com/gred-ecdi/datadetective/assets/97565124/f6519c9c-87f7-4a02-918a-abb22cb8b826)
-![image](https://github.com/gred-ecdi/datadetective/assets/97565124/18c187af-79a2-4c63-87f4-4f35b1ce51db)
+<img width="966" alt="image" src="https://github.com/gred-ecdi/datadetective/assets/97565124/5b72b9b1-04a2-4b23-9dec-29147af4a360">
+
 
 
 ## Installation Steps
