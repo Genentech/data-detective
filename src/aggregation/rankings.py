@@ -163,7 +163,6 @@ class ResultAggregator:
                 aggregation_method_name = aggregation_method.value
                 scorelist = self.convert_to_scorelist(rankings_df)
                 agg_method = getattr(ResultAggregator.FLRA, aggregation_method_name)
-                import pdb; pdb.set_trace()
                 agg_rankings = agg_method(scorelist)[1]
 
                 rankings_output_df[f"{aggregation_method_name}_agg_rank"] = list(agg_rankings.values())
