@@ -24,7 +24,7 @@ Data Detective is an open-source, modular, extensible validation framework for i
 git clone https://github.com/thelahunginjeet/pyrankagg.git
 git clone https://github.com/thelahunginjeet/kbutil.git
 
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 [# install all other packages]: #
