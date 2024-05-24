@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 setup(
     name='ddetect',
     version='0.1.0',
-    packages=find_packages(),
+    # packages=find_packages(),
+    packages=['ddetect'],
     install_requires=[
         # List your project dependencies here
         "coverage==7.4.1",
@@ -18,9 +19,14 @@ setup(
         "pytest==7.1.2",
         "scikit-learn==1.2",
         "scipy>=1.7.2",
-        "shap==0.41.0",
         "torch==1.13.1",
         "torchvision==0.14.1",
+        "pyrankagg @ git+https://github.com/thelahunginjeet/pyrankagg.git",
+        "kbutil @ git+https://github.com/thelahunginjeet/kbutil.git",    
+    ],
+    dependency_links = [
+        "pyrankagg @ git+https://github.com/thelahunginjeet/pyrankagg.git",
+        "kbutil @ git+https://github.com/thelahunginjeet/kbutil.git",    
     ],
     entry_points={
         'console_scripts': [
@@ -50,7 +56,7 @@ identification of potential data-related issues.',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License',
-        'Programming Language :: Python :: 3.9',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.10',
     ],
 )

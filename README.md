@@ -20,19 +20,20 @@ Data Detective is an open-source, modular, extensible validation framework for i
 
 
 ## Installation Steps
-After cloning the repository and `cd`'ing into the directory, run the following commands. 
 
 ```bash
 # install packages supporting rank aggregation
 git clone https://github.com/thelahunginjeet/pyrankagg.git
 git clone https://github.com/thelahunginjeet/kbutil.git
 
-# install all other packages
-virtualenv dd_env -p python3.9 
-source dd_env/bin/activate
-pip3 install -r requirements.txt
-dd_env/bin/python -m ipykernel install --name=dd_env 
+pip install -r requirements.txt
 ```
+
+[# install all other packages]: #
+[virtualenv dd_env -p python3.10]: #
+[source dd_env/bin/activate]: #
+[pip3 install -r requirements.txt]: #
+[dd_env/bin/python -m ipykernel install --name=dd_env]: #
 
 If you are planning on using Data Detective in a jupyter notebook, please ensure that the kernel is switched to the appropriate virtual environoment.
 
@@ -41,16 +42,17 @@ If you are planning to make use of the pretrained transform library for high dim
 ```bash
 # for huggingface hosted models
 pip install transformers
-
 ```
 
-## Quickstart
+## Examples and Guide Notebooks
+| notebook | description |
+| ----- | ----- |
+| [Tutorial](./examples/Tutorial.ipynb) | To get started on our tutorial dataset and step through each part of an investigation, see the tutorial. |
+| [Quickstart](./examples/Quickstart.ipynb) | To get started as quickly as possible on your own data, please see Quickstart.ipynb in the examples folder. |
+| [Extending DD](./examples/ExtendingDD.ipynb) | To extend the capacity of Data Detective to your custom validation or transform needs, see ExtendingDD.ipynb |
 
-To get started as quickly as possible, please see Quickstart.ipynb in the root directory of this repo.
 
-
-
-# Contributing
+## Contributing
 
 To contribute to Data Detective, please first complete the `ExtendingDD` jupyter notebook to learn more about 
 how to extend Data Detective to add new validator methods, validators, and validator methods to the Data Detective 
@@ -60,3 +62,10 @@ administrator before being merged into the master branch.
 
 There should be at least one test attached to each validator method / transform. All submitted code should be 
 well-documented and follow the PEP-8 standard. 
+
+## Acknowledgements
+
+- Zhang et. al for KCI/FCIT, used in validator method
+- Zhao et. al for pyod
+- Kevin Brown for pyrankagg
+- all interviewed members of Genentech/Roche for continued feedback during development 

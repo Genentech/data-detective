@@ -10,6 +10,4 @@ pyod==1.0.7
 pytest==7.1.2
 scikit-learn==1.2
 scipy>=1.7.2
-shap==0.41.0
 torch==1.13.1
-torchvision==0.14.1

@@ -1,0 +1,3 @@
+-r requirements.txt
+torchvision==0.14.1
+transformers==4.40.2

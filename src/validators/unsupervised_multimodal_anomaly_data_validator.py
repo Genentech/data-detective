@@ -19,6 +19,4 @@ class UnsupervisedMultimodalAnomalyDataValidator(DataValidator):
             ADBenchMultimodalValidatorMethodFactory.get_validator_method("cblof"),
             ADBenchMultimodalValidatorMethodFactory.get_validator_method("pca"),
             ADBenchMultimodalValidatorMethodFactory.get_validator_method("iforest"),
-            # ShapTreeValidatorMethod,
-            # DiffiAnomalyExplanationValidatorMethod
         }
