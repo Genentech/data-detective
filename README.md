@@ -13,8 +13,10 @@ Data Detective is an open-source, modular, extensible validation framework for i
 - Are there mislabeled samples present within the dataset?
 
 # Workflow
-![Frame 33](https://github.com/gred-ecdi/datadetective/assets/97565124/f6519c9c-87f7-4a02-918a-abb22cb8b826)
-![image](https://github.com/gred-ecdi/datadetective/assets/97565124/18c187af-79a2-4c63-87f4-4f35b1ce51db)
+<img width="966" alt="image" src="https://github.com/gred-ecdi/datadetective/assets/97565124/6464a6ce-1dbf-43a0-b5ca-a4d455ba5dd0">
+![image](https://github.com/gred-ecdi/datadetective/assets/97565124/7811e8a7-35fc-4546-a2a2-b67ac0ef0d8c)
+
+
 
 
 ## Installation Steps
