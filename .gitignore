@@ -3,8 +3,6 @@
 *.json
 *.csv
 *.zip
-./*.ipynb
-*.ipynb
 
 .idea/
 .ipynb_checkpoints/
